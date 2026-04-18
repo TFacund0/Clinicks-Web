@@ -1,0 +1,6 @@
+components/ (Capa de Presentación Atómica)
+    Aquí van las "piezas" del rompecabezas. Un componente no es una página entera, es una parte que podrías usar en varios lados.
+
+    Lógica: Si vas a usar el mismo diseño de botón en el Login y en el Registro, creas un Button.jsx aquí.
+
+    Ejemplo: Navbar.jsx, Sidebar.jsx, InputField.jsx.

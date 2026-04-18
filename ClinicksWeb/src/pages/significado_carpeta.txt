@@ -1,0 +1,6 @@
+pages/ (Vistas de Usuario)
+    Son las pantallas que el usuario ve una a la vez. Cada "page" suele llamar a varios "components".
+
+    Lógica: La página de Login.jsx usará el componente Button.jsx y el InputField.jsx.
+
+    Ejemplo: Home.jsx, Login.jsx, Pacientes.jsx.

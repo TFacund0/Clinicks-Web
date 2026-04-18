@@ -1,0 +1,4 @@
+routes/ (Navegación)
+    Es el mapa de tu sitio. Aquí defines que si el usuario escribe /login en la barra de direcciones, React debe mostrar la página Login.jsx.
+
+    Lógica: Evita que el App.jsx sea un archivo gigante de 500 líneas.
