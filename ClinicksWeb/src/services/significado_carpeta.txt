@@ -1,6 +1,0 @@
-services/ (Capa de Datos / Client API)
-    Esta es la parte más importante para la arquitectura por capas. Aquí es donde vive la lógica para hablar con tu ClinicksApi (ASP.NET).
-
-    Lógica: Tu página no debería saber la URL de la API. Solo llama a una función del servicio.
-
-    Ejemplo: Un archivo pacienteService.js que tenga una función getPacientes(). Dentro de esa función usas fetch para llamar a http://localhost:5000/api/pacientes.
