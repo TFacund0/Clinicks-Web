@@ -4,10 +4,10 @@ using ClinicksApi.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Obtener la cadena de conexión del appsettings.json
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("ClinicksDataBase");
 
 // Registrar el DbContext para que use PostgreSQL
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<ClinicksDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 // Configurar CORS para que React pueda conectarse
@@ -37,10 +37,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowReactApp");
+
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseCors("AllowReactApp");
 
 app.Run();
