@@ -3,17 +3,20 @@ using System;
 using ClinicksApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace ClinicksApi.Data.Migrations
+namespace ClinicksApi.Migrations
 {
     [DbContext(typeof(ClinicksDbContext))]
-    partial class ClinicksDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260419151956_ReinstalacionInicial")]
+    partial class ReinstalacionInicial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
