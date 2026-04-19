@@ -1,4 +1,23 @@
+using Microsoft.EntityFrameworkCore;
+using ClinicksApi.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Obtener la cadena de conexión del appsettings.json
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Registrar el DbContext para que use PostgreSQL
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+// Configurar CORS para que React pueda conectarse
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy => policy.WithOrigins("http://localhost:5173") // El puerto de tu Vite
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
 
 // Add services to the container.
 
@@ -21,5 +40,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("AllowReactApp");
 
 app.Run();

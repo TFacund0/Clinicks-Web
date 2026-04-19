@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/.vs/
+**/node_modules/
+**/dist/
+.env
+appsettings.Development.json
+
+# Forzar ignorar por ruta completa
+ClinicksApi/obj/
+ClinicksApi/bin/
+ClinicksWeb/node_modules/
