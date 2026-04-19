@@ -1,4 +1,0 @@
-assets/ (Recursos)
-    Aquí guardas todo lo que no es código. El logo de la clínica, fotos de perfil por defecto o iconos SVG.
-
-    Ejemplo: clinicks-logo.png
