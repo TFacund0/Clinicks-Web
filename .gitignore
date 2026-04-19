@@ -10,3 +10,10 @@ appsettings.Development.json
 ClinicksApi/obj/
 ClinicksApi/bin/
 ClinicksWeb/node_modules/
+
+# Visual Studio archivos temporales
+.vs/
+**/bin/
+**/obj/
+*.user
+*.suo
