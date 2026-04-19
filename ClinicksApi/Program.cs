@@ -1,5 +1,11 @@
-using Microsoft.EntityFrameworkCore;
+using ClinicksApi.Business.Interfaces;
+using ClinicksApi.Business.Services;
+using ClinicksApi.Business;
 using ClinicksApi.Data;
+using ClinicksApi.Data.Interfaces;
+using ClinicksApi.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,15 +17,22 @@ builder.Services.AddDbContext<ClinicksDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 // Configurar CORS para que React pueda conectarse
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowReactApp",
-        policy => policy.WithOrigins("http://localhost:5173") // El puerto de tu Vite
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowReactApp", policy => {
+        policy.WithOrigins("http://localhost:5173") // El puerto de tu React
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
 });
 
 // Add services to the container.
+
+// CONEXIONES DE LAS INTERFACES
+// Capa de Negocio (Servicios)
+builder.Services.AddScoped<IPacienteService, PacienteService>();
+
+// Capa de Datos
+builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

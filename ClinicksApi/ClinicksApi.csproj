@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Business\DTOs\" />
     <Folder Include="Business\Services\" />
     <Folder Include="Data\Repositories\" />
   </ItemGroup>
