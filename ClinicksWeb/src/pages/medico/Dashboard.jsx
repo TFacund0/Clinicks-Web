@@ -1,5 +1,5 @@
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
+import Sidebar from '../../components/Sidebar';
+import Header from '../../components/Header';
 import { ClipboardPlus, Activity, ExternalLink } from 'lucide-react';
 
 const Dashboard = () => {

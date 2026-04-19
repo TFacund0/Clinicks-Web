@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
-import Dashboard from '../pages/Dashboard';
-import Patients from '../pages/Patients';
+import Dashboard from '../pages/medico/Dashboard';
+import Patients from '../pages/medico/Patients';
 
 const AppRoutes = () => {
   return (

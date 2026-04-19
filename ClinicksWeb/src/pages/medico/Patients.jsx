@@ -1,5 +1,5 @@
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
+import Sidebar from '../../components/Sidebar';
+import Header from '../../components/Header';
 import { Search, Filter, ExternalLink, UserPlus } from 'lucide-react';
 
 const Patients = () => {
@@ -9,7 +9,7 @@ const Patients = () => {
       <div className="flex-1 flex flex-col min-w-0">
         <Header />
         <main className="flex-1 p-8 overflow-y-auto w-full">
-          <div className="max-w-[1600px] mx-auto">
+          <div className="max-w-400px mx-auto">
             
             {/* Header de la Página */}
             <div className="flex justify-between items-center mb-8">
