@@ -53,7 +53,7 @@ const Patients = () => {
         <Header />
         
         <main className="flex-1 p-8 overflow-y-auto w-full">
-          <div className="max-w-4xl mx-auto">
+            <div className="max-w-7xl mx-auto w-full">
             
             <div className="flex justify-between items-center mb-8">
               <div>
