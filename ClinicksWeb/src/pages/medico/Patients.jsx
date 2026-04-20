@@ -1,37 +1,30 @@
 import { useState, useEffect } from 'react'; 
-import axios from 'axios'; 
+// 1. ELIMINAMOS AXIOS DE ACÁ E IMPORTAMOS EL SERVICIO
+import { pacienteService } from '../../services/pacienteService'; 
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { Search, Filter, ExternalLink } from 'lucide-react';
 
 const Patients = () => {
-  // 1. ESTADOS DEL COMPONENTE
-  const [pacientes, setPacientes] = useState([]); // Almacena la lista que viene de la API
-  const [cargando, setCargando] = useState(true); // Controla el mensaje de "Cargando..."
-  const [error, setError] = useState(null);       // Captura errores de conexión
+  const [pacientes, setPacientes] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
 
-  // 2. LÓGICA DE CARGA (DENTRO DEL CICLO DE VIDA)
   useEffect(() => {
-    // Variable de seguridad para evitar fugas de memoria
     let montado = true;
 
     const fetchData = async () => {
       try {
-
-        // Hacemos la petición a la API de C#
-        // Usamos la variable de entorno. Si no existe, usamos una por defecto por seguridad.
-        const baseUrl = import.meta.env.VITE_API_URL || 'https://localhost:7135/api';
-
-        const respuesta = await axios.get(`${baseUrl}/pacientes`);
+        // 2. USAMOS EL SERVICIO EN LUGAR DE AXIOS DIRECTO
+        const datos = await pacienteService.obtenerTodos();
         
-        // Solo actualizamos el estado si el componente sigue existiendo en pantalla
         if (montado) {
-          setPacientes(respuesta.data);
+          setPacientes(datos);
           setCargando(false);
         }
       } catch (err) {
         if (montado) {
-          console.error("Error al conectar con ClinicksApi:", err);
+          console.error("Error en la capa de servicio:", err);
           setError("No se pudo cargar la lista de pacientes.");
           setCargando(false);
         }
@@ -40,11 +33,10 @@ const Patients = () => {
 
     fetchData();
 
-    // Función de limpieza: se ejecuta cuando el médico sale de esta pestaña
     return () => {
       montado = false;
     };
-  }, []); // El [] vacío asegura que esto corra UNA sola vez al inicio
+  }, []);
 
   return (
     <div className="flex h-screen w-full bg-slate-950 text-slate-200 overflow-hidden font-sans">
