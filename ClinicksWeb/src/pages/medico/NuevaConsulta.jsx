@@ -20,6 +20,7 @@ const [formData, setFormData] = useState({
 const [errors, setErrors] = useState({});
 
 const [showSuccess, setShowSuccess] = useState(false);
+const [errorMsg, setErrorMsg] = useState(null);
 
 const handleChange = (e) => {
     const { name, value } = e.target; 
@@ -48,10 +49,16 @@ const handleSubmit = async (e) => {
         console.log("Consulta creada con éxito:", respuesta);
 
         setShowSuccess(true);
+        setErrorMsg(null);
+
         setTimeout(() => setShowSuccess(false), 3000);
 
     } catch (error) {
         console.error("Error al crear la consulta:", error.response?.data || error.message);
+
+        setErrorMsg(error.response?.data?.message || "este no es un dni válido o el paciente no existe");
+
+    setTimeout(() => setErrorMsg(null), 4000);
     }
 };
 const validarFormulario = () => {
@@ -65,6 +72,10 @@ const validarFormulario = () => {
         erroresTemporales.diagnostico = "El diagnóstico es obligatorio.";
     }
     
+    if (!formData.dnipaciente.trim()) {
+        erroresTemporales.dnipaciente = "El DNI del paciente es obligatorio.";
+    }
+
     if (!formData.tratamiento.trim()) {
         erroresTemporales.tratamiento = "El tratamiento indicado es obligatorio.";
     }
@@ -232,10 +243,15 @@ const validarFormulario = () => {
         </main>
       </div>
         {showSuccess && (
-  <div className="fixed bottom-6 right-6 bg-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in">
-    <span className="font-semibold">✅ Consulta guardada con éxito</span>
-  </div>
-)}
+            <div className="fixed bottom-6 right-6 bg-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in">
+                <span className="font-semibold">Consulta guardada con éxito</span>
+            </div>
+        )}
+        {errorMsg && (
+            <div className="fixed bottom-6 right-6 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in">
+                <span className="font-semibold"> {errorMsg}</span>
+            </div>
+        )}
     </div>
   );
 };
