@@ -3,13 +3,20 @@ import clinicksApi from '../api/clinicksApi';
 
 export const pacienteService = {
     
-    // Función para traer todos los pacientes
+    // Trae todos los pacientes
     obtenerTodos: async () => {
         const respuesta = await clinicksApi.get('/pacientes');
-        return respuesta.data; // Devolvemos solo los datos (el JSON)
+        return respuesta.data;
     },
 
-    // Aquí podrías agregar en el futuro:
-  // obtenerPorId: async (id) => { ... },
-  // crear: async (nuevoPaciente) => { ... },
+    // Trae solo los pacientes que atendió un médico específico
+    obtenerAtendidosPorMedico: async (medicoId) => {
+        try {
+            const respuesta = await clinicksApi.get(`/pacientes/atendidos/${medicoId}`);
+            return respuesta.data;
+        } catch (error) {
+            console.error(`Error al obtener pacientes del médico ${medicoId}:`, error);
+            throw error;
+        }
+    }
 };
