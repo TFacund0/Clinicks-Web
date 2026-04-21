@@ -12,5 +12,8 @@ namespace ClinicksApi.Data.Interfaces
 
         // Buscar un paciente por DNI
         Task<Paciente?> GetByDniAsync(string dni);
+
+        // Obtener pacientes atendidos por un médico específico (medicoId)
+        Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId);
     }
 }

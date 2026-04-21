@@ -37,4 +37,15 @@ public class PacienteRepository : IPacienteRepository
             .Include(p => p.IdDireccionNavigation) // <--- CARGA LA TABLA DE DIRECCIONES
             .FirstOrDefaultAsync(p => p.Dni == dni);
     }
+
+    public async Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId)
+    {
+        // Buscamos los pacientes que tengan al menos un turno con ese médicoId
+        return await _context.Pacientes
+            .Include(p => p.IdEstadoPacienteNavigation)
+            .Include(p => p.IdDireccionNavigation)
+            .Include(p => p.Turnos) // Cargamos los turnos para poder filtrar por médico
+            .Where(p => p.Turnos.Any(t => t.IdMedico == medicoId && t.IdEstadoTurno == 3))
+            .ToListAsync();
+    }
 }
