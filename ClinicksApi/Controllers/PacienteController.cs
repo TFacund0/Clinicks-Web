@@ -1,53 +1,46 @@
-﻿using ClinicksApi.Business.Interfaces;
-using ClinicksApi.Business.Dtos;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using ClinicksApi.Business.Interfaces;
+using ClinicksApi.Business.DTOs; // CORREGIDO: DTOs en mayúscula
 
-namespace ClinicksApi.Controllers;
-
-// Controlador para manejar las operaciones relacionadas con los pacientes
-[ApiController]
-[Route("api/[controller]")]
-public class PacientesController : ControllerBase
+namespace ClinicksApi.Controllers
 {
-    private readonly IPacienteService _pacienteService;
-
-    // Inyectamos el servicio de pacientes para poder usarlo en los endpoints
-    public PacientesController(IPacienteService pacienteService)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class PacientesController : ControllerBase
     {
-        _pacienteService = pacienteService;
-    }
+        private readonly IPacienteService _pacienteService;
 
-    // Endpoint para obtener el listado completo de pacientes
-    // GET: api/pacientes
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var pacientes = await _pacienteService.ObtenerListado();
-        return Ok(pacientes);
-    }
+        public PacientesController(IPacienteService pacienteService)
+        {
+            _pacienteService = pacienteService;
+        }
 
-    // Endpoint para obtener un paciente por su ID
-    // GET: api/pacientes/5
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
-    {
-        var paciente = await _pacienteService.ObtenerPorId(id);
+        // GET: api/pacientes
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var pacientes = await _pacienteService.ObtenerListado();
+            return Ok(pacientes);
+        }
 
-        if (paciente == null)
-            return NotFound(new { message = "Paciente no encontrado" });
+        // GET: api/pacientes/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var paciente = await _pacienteService.ObtenerPorId(id);
 
-        return Ok(paciente);
-    }
+            if (paciente == null)
+                return NotFound(new { message = "Paciente no encontrado" });
 
-    // Endpoint para obtener los pacientes atendidos por un médico específico
-    // GET: api/pacientes/atendidos/1
-    [HttpGet("atendidos/{medicoId}")]
-    public async Task<IActionResult> GetAtendidosByMedico(int medicoId)
-    {
-        // Obtenemos los pacientes atendidos por el médico usando el servicio
-        var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(medicoId);
+            return Ok(paciente);
+        }
 
-        // Si no se encuentran pacientes, devolvemos una lista vacía (en lugar de un error)
-        return Ok(pacientes);
+        // GET: api/pacientes/atendidos/1
+        [HttpGet("atendidos/{medicoId}")]
+        public async Task<IActionResult> GetAtendidosByMedico(int medicoId)
+        {
+            var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(medicoId);
+            return Ok(pacientes);
+        }
     }
 }
