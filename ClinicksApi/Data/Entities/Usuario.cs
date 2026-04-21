@@ -21,5 +21,7 @@ public partial class Usuario
 
     public virtual EstadoUsuario IdEstadoUsuarioNavigation { get; set; } = null!;
 
+    public virtual ICollection<Medico> Medicos { get; set; } = new List<Medico>();
+
     public virtual ICollection<Rol> IdRols { get; set; } = new List<Rol>();
 }

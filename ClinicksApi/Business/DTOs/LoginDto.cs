@@ -1,4 +1,4 @@
-﻿namespace ClinicksApi.Business.DTOs
+﻿namespace ClinicksApi.Business.Dtos
 {
     public class LoginRequest
     {

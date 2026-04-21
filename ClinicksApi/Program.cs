@@ -1,9 +1,10 @@
+using ClinicksApi.Business;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.Services;
-using ClinicksApi.Business;
 using ClinicksApi.Data;
 using ClinicksApi.Data.Interfaces;
 using ClinicksApi.Data.Repositories;
+using ClinicksApi.Data.repository;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -28,13 +29,17 @@ builder.Services.AddCors(options => {
 // Add services to the container.
 
 // CONEXIONES DE LAS INTERFACES
+
 // Capa de Negocio (Servicios)
 builder.Services.AddScoped<IPacienteService, PacienteService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Capa de Datos
 builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

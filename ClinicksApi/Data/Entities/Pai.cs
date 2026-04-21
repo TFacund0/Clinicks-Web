@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using ClinicksApi.Data.Entities;
 
 namespace ClinicksApi.Data.Entities;
 
-public partial class Pais
+public partial class Pai
 {
     public int IdPais { get; set; }
 

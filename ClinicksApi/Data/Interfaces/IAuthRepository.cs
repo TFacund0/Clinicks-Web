@@ -4,7 +4,7 @@ namespace ClinicksApi.Data.Interfaces
 {
     public interface IAuthRepository
     {
-        // Devuelve la ENTIDAD Medico si las credenciales son correctas
+        // Devuelve el objeto Medico si las credenciales son correctas
         Task<Medico?> LoginAsync(string username, string password);
     }
 }

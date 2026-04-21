@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ClinicksApi.Models;
+using ClinicksApi.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClinicksApi.Data;

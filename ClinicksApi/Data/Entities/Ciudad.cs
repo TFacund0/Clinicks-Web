@@ -13,5 +13,5 @@ public partial class Ciudad
 
     public virtual ICollection<CodigoPostal> CodigoPostals { get; set; } = new List<CodigoPostal>();
 
-    public virtual Pais IdPaisNavigation { get; set; } = null!;
+    public virtual Pai IdPaisNavigation { get; set; } = null!;
 }
