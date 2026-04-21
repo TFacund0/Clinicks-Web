@@ -1,6 +1,9 @@
-﻿namespace ClinicksApi.Data.Interfaces
+﻿using ClinicksApi.Data.Entities;
+
+namespace ClinicksApi.Data.Interfaces
 {
-    public class IPacienteRepository
+    public interface IPacienteRepository
     {
+            Task<Paciente?> BuscarPorDni(string dni);
     }
 }

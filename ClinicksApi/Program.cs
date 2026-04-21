@@ -1,9 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using ClinicksApi.Data;
+using ClinicksApi.Services.Interfaces;
+using ClinicksApi.Data.Interfaces;
+using ClinicksApi.Data.Repositories;
+using ClinicksApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Obtener la cadena de conexión del appsettings.json
+// Obtener la cadena de conexiï¿½n del appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("ClinicksDataBase");
 
 // Registrar el DbContext para que use PostgreSQL
@@ -19,7 +23,9 @@ builder.Services.AddCors(options =>
                         .AllowAnyHeader());
 });
 
-// Add services to the container.
+builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
+builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
+builder.Services.AddScoped<IConsultaService, ConsultaService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -35,7 +41,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
 

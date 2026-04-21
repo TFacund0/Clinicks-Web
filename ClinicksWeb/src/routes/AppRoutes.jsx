@@ -7,6 +7,7 @@ import { Routes, Route } from 'react-router-dom';
 // Importamos los componentes de nivel de página para la interfaz del médico.
 import Dashboard from '../pages/medico/Dashboard';
 import Patients from '../pages/medico/Patients';
+import NuevaConsulta from '../pages/medico/NuevaConsulta';
 
 
 // Componente AppRoutes: Centraliza la lógica de navegación de la aplicación.
@@ -20,6 +21,8 @@ const AppRoutes = () => {
       
       {/* RUTA DE PACIENTES: Vinculada al path '/pacientes' definido en el Sidebar */}
       <Route path="/pacientes" element={<Patients />} />
+
+      <Route path="/NuevaConsulta" element={<NuevaConsulta />} />
     </Routes>
   );
 };
