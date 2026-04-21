@@ -1,4 +1,5 @@
 ﻿using ClinicksApi.Data.Entities;
+using ClinicksApi.Models;
 
 namespace ClinicksApi.Data.Interfaces
 {
