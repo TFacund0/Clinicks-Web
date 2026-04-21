@@ -1,59 +1,52 @@
+// IMPORTANTE: En el siguiente paso vamos a arreglar los servicios y sus namespaces
+// por ahora dejalos apuntando a donde estén (Services o Business)
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.Services;
-using ClinicksApi.Business;
 using ClinicksApi.Data;
 using ClinicksApi.Data.Interfaces;
 using ClinicksApi.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Obtener la cadena de conexi�n del appsettings.json
+// 1. CONEXIÓN A BASE DE DATOS
 var connectionString = builder.Configuration.GetConnectionString("ClinicksDataBase");
-
-// Registrar el DbContext para que use PostgreSQL
 builder.Services.AddDbContext<ClinicksDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Configurar CORS para que React pueda conectarse
+// 2. CORS (Para React)
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowReactApp", policy => {
-        policy.WithOrigins("http://localhost:5173") // El puerto de tu React
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader();
     });
 });
 
-// Add services to the container.
-
-// CONEXIONES DE LAS INTERFACES
-// Capa de Negocio (Servicios)
-builder.Services.AddScoped<IPacienteService, PacienteService>();
-
-// Capa de Datos
+// 3. INYECCIÓN DE DEPENDENCIAS (DATA LAYER) - ¡Sin duplicados!
+builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
 
+// 4. INYECCIÓN DE DEPENDENCIAS (BUSINESS LAYER)
+// (Ajustaremos esto cuando pasemos a la capa de Servicios)
+builder.Services.AddScoped<IConsultaService, ConsultaService>();
+builder.Services.AddScoped<IPacienteService, PacienteService>();
+
+// 5. CONFIGURACIÓN DE LA API
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
 app.UseCors("AllowReactApp");
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

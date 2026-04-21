@@ -1,24 +1,23 @@
-// 1. IMPORTACIÓN DE LIBRERÍAS
 import { Routes, Route, Navigate } from 'react-router-dom';
-
-// 2. IMPORTACIÓN DE PÁGINAS
 import Dashboard from '../pages/medico/Dashboard';
 import Patients from '../pages/medico/Patients';
+import NewConsultation from '../pages/medico/NewConsultation';
 import PatientHistory from '../pages/medico/PatientHistory'; 
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Muestra el Dashboard al inicio */}
       <Route path="/" element={<Dashboard />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       
-      {/* Listado de pacientes */}
       <Route path="/pacientes" element={<Patients />} />
-
-      {/* Historial clínico dinámico */}
+      
+      {/* EL FIX ESTÁ ACÁ: El path debe ser idéntico al del Sidebar */}
+      <Route path="/nueva-consulta" element={<NewConsultation />} />
+      
       <Route path="/pacientes/:id/historial" element={<PatientHistory />} />
 
-      {/* Catch-all: Si la ruta no existe, redirigir al Dashboard */}
+      {/* Si no encuentra la ruta, vuelve al inicio */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
