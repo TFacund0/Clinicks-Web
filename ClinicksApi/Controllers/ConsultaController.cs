@@ -27,10 +27,16 @@ namespace ClinicksApi.Controllers
 
             if (resultado.Success)
             {
-                return Ok(new { mensaje = resultado.Message, data = resultado.Data });
+                return Ok(new { 
+                    success = true, 
+                    mensaje = "Consulta guardada correctamente" 
+                });
             }
 
-            return BadRequest(new { mensaje = resultado.Message });
+                return BadRequest(new { 
+                    success = false, 
+                    mensaje = resultado.Message 
+                });
         }
 
         [HttpGet("historial/{pacienteId}")]
