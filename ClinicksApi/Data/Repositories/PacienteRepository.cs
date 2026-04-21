@@ -3,7 +3,6 @@ using ClinicksApi.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClinicksApi.Data.Repositories;
-
 public class PacienteRepository : IPacienteRepository
 {
     private readonly ClinicksDbContext _context;
@@ -21,7 +20,10 @@ public class PacienteRepository : IPacienteRepository
             .Include(p => p.IdDireccionNavigation) // <--- CARGA LA TABLA DE DIRECCIONES
             .ToListAsync();
     }
-
+    public async Task<Paciente?> BuscarPorDni(string dni)
+        {
+            return await _context.Pacientes.FirstOrDefaultAsync(p => p.Dni == dni);
+        }
     public async Task<Paciente?> GetByIdAsync(int id)
     {
         return await _context.Pacientes

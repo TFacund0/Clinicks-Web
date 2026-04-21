@@ -23,7 +23,7 @@ const Sidebar = () => {
     { 
       icon: <ClipboardPlus size={20} />, 
       label: 'Nueva Consulta', 
-      path: '/consulta' 
+      path: '/NuevaConsulta' 
     },
     { 
       icon: <Activity size={20} />, 

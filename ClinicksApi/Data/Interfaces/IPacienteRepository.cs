@@ -4,6 +4,7 @@ namespace ClinicksApi.Data.Interfaces
 {
     public interface IPacienteRepository
     {
+        Task<Paciente?> BuscarPorDni(string dni);
         // Obtener todos los pacientes
         Task<IEnumerable<Paciente>> GetAllAsync();
 

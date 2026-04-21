@@ -1,15 +1,16 @@
 using ClinicksApi.Business.Interfaces;
-using ClinicksApi.Business.Services;
-using ClinicksApi.Business;
 using ClinicksApi.Data;
+using ClinicksApi.Services.Interfaces;
 using ClinicksApi.Data.Interfaces;
 using ClinicksApi.Data.Repositories;
+using ClinicksApi.Services;
 using Microsoft.EntityFrameworkCore;
+using ClinicksApi.Business.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Obtener la cadena de conexión del appsettings.json
+// Obtener la cadena de conexiï¿½n del appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("ClinicksDataBase");
 
 // Registrar el DbContext para que use PostgreSQL
@@ -20,12 +21,14 @@ builder.Services.AddDbContext<ClinicksDbContext>(options =>
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowReactApp", policy => {
         policy.WithOrigins("http://localhost:5173") // El puerto de tu React
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+            .AllowAnyMethod()
+            .AllowAnyHeader();
     });
 });
 
-// Add services to the container.
+builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
+builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
+builder.Services.AddScoped<IConsultaService, ConsultaService>();
 
 // CONEXIONES DE LAS INTERFACES
 // Capa de Negocio (Servicios)
@@ -48,7 +51,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
 
