@@ -5,8 +5,13 @@ export const pacienteService = {
     
     // Trae todos los pacientes
     obtenerTodos: async () => {
-        const respuesta = await clinicksApi.get('/pacientes');
-        return respuesta.data;
+        try {
+            const respuesta = await clinicksApi.get('/pacientes');
+            return respuesta.data;
+        } catch (error) {
+            console.error(`Error al obtener todos los pacientes del médico`, error);
+            throw error;
+        }
     },
 
     // Trae solo los pacientes que atendió un médico específico

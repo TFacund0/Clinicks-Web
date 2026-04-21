@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { pacienteService } from '../services/pacienteService'; 
 
 export const usePatients = (medicoId) => {
-  // 1. ESTADOS (Igual que antes)
+  // 1. ESTADOS
     const [pacientes, setPacientes] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
@@ -45,7 +45,7 @@ useEffect(() => {
     return nombre.includes(busqueda) || dni.includes(busqueda);
 });
 
-  // 4. RETORNO (Esto es lo que cambia: devolvemos objetos, no HTML)
+  // 4. RETORNO
 return {
     pacientesFiltrados,
     cargando,

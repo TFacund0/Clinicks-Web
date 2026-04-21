@@ -8,7 +8,7 @@ const PatientHistory = () => {
   const { id } = useParams(); // Obtenemos el ID del paciente de la URL
   const navigate = useNavigate();
 
-  // MOCK DE DATOS: Esto en el futuro vendrá de un service
+  // Datos de ejemplo
   const historialEjemplo = {
     nombre: "Juan Pérez",
     dni: "32.123.456",
