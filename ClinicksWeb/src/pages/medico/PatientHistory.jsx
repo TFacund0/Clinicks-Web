@@ -57,7 +57,7 @@ const PatientHistory = () => {
                 <div key={consulta.id} className="relative pl-8 group">
                   {/* Línea vertical decorativa */}
                   {index !== historialEjemplo.consultas.length - 1 && (
-                    <div className="absolute left-[11px] top-8 bottom-[-24px] w-[2px] bg-slate-800 group-hover:bg-cyan-500/30 transition-colors"></div>
+                    <div className="absolute left-2.75 top-8 -bottom-6 w-0.5 bg-slate-800 group-hover:bg-cyan-500/30 transition-colors"></div>
                   )}
                   
                   {/* Punto de la línea de tiempo */}
