@@ -1,9 +1,9 @@
 using ClinicksApi.Business.DTOs;
+using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
-using ClinicksApi.Services.Interfaces;
 
-namespace ClinicksApi.Services
+namespace ClinicksApi.Business.Services
 {
     public class ConsultaService : IConsultaService
     {
@@ -26,7 +26,7 @@ namespace ClinicksApi.Services
             return await _consultaRepo.HistorialPaciente(pacienteId);
         }
 
-        public async  Task<(bool Success, string Message, ConsultaMedica? Data)> RegistrarConsulta(ConsultaAltaDto dto, int idMedicoLogueado)
+        public async Task<(bool Success, string Message, ConsultaMedica? Data)> RegistrarConsulta(ConsultaAltaDto dto, int idMedicoLogueado)
         {
             try
             {
@@ -34,16 +34,19 @@ namespace ClinicksApi.Services
                     return (false, "El Motivo es obligatorio.", null);
                 if (string.IsNullOrWhiteSpace(dto.diagnostico))
                     return (false, "El Diagnóstico es obligatorio.", null);
-                
+
                 if (dto.fechaconsulta != null && dto.fechaconsulta > DateTime.Now)
                     return (false, "La fecha de consulta no puede ser futura.", null);
+
                 if (idMedicoLogueado <= 0)
                     return (false, "El Id del Médico logueado es obligatorio y debe ser mayor a cero.", null);
-                
-                var paciente = await _pacienteRepo.BuscarPorDni(dto.dnipaciente);
-                    if (paciente == null) return (false, "Paciente no encontrado", null);
 
-                
+                // FIX: Usamos el método unificado que dejamos en el Repositorio
+                var paciente = await _pacienteRepo.GetByDniAsync(dto.dnipaciente);
+
+                if (paciente == null)
+                    return (false, "Paciente no encontrado", null);
+
                 var nuevaConsulta = new ConsultaMedica
                 {
                     Motivo = dto.motivo,
@@ -51,7 +54,7 @@ namespace ClinicksApi.Services
                     Tratamiento = dto.tratamiento ?? "sin definir",
                     Observacion = dto.observaciones ?? "sin observaciones relevantes",
                     Recomendacion = dto.recomendacion ?? "sin recomendaciones",
-                    FechaConsulta = dto.fechaconsulta ?? DateTime.Now, 
+                    FechaConsulta = dto.fechaconsulta ?? DateTime.Now,
                     IdMedico = idMedicoLogueado,
                     IdPaciente = paciente.IdPaciente
                 };
@@ -66,4 +69,4 @@ namespace ClinicksApi.Services
             }
         }
     }
-}           
+}

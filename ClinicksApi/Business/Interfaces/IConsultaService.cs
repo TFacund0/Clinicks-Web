@@ -1,7 +1,7 @@
 using ClinicksApi.Business.DTOs;
 using ClinicksApi.Data.Entities;
 
-namespace ClinicksApi.Services.Interfaces
+namespace ClinicksApi.Business.Interfaces
 {
     public interface IConsultaService
     {

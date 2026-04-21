@@ -1,4 +1,3 @@
-
 namespace ClinicksApi.Business.DTOs
 {
     public class ConsultaAltaDto
@@ -10,6 +9,5 @@ namespace ClinicksApi.Business.DTOs
         public string? recomendacion { get; set; }
         public DateTime? fechaconsulta { get; set; }
         public required string dnipaciente { get; set; }
-        
     }
 }

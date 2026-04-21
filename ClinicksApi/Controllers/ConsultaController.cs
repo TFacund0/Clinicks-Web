@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using ClinicksApi.Services.Interfaces;
+using ClinicksApi.Business.Interfaces; // CORREGIDO: Apunta a la capa correcta
 using ClinicksApi.Business.DTOs;
-
 
 namespace ClinicksApi.Controllers
 {
@@ -11,7 +10,6 @@ namespace ClinicksApi.Controllers
     {
         private readonly IConsultaService _consultaService;
 
-        // Inyectamos el servicio
         public ConsultasController(IConsultaService consultaService)
         {
             _consultaService = consultaService;
@@ -20,23 +18,26 @@ namespace ClinicksApi.Controllers
         [HttpPost]
         public async Task<IActionResult> RegistrarConsulta([FromBody] ConsultaAltaDto dto)
         {
-            // 1. El ID del médico es 1 por que no tenemos login
-            int idMedicoPrueba = 2;
+            // Mantenemos el ID hardcodeado temporalmente porque no hay login
+            // (Asegurate de que el ID 2 o 1 exista en tu tabla "medico")
+            int idMedicoPrueba = 1;
 
             var resultado = await _consultaService.RegistrarConsulta(dto, idMedicoPrueba);
 
             if (resultado.Success)
             {
-                return Ok(new { 
-                    success = true, 
-                    mensaje = "Consulta guardada correctamente" 
+                return Ok(new
+                {
+                    success = true,
+                    mensaje = "Consulta guardada correctamente"
                 });
             }
 
-                return BadRequest(new { 
-                    success = false, 
-                    mensaje = resultado.Message 
-                });
+            return BadRequest(new
+            {
+                success = false,
+                mensaje = resultado.Message
+            });
         }
 
         [HttpGet("historial/{pacienteId}")]
