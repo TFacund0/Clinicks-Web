@@ -1,5 +1,5 @@
 
-namespace ClinicksApi.Business.Services.DTOs
+namespace ClinicksApi.Business.DTOs
 {
     public class ConsultaAltaDto
     {

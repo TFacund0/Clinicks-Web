@@ -1,28 +1,27 @@
-// IMPORTACIÓN DE LIBRERÍAS DE ENRUTAMIENTO
-// Routes: Actúa como un contenedor que evalúa todas las rutas definidas.
-// Route: Define una relación específica entre una URL (path) y un Componente (element).
-import { Routes, Route } from 'react-router-dom';
+// 1. IMPORTACIÓN DE LIBRERÍAS
+import { Routes, Route, Navigate } from 'react-router-dom';
 
-// IMPORTACIÓN DE PÁGINAS (Vistas principales)
-// Importamos los componentes de nivel de página para la interfaz del médico.
+// 2. IMPORTACIÓN DE PÁGINAS
 import Dashboard from '../pages/medico/Dashboard';
 import Patients from '../pages/medico/Patients';
 import NuevaConsulta from '../pages/medico/NuevaConsulta';
+import PatientHistory from '../pages/medico/PatientHistory'; 
 
-
-// Componente AppRoutes: Centraliza la lógica de navegación de la aplicación.
 const AppRoutes = () => {
   return (
-    // El componente <Routes> analiza la URL actual y renderiza 
     <Routes>
-
-      {/* RUTA RAÍZ: Muestra el Dashboard principal cuando el médico ingresa al sistema */}
+      {/* Muestra el Dashboard al inicio */}
       <Route path="/" element={<Dashboard />} />
       
-      {/* RUTA DE PACIENTES: Vinculada al path '/pacientes' definido en el Sidebar */}
+      {/* Listado de pacientes */}
       <Route path="/pacientes" element={<Patients />} />
 
       <Route path="/NuevaConsulta" element={<NuevaConsulta />} />
+      {/* Historial clínico dinámico */}
+      <Route path="/pacientes/:id/historial" element={<PatientHistory />} />
+
+      {/* Catch-all: Si la ruta no existe, redirigir al Dashboard */}
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };

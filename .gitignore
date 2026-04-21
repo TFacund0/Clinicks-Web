@@ -3,7 +3,7 @@
 **/.vs/
 **/node_modules/
 **/dist/
-.env
+**/.env
 appsettings.Development.json
 
 # Forzar ignorar por ruta completa
@@ -17,3 +17,5 @@ ClinicksWeb/node_modules/
 **/obj/
 *.user
 *.suo
+
+**/.env.local

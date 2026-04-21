@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ClinicksApi.Services.Interfaces;
-using ClinicksApi.Business.Services.DTOs;
+using ClinicksApi.Business.DTOs;
 
 
 namespace ClinicksApi.Controllers
