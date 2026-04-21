@@ -1,25 +1,48 @@
-// 1. IMPORTACIÓN DE LIBRERÍAS
 import { Routes, Route, Navigate } from 'react-router-dom';
-
-// 2. IMPORTACIÓN DE PÁGINAS
+import Login from '../pages/auth/Login';
 import Dashboard from '../pages/medico/Dashboard';
 import Patients from '../pages/medico/Patients';
-import PatientHistory from '../pages/medico/PatientHistory'; 
+import PatientHistory from '../pages/medico/PatientHistory';
 
 const AppRoutes = () => {
+  // Verificamos la sesión mirando el disco del navegador
+  const estaAutenticado = !!localStorage.getItem('medicoId');
+
   return (
     <Routes>
-      {/* Muestra el Dashboard al inicio */}
-      <Route path="/" element={<Dashboard />} />
+      {/* RUTA LOGIN: Si ya tiene sesión, lo mandamos directo al dashboard */}
+      <Route 
+        path="/login" 
+        element={estaAutenticado ? <Navigate to="/dashboard" /> : <Login />} 
+      />
+
+      {/* RUTAS PROTEGIDAS: Solo accesibles con sesión iniciada */}
+      <Route 
+        path="/dashboard" 
+        element={estaAutenticado ? <Dashboard /> : <Navigate to="/login" />} 
+      />
       
-      {/* Listado de pacientes */}
-      <Route path="/pacientes" element={<Patients />} />
+      <Route 
+        path="/pacientes" 
+        element={estaAutenticado ? <Patients /> : <Navigate to="/login" />} 
+      />
 
-      {/* Historial clínico dinámico */}
-      <Route path="/pacientes/:id/historial" element={<PatientHistory />} />
+      <Route 
+        path="/pacientes/:id/historial" 
+        element={estaAutenticado ? <PatientHistory /> : <Navigate to="/login" />} 
+      />
 
-      {/* Catch-all: Si la ruta no existe, redirigir al Dashboard */}
-      <Route path="*" element={<Navigate to="/" />} />
+      {/* REDIRECCIÓN INICIAL: Si entras a localhost:5173/ sin nada más */}
+      <Route 
+        path="/" 
+        element={<Navigate to={estaAutenticado ? "/dashboard" : "/login"} />} 
+      />
+      
+      {/* COMODÍN (Catch-all): Si escribe cualquier cosa mal, decidimos según la sesión */}
+      <Route 
+        path="*" 
+        element={<Navigate to={estaAutenticado ? "/dashboard" : "/login"} />} 
+      />
     </Routes>
   );
 };
