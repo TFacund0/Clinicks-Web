@@ -45,7 +45,7 @@ const Patients = () => {
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Barra superior con info del médico y reloj */}
-        <Header />
+        <Header paginaActual='Listado de Pacientes'/>
         
         <main className="flex-1 p-8 overflow-y-auto w-full">
             <div className="max-w-7xl mx-auto w-full">

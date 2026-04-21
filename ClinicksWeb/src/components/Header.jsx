@@ -2,12 +2,13 @@
  * COMPONENTE: Header
  * PROPÓSITO: Barra superior dinámica que gestiona el reloj en tiempo real, 
  * la ubicación contextual (breadcrumbs) y la sesión del médico.
+ * * @param {string} paginaActual - Recibe el nombre de la vista desde el padre (Dashboard, Listado, etc.)
  */
 
 import { useState, useEffect } from 'react';
 import { Bell, Calendar as CalendarIcon, User, ChevronRight } from 'lucide-react';
 
-const Header = () => {
+const Header = ({ paginaActual = "Panel de Control" }) => {
   // 1. ESTADO DEL RELOJ
   // Usamos un objeto Date completo para tener acceso a hora, minutos y segundos.
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -46,12 +47,12 @@ const Header = () => {
     <header className="h-20 border-b border-slate-800 flex items-center justify-between px-8 bg-slate-950">
       
       {/* SECCIÓN IZQUIERDA: BREADCRUMBS (MIGAS DE PAN)
-          Sirve para que el médico sepa en qué nivel del sistema está parado. */}
+          Ahora es DINÁMICO: muestra el nombre de la página que le pase el componente padre. */}
       <div className="flex items-center gap-2 text-sm font-medium">
         <span className="text-slate-500">Módulo Médico</span>
         <ChevronRight size={14} className="text-slate-600" />
         <span className="text-cyan-500 bg-cyan-500/10 px-3 py-1 rounded-full">
-          Listado de Pacientes
+          {paginaActual}
         </span>
       </div>
 
