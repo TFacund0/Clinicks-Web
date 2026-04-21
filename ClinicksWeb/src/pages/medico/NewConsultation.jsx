@@ -1,82 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
-// Corregimos la ruta de importación del servicio
-import consultaService from '../../services/consultaService'; 
 import { ClipboardList, User, FileText, Save, X } from 'lucide-react';
+import { useNewConsultation } from '../../hooks/useNewConsultation'; 
 
-const NuevaConsulta = () => {
-  const [formData, setFormData] = useState({
-    dnipaciente: '',
-    motivo: '',
-    fechaconsulta: '', 
-    diagnostico: '',
-    tratamiento: '',
-    observaciones: '',
-    recomendacion: '',
-  });
-
-  const [errors, setErrors] = useState({});
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(null);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target; 
-    setFormData({ ...formData, [name]: value });
-    
-    if (errors[name]) {
-        setErrors({ ...errors, [name]: null });
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validarFormulario()) return;
-
-    try {
-        const dataLimpia = {
-            ...formData,
-            fechaconsulta: formData.fechaconsulta || null,
-            // COMO NO HAY LOGIN AÚN: Enviamos el ID del médico 'House' por defecto
-            idMedico: 1 
-        };
-
-        const respuesta = await consultaService.crearConsulta(dataLimpia);
-        console.log("Consulta creada con éxito:", respuesta);
-
-        setShowSuccess(true);
-        setErrorMsg(null);
-        setTimeout(() => setShowSuccess(false), 3000);
-
-        // Limpiar formulario tras éxito
-        setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '' });
-
-    } catch (error) {
-        console.error("Error al crear la consulta:", error);
-        setErrorMsg(error.response?.data?.message || "Error al conectar con la base de datos.");
-        setTimeout(() => setErrorMsg(null), 4000);
-    }
-  };
-
-  const validarFormulario = () => {
-    let erroresTemporales = {};
-    if (!formData.motivo.trim()) erroresTemporales.motivo = "El motivo de la consulta es obligatorio.";
-    if (!formData.diagnostico.trim()) erroresTemporales.diagnostico = "El diagnóstico es obligatorio.";
-    if (!formData.dnipaciente.trim()) erroresTemporales.dnipaciente = "El DNI del paciente es obligatorio.";
-    if (!formData.tratamiento.trim()) erroresTemporales.tratamiento = "El tratamiento indicado es obligatorio.";
-    if (!formData.observaciones.trim()) erroresTemporales.observaciones = "Las observaciones son obligatorias.";
-    if (!formData.recomendacion.trim()) erroresTemporales.recomendacion = "Las recomendaciones son obligatorias.";
-
-    setErrors(erroresTemporales);
-    return Object.keys(erroresTemporales).length === 0;
-  };
+const NewConsultation = () => {
+  // Destructuramos (extraemos) todo lo que nos devuelve el hook
+  const {
+    formData,
+    errors,
+    showSuccess,
+    errorMsg,
+    isSubmitting,
+    handleChange,
+    handleSubmit,
+    handleCancel
+  } = useNewConsultation();
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
       <Sidebar />
       <div className="flex-1 flex flex-col">
-        <Header />
+        <Header paginaActual='Crear Consulta'/>
         <main className="p-8 overflow-y-auto">
+          
           <div className="mb-8">
             <h1 className="text-4xl font-bold flex items-center gap-3">
                 <ClipboardList className="text-cyan-500" size={40} />
@@ -87,6 +34,7 @@ const NuevaConsulta = () => {
 
           <form onSubmit={handleSubmit} className="w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              
               {/* Contexto de la Consulta */}
               <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
                 <h3 className="text-lg font-bold flex items-center gap-2 border-b border-slate-800 pb-3">
@@ -144,10 +92,19 @@ const NuevaConsulta = () => {
             </div>
             
             <div className="flex gap-4">
-                <button type="submit" className="bg-cyan-500 text-slate-950 px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20">
-                    <Save size={20} /> Guardar Consulta
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting} // Desactivamos el botón si está cargando
+                  className={`px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-lg shadow-cyan-500/20 ${isSubmitting ? 'bg-cyan-700 text-slate-400 cursor-not-allowed' : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400'}`}
+                >
+                    <Save size={20} /> 
+                    {isSubmitting ? 'Guardando...' : 'Guardar Consulta'}
                 </button>
-                <button type="button" className="bg-slate-800 text-slate-400 px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-700 hover:text-slate-200 transition-colors">
+                <button 
+                  type="button" 
+                  onClick={handleCancel} 
+                  className="bg-slate-800 text-slate-400 px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-700 hover:text-slate-200 transition-colors"
+                >
                     <X size={20} /> Cancelar
                 </button>
             </div>
@@ -155,6 +112,7 @@ const NuevaConsulta = () => {
         </main>
       </div>
       
+      {/* Alertas */}
       {showSuccess && (
         <div className="fixed bottom-6 right-6 bg-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in">
             <span className="font-semibold">Consulta guardada con éxito</span>
@@ -169,4 +127,4 @@ const NuevaConsulta = () => {
   );
 };
 
-export default NuevaConsulta;
+export default NewConsultation;

@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from '../pages/medico/Dashboard';
 import Patients from '../pages/medico/Patients';
-import NuevaConsulta from '../pages/medico/NuevaConsulta';
+import NewConsultation from '../pages/medico/NewConsultation';
 import PatientHistory from '../pages/medico/PatientHistory'; 
 
 const AppRoutes = () => {
@@ -13,7 +13,7 @@ const AppRoutes = () => {
       <Route path="/pacientes" element={<Patients />} />
       
       {/* EL FIX ESTÁ ACÁ: El path debe ser idéntico al del Sidebar */}
-      <Route path="/nueva-consulta" element={<NuevaConsulta />} />
+      <Route path="/nueva-consulta" element={<NewConsultation />} />
       
       <Route path="/pacientes/:id/historial" element={<PatientHistory />} />
 
