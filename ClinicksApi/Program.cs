@@ -4,7 +4,6 @@ using ClinicksApi.Business.Services;
 using ClinicksApi.Data;
 using ClinicksApi.Data.Interfaces;
 using ClinicksApi.Data.Repositories;
-using ClinicksApi.Data.repository;
 using Microsoft.EntityFrameworkCore;
 
 

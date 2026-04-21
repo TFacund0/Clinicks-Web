@@ -18,20 +18,23 @@ namespace ClinicksApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            // ESTO TE VA A DECIR TODO:
+            Console.WriteLine($"DEBUG: Recibido User='{request.Username}' Pass='{request.Password}'");
+
+            if (string.IsNullOrEmpty(request.Username))
+            {
+                return BadRequest(new { message = "C# recibió el nombre de usuario VACÍO. Revisá el JsonPropertyName." });
+            }
+
             var medico = await _authService.AuthenticateAsync(request.Username, request.Password);
 
             if (medico == null)
             {
+                Console.WriteLine("DEBUG: El servicio no encontró al médico en la DB.");
                 return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
             }
 
-            return Ok(new
-            {
-                idMedico = medico.IdMedico,
-                nombre = medico.Nombre,
-                apellido = medico.Apellido,
-                matricula = medico.Matricula
-            });
+            return Ok(new { /* info del medico */ });
         }
     }
 }
