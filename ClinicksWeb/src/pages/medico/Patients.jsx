@@ -85,24 +85,20 @@ const Patients = () => {
                     <th className="p-5 text-right">Acciones</th>
                   </tr>
                 </thead>
+                
                 <tbody className="divide-y divide-slate-800">
-                  
-                  {/* MANEJO DE ESTADOS LÓGICOS EN LA TABLA */}
                   {cargando ? (
-                    // Caso 1: Los datos todavía están viajando desde el servidor
+                    // ESTADO 1: CARGANDO
                     <tr><td colSpan="6" className="p-10 text-center text-slate-500 italic">Conectando con el servidor hospitalario...</td></tr>
                   ) : error ? (
-                    // Caso 2: Hubo un problema con la API o la base de datos
+                    // ESTADO 2: ERROR
                     <tr><td colSpan="6" className="p-10 text-center text-red-400">{error}</td></tr>
                   ) : (
-                    // Caso 3: Datos listos. Verificamos si hay pacientes tras el filtro
+                    // ESTADO 3: HAY DATOS O ESTÁ VACÍO
                     pacientesFiltrados.length > 0 ? (
                       pacientesFiltrados.map((paciente) => (
                         <tr key={paciente.id} className="hover:bg-slate-800/30 transition-colors group">
-                          {/* ID formateado para estilo médico */}
                           <td className="p-5 text-cyan-500 font-mono text-sm">#000{paciente.id}</td>
-                          
-                          {/* Info Principal: Nombre y DNI */}
                           <td className="p-5">
                             <div className="flex items-center gap-3">
                               <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-400">
@@ -114,11 +110,8 @@ const Patients = () => {
                               </div>
                             </div>
                           </td>
-
                           <td className="p-5 text-center text-sm text-slate-400">{paciente.edad}</td>
                           <td className="p-5 text-sm text-slate-400">{paciente.fechaUltimaConsulta}</td>
-                          
-                          {/* Badge dinámico de estado (Activo/Inactivo) */}
                           <td className="p-5">
                             <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
                               paciente.estaActivo 
@@ -128,11 +121,8 @@ const Patients = () => {
                               {paciente.estaActivo ? "Activo" : "Inactivo"}
                             </span>
                           </td>
-
-                          {/* ACCIONES: Salto al Historial Clínico */}
                           <td className="p-5 text-right">
                             <button 
-                              // Al hacer clic, enviamos al médico a la ruta dinámica con el ID del paciente
                               onClick={() => navigate(`/pacientes/${paciente.id}/historial`)}
                               className="text-cyan-400 text-xs font-bold flex items-center gap-1 ml-auto hover:text-cyan-300 transition-colors"
                             >
@@ -142,11 +132,19 @@ const Patients = () => {
                         </tr>
                       ))
                     ) : (
-                      // Caso 4: El médico buscó un nombre/DNI que no existe en su lista
-                      <tr><td colSpan="6" className="p-10 text-center text-slate-600">No se encontraron pacientes que coincidan con "{searchTerm}"</td></tr>
+                      // ESTADO 4: LA LISTA ESTÁ VACÍA (Aquí aplicamos tu cambio)
+                      <tr>
+                        <td colSpan="6" className="p-10 text-center text-slate-500">
+                          {searchTerm === "" 
+                            ? "No hay pacientes atendidos registrados" // Si no buscó nada y está vacío
+                            : `No se encontraron pacientes que coincidan con "${searchTerm}"` // Si buscó algo y no hay match
+                          }
+                        </td>
+                      </tr>
                     )
                   )}
                 </tbody>
+
               </table>
             </div>
           </div>
