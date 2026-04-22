@@ -1,22 +1,23 @@
-// 1. IMPORTACIONES
+// src/pages/medico/Dashboard.jsx
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
-import { usePatients } from '../../hooks/usePatients'; // Reutilizamos el cerebro
+import { usePatients } from '../../hooks/usePatients'; 
 import { ClipboardPlus, Activity, ExternalLink, User } from 'lucide-react';
 
+// Vista principal que muestra un resumen rápido de acciones, agenda y los últimos pacientes atendidos.
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // 2. LÓGICA DE SESIÓN
+  // Recupera la información del médico logueado desde el almacenamiento del navegador.
   const idGuardado = localStorage.getItem('medicoId');
   const medicoNombre = localStorage.getItem('medicoNombre') || "Alex Carter";
   const MEDICO_ID_ACTUAL = parseInt(idGuardado) || 1; 
 
-  // 3. CONSUMO DE DATOS REALES
+  // Obtiene los pacientes atendidos por este médico manejando estados de carga y error.
   const { pacientesFiltrados, cargando, error } = usePatients(MEDICO_ID_ACTUAL);
 
-  // Tomamos solo los últimos 5 para que el Dashboard no sea gigante
+  // Limita la lista a solo 5 pacientes para no sobrecargar la pantalla del panel de control.
   const pacientesRecientes = pacientesFiltrados.slice(0, 5);
 
   return (
@@ -28,7 +29,7 @@ const Dashboard = () => {
 
         <main className="p-8 overflow-y-auto">
           
-          {/* BIENVENIDA DINÁMICA */}
+          {/* Mensaje de bienvenida personalizado con el nombre del médico */}
           <div className="flex justify-between items-end mb-8">
             <div>
               <h1 className="text-4xl font-bold text-white">Buenos días, {medicoNombre}</h1>
@@ -38,7 +39,7 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            {/* COLUMNA IZQUIERDA: Acciones y Agenda */}
+            {/* Botones de acceso rápido para crear consultas o procedimientos */}
             <div className="space-y-8">
               <div className="grid grid-cols-2 gap-4">
                 <button 
@@ -59,7 +60,7 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              {/* Agenda Simulada */}
+              {/* Sección reservada para mostrar los turnos del día */}
               <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-sm">
                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <div className="w-1 h-6 bg-cyan-500 rounded-full"></div> Mi Agenda
@@ -70,7 +71,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* COLUMNA DERECHA: Tabla con DATOS REALES */}
+            {/* Tabla que lista los últimos pacientes atendidos y permite ir a su historial */}
             <div className="lg:col-span-2 bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl flex flex-col">
               <div className="p-6 border-b border-slate-800 flex justify-between items-center">
                 <h3 className="text-xl font-bold">Pacientes Recientes</h3>

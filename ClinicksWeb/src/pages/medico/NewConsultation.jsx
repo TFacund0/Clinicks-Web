@@ -1,11 +1,13 @@
+// src/pages/medico/NewConsultation.jsx
 import React from 'react';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { ClipboardList, User, FileText, Save, X } from 'lucide-react';
 import { useNewConsultation } from '../../hooks/useNewConsultation'; 
 
+// Componente visual principal para registrar una nueva consulta médica.
 const NewConsultation = () => {
-  // Destructuramos (extraemos) todo lo que nos devuelve el hook
+  // Extrae toda la lógica (datos, errores, funciones de guardado/limpieza) desde nuestro Custom Hook.
   const {
     formData,
     errors,
@@ -18,12 +20,14 @@ const NewConsultation = () => {
   } = useNewConsultation();
 
   return (
+    // Contenedor principal que estructura la pantalla: Sidebar a la izquierda y contenido a la derecha.
     <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
       <Sidebar />
       <div className="flex-1 flex flex-col">
         <Header paginaActual='Crear Consulta'/>
         <main className="p-8 overflow-y-auto">
           
+          {/* Encabezado de la página */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold flex items-center gap-3">
                 <ClipboardList className="text-cyan-500" size={40} />
@@ -32,10 +36,11 @@ const NewConsultation = () => {
             <p className="text-slate-500 mt-2">Completa los campos médicos para generar la ficha de atención.</p>
           </div>
 
+          {/* Formulario principal: el evento onSubmit está conectado a la función del Hook */}
           <form onSubmit={handleSubmit} className="w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               
-              {/* Contexto de la Consulta */}
+              {/* Panel Izquierdo: Datos básicos de contexto (DNI, Motivo, Fecha) */}
               <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
                 <h3 className="text-lg font-bold flex items-center gap-2 border-b border-slate-800 pb-3">
                     <User size={20} className="text-cyan-400" />
@@ -57,7 +62,7 @@ const NewConsultation = () => {
                 </div>
               </div>
 
-              {/* Diagnóstico y Tratamiento */}
+              {/* Panel Derecho: Datos de la evaluación médica */}
               <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
                 <h3 className="text-lg font-bold flex items-center gap-2 border-b border-slate-800 pb-3">
                     <User size={20} className="text-cyan-400" />
@@ -81,7 +86,7 @@ const NewConsultation = () => {
               </div>
             </div>
 
-            {/* Observaciones */}
+            {/* Fila Inferior: Campo extenso para notas privadas */}
             <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 mb-8">
                 <h3 className="text-lg font-bold flex items-center gap-2 mb-4">
                     <FileText size={20} className="text-cyan-400" />
@@ -91,15 +96,18 @@ const NewConsultation = () => {
                 {errors.observaciones && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.observaciones}</p>}
             </div>
             
+            {/* Controles de Acción */}
             <div className="flex gap-4">
+                {/* El botón se deshabilita (disabled) si ya se está enviando para evitar doble carga */}
                 <button 
                   type="submit" 
-                  disabled={isSubmitting} // Desactivamos el botón si está cargando
+                  disabled={isSubmitting} 
                   className={`px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-lg shadow-cyan-500/20 ${isSubmitting ? 'bg-cyan-700 text-slate-400 cursor-not-allowed' : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400'}`}
                 >
                     <Save size={20} /> 
                     {isSubmitting ? 'Guardando...' : 'Guardar Consulta'}
                 </button>
+                {/* Conecta el botón cancelar a la función que vacía el formulario */}
                 <button 
                   type="button" 
                   onClick={handleCancel} 
@@ -112,7 +120,7 @@ const NewConsultation = () => {
         </main>
       </div>
       
-      {/* Alertas */}
+      {/* Alertas Flotantes (Toasts): Solo se renderizan si showSuccess o errorMsg tienen valor */}
       {showSuccess && (
         <div className="fixed bottom-6 right-6 bg-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in">
             <span className="font-semibold">Consulta guardada con éxito</span>
