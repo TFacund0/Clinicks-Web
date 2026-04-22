@@ -49,5 +49,24 @@ namespace ClinicksApi.Controllers
             var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(medicoId);
             return Ok(pacientes);
         }
+        [HttpGet("validar/{dni}")]
+        public async Task<IActionResult> ValidarPaciente(string dni)
+        {
+        // Llamamos al service para ver si existe
+            var resultado = await _pacienteService.ExistePaciente(dni);
+
+        if (resultado.Success)
+        {
+            return Ok(new { 
+                success = true, 
+                mensaje = "Paciente verificado correctamente." 
+            });
+        }
+
+        return NotFound(new { 
+            success = false, 
+            mensaje = "El DNI ingresado no corresponde a un paciente registrado." 
+        });
+    }
     }
 }

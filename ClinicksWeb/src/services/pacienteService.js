@@ -24,5 +24,17 @@ export const pacienteService = {
             console.error(`Error al obtener pacientes del médico ${medicoId}:`, error);
             throw error;
         }
+    },
+
+    validarPacientePorDni: async (dni) => {
+        try {
+            // Mandamos el DNI como parámetro de ruta o query según tu API
+            const respuesta = await clinicksApi.get(`/pacientes/validar/${dni}`);
+            return respuesta.data; // Debería devolver { success: true, mensaje: "..." }
+        } catch (error) {
+            console.error("Error al validar paciente:", error.response?.data || error.message);
+            throw error;
+        }
     }
 };
+export default pacienteService;

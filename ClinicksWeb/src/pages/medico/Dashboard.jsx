@@ -43,7 +43,7 @@ const Dashboard = () => {
             <div className="space-y-8">
               <div className="grid grid-cols-2 gap-4">
                 <button 
-                  onClick={() => navigate('/nueva-consulta')} 
+                  onClick={() => navigate('/acceso-consulta')} 
                   className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-cyan-500/50 transition-all group shadow-sm"
                 >
                   <div className="p-4 bg-cyan-500/10 rounded-full text-cyan-400 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-colors">

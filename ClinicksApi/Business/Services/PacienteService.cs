@@ -68,5 +68,17 @@ namespace ClinicksApi.Business.Services
                 EstaActivo = dato.IdEstadoPacienteNavigation?.Nombre.ToLower() == "activo"
             };
         }
+
+        public async Task<(bool Success, string Message)> ExistePaciente(string dni)
+{ 
+    var existe = await _repository.ExistePacientePorDniAsync(dni);
+
+    if (existe)
+    {
+        return (true, "Paciente encontrado");
+    }
+
+    return (false, "Paciente no encontrado");
+}
     }
 }

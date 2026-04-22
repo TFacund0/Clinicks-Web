@@ -1,11 +1,16 @@
 // src/App.jsx (o App.js)
 import { BrowserRouter as Router } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
+<<<<<<< HEAD
 
 // 1. SIMULACIÓN DE LOGIN (Temporal)
 // Inyectamos datos hardcodeados en la memoria del navegador para poder probar 
 // el sistema (Dashboard, consultas, etc.) sin tener que armar la pantalla de Login todavía.
 localStorage.setItem('medicoId', '1');
+=======
+// Simulamos que el login guardó estos datos en el navegador
+localStorage.setItem('medicoId', '2');
+>>>>>>> feature-ingreso-consulta
 localStorage.setItem('medicoNombre', 'Dr. Perez');
 
 // 2. COMPONENTE RAÍZ

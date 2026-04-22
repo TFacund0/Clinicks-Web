@@ -22,8 +22,14 @@ namespace ClinicksApi.Controllers
         // Recibe el JSON desde React (ConsultaAltaDto) y guarda una nueva atención médica.
         public async Task<IActionResult> RegistrarConsulta([FromBody] ConsultaAltaDto dto)
         {
+<<<<<<< HEAD
             // Mantenemos el ID hardcodeado temporalmente porque no hay login conectado aún.
             int idMedicoPrueba = 1;
+=======
+            // Mantenemos el ID hardcodeado temporalmente porque no hay login
+            // (Asegurate de que el ID 2 o 1 exista en tu tabla "medico")
+            int idMedicoPrueba = 2;
+>>>>>>> feature-ingreso-consulta
 
             // Delega la validación y guardado en base de datos al servicio de negocio.
             var resultado = await _consultaService.RegistrarConsulta(dto, idMedicoPrueba);
