@@ -8,14 +8,10 @@ import { useLocation } from 'react-router-dom';
 
 // Componente visual principal para registrar una nueva consulta médica.
 const NewConsultation = () => {
-<<<<<<< HEAD
-  // Extrae toda la lógica (datos, errores, funciones de guardado/limpieza) desde nuestro Custom Hook.
-=======
   // Destructuramos (extraemos) todo lo que nos devuelve el hook
   const location = useLocation();
   const dniEntrante = location.state?.dniIngresado || '';
 
->>>>>>> feature-ingreso-consulta
   const {
     formData,
     errors,
@@ -35,21 +31,11 @@ const NewConsultation = () => {
         <Header paginaActual='Crear Consulta'/>
         <main className="p-8 overflow-y-auto">
           
-<<<<<<< HEAD
-          {/* Encabezado de la página */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold flex items-center gap-3">
-                <ClipboardList className="text-cyan-500" size={40} />
-                Registrar Nueva Consulta
-            </h1>
-            <p className="text-slate-500 mt-2">Completa los campos médicos para generar la ficha de atención.</p>
-=======
           <div className="flex justify-between items-end mb-8">
             <div>
               <h1 className="text-4xl font-bold text-white">Buenos días</h1>
               <p className="text-slate-500 mt-1">Aquí tienes un resumen de tu actividad de hoy.</p>
             </div> 
->>>>>>> feature-ingreso-consulta
           </div>
 
           {/* Formulario principal: el evento onSubmit está conectado a la función del Hook */}

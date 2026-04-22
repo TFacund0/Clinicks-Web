@@ -8,13 +8,6 @@ const Sidebar = () => {
   // "menuItems" es un arreglo (array) que guarda la configuración de cada botón del menú.
   // Guardarlo acá arriba hace que sea facilísimo agregar o quitar pantallas en el futuro 
   const menuItems = [
-<<<<<<< HEAD
-    { icon: <LayoutDashboard size={20} />, label: 'Dashboard', path: '/' },
-    { icon: <Users size={20} />, label: 'Pacientes', path: '/pacientes' },
-    { icon: <ClipboardPlus size={20} />, label: 'Nueva Consulta', path: '/nueva-consulta' },
-    { icon: <Activity size={20} />, label: 'Nuevo Procedimiento', path: '/procedimiento' },
-    { icon: <Calendar size={20} />, label: 'Mi Agenda', path: '/agenda' },
-=======
     { 
       icon: <LayoutDashboard size={20} />, 
       label: 'Dashboard', 
@@ -40,7 +33,6 @@ const Sidebar = () => {
       label: 'Mi Agenda', 
       path: '/agenda' 
     },
->>>>>>> feature-ingreso-consulta
   ];
 
   // El "return" es la parte visual que React va a dibujar en la pantalla (HTML/Tailwind).
