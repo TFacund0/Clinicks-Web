@@ -2,10 +2,11 @@
 import { useState } from 'react';
 import consultaService from '../services/consultaService';
 
-export const useNewConsultation = () => {
+
+export const useNewConsultation = (dniInicial = '') => {
     // 1. Estado del formulario
     const [formData, setFormData] = useState({
-        dnipaciente: '',
+        dnipaciente: dniInicial,
         motivo: '',
         fechaconsulta: '', 
         diagnostico: '',
@@ -13,8 +14,7 @@ export const useNewConsultation = () => {
         observaciones: '',
         recomendacion: '',
     });
-
-    // 2. Estados de UI (errores y mensajes de éxito)
+    
     const [errors, setErrors] = useState({});
     const [showSuccess, setShowSuccess] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);

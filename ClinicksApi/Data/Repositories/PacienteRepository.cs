@@ -46,5 +46,10 @@ namespace ClinicksApi.Data.Repositories
                 .Where(p => p.Turnos.Any(t => t.IdMedico == medicoId && t.IdEstadoTurno == 3))
                 .ToListAsync();
         }
+
+        public async Task<bool> ExistePacientePorDniAsync(string dni)
+        {
+            return await _context.Pacientes.AnyAsync(p => p.Dni == dni);
+        }
     }
 }

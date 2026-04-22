@@ -51,13 +51,12 @@ const Patients = () => {
             <div className="max-w-7xl mx-auto w-full">
             
             {/* Encabezado de la sección */}
-            <div className="flex justify-between items-center mb-8">
-              <div>
-                <h1 className="text-3xl font-bold">Listado de Pacientes</h1>
-                <p className="text-slate-500 text-sm">Gestiona y consulta el historial de tus pacientes.</p>
-              </div>
-            </div>
-
+            <div className="flex justify-between items-end mb-8">
+            <div>
+              <h1 className="text-4xl font-bold text-white">Listado de Pacientes</h1>
+              <p className="text-slate-500 mt-1">Gestiona y consulta el historial de tus pacientes.</p>
+            </div> 
+          </div>
             {/* BARRA DE HERRAMIENTAS (Buscador) */}
             <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 mb-6 flex flex-wrap gap-4 items-center justify-between">
               <div className="flex items-center gap-3 bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 w-full md:w-96">

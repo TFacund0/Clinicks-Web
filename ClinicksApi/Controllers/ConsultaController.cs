@@ -20,7 +20,7 @@ namespace ClinicksApi.Controllers
         {
             // Mantenemos el ID hardcodeado temporalmente porque no hay login
             // (Asegurate de que el ID 2 o 1 exista en tu tabla "medico")
-            int idMedicoPrueba = 1;
+            int idMedicoPrueba = 2;
 
             var resultado = await _consultaService.RegistrarConsulta(dto, idMedicoPrueba);
 
