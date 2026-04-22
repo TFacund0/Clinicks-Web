@@ -2,16 +2,12 @@
 import { useState } from 'react';
 import consultaService from '../services/consultaService';
 
-// Acá estoy creando un "Custom Hook" (Hook personalizado). 
-// Lo hago para sacar toda la lógica pesada (estados, validaciones, llamadas a la base de datos) 
-// fuera de mi componente visual. Así la pantalla queda limpia y acá manejo todo el "cerebro" del formulario.
-export const useNewConsultation = () => {
-    
-    // 1. ESTADO DEL FORMULARIO
-    // Acá guardo todo lo que el médico va escribiendo en los inputs. 
-    // Lo inicializo vacío para que los campos arranquen en blanco.
+import { useNavigate } from 'react-router-dom';
+
+export const useNewConsultation = (dniInicial = '') => {
+    // 1. Estado del formulario
     const [formData, setFormData] = useState({
-        dnipaciente: '',
+        dnipaciente: dniInicial,
         motivo: '',
         fechaconsulta: '', 
         diagnostico: '',
@@ -19,13 +15,11 @@ export const useNewConsultation = () => {
         observaciones: '',
         recomendacion: '',
     });
-
-    // 2. ESTADOS DE LA INTERFAZ DE USUARIO (UI)
-    // Estos estados me sirven para darle feedback visual al médico.
-    const [errors, setErrors] = useState({}); // Guardo los mensajes de error de validación ("Falta el DNI", etc.)
-    const [showSuccess, setShowSuccess] = useState(false); // Un interruptor (true/false) para mostrar el cartelito verde de éxito
-    const [errorMsg, setErrorMsg] = useState(null); // Guardo errores que vengan del backend (ej: "Paciente no encontrado")
-    const [isSubmitting, setIsSubmitting] = useState(false); // Me avisa si estoy en medio de un guardado para bloquear el botón y evitar que hagan doble clic.
+    const navigate = useNavigate();
+    const [errors, setErrors] = useState({});
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // 3. MANEJADOR DE CAMBIOS EN LOS INPUTS
     // Cada vez que el médico teclea algo, esta función se ejecuta.
@@ -94,7 +88,10 @@ export const useNewConsultation = () => {
 
             // Vacío el formulario para que el médico pueda cargar otra consulta.
             setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '' });
-
+            
+            setTimeout(() => {
+                navigate('/dashboard'); 
+                }, 1500);
         } catch (error) {
             // Si el backend me rechaza (ej: el DNI no existe en la base de datos), atrapo el error acá.
             console.error("Error al crear la consulta:", error);
