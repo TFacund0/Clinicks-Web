@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import consultaService from '../services/consultaService';
 
+import { useNavigate } from 'react-router-dom';
 
 export const useNewConsultation = (dniInicial = '') => {
     // 1. Estado del formulario
@@ -14,7 +15,7 @@ export const useNewConsultation = (dniInicial = '') => {
         observaciones: '',
         recomendacion: '',
     });
-    
+    const navigate = useNavigate();
     const [errors, setErrors] = useState({});
     const [showSuccess, setShowSuccess] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
@@ -70,7 +71,10 @@ export const useNewConsultation = (dniInicial = '') => {
 
             // Resetear el formulario
             setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '' });
-
+            
+            setTimeout(() => {
+                navigate('/dashboard'); 
+                }, 1500);
         } catch (error) {
             console.error("Error al crear la consulta:", error);
             setErrorMsg(error.response?.data?.message || "Error al conectar con la base de datos.");
