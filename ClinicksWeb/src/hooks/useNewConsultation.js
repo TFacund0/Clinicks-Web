@@ -1,6 +1,7 @@
 // src/hooks/useNewConsultation.js
 import { useState } from 'react';
 import consultaService from '../services/consultaService';
+import { pacienteService } from '../services/pacienteService'; // IMPORTANTE: Importamos el servicio de pacientes para la búsqueda
 
 // Acá estoy creando un "Custom Hook" (Hook personalizado). 
 // Lo hago para sacar toda la lógica pesada (estados, validaciones, llamadas a la base de datos) 
@@ -27,9 +28,13 @@ export const useNewConsultation = () => {
     const [errorMsg, setErrorMsg] = useState(null); // Guardo errores que vengan del backend (ej: "Paciente no encontrado")
     const [isSubmitting, setIsSubmitting] = useState(false); // Me avisa si estoy en medio de un guardado para bloquear el botón y evitar que hagan doble clic.
 
+    // --- NUEVOS ESTADOS PARA EL AUTOCOMPLETE ---
+    const [sugerencias, setSugerencias] = useState([]); // Guardará la lista de pacientes que coincidan con lo escrito
+    const [buscandoSugerencias, setBuscandoSugerencias] = useState(false); // Para saber si la API de búsqueda está trabajando
+
     // 3. MANEJADOR DE CAMBIOS EN LOS INPUTS
     // Cada vez que el médico teclea algo, esta función se ejecuta.
-    const handleChange = (e) => {
+    const handleChange = async (e) => {
         // Extraigo el 'name' (ej: 'motivo') y el 'value' (lo que escribió) del input que disparó el evento.
         const { name, value } = e.target; 
         
@@ -41,6 +46,35 @@ export const useNewConsultation = () => {
         if (errors[name]) {
             setErrors({ ...errors, [name]: null });
         }
+
+        // --- LÓGICA DE BÚSQUEDA PREDICTIVA (AUTOCOMPLETE) ---
+        // Si el campo que cambió es el 'dnipaciente'...
+        if (name === 'dnipaciente') {
+            // Solo buscamos si el médico escribió más de 2 caracteres (para no saturar la API)
+            if (value.trim().length > 2) {
+                setBuscandoSugerencias(true);
+                try {
+                    // Llamamos a la API de C# pasando lo que el médico escribió hasta ahora
+                    const resultados = await pacienteService.buscarPorDni(value);
+                    setSugerencias(resultados); // Guardamos los 5 pacientes encontrados
+                } catch (err) {
+                    console.error("Error buscando sugerencias:", err);
+                    setSugerencias([]);
+                } finally {
+                    setBuscandoSugerencias(false);
+                }
+            } else {
+                // Si el campo está casi vacío, borramos la lista de sugerencias
+                setSugerencias([]);
+            }
+        }
+    };
+
+    // --- FUNCIÓN PARA SELECCIONAR PACIENTE ---
+    // Esta función se ejecutará cuando el médico haga CLIC en un paciente de la listita flotante.
+    const seleccionarPaciente = (paciente) => {
+        setFormData({ ...formData, dnipaciente: paciente.dni }); // Completamos el DNI automáticamente
+        setSugerencias([]); // Cerramos la lista de sugerencias
     };
 
     // 4. LÓGICA DE VALIDACIÓN
@@ -122,6 +156,7 @@ export const useNewConsultation = () => {
             recomendacion: '',
         });
         setErrors({}); // También limpio los mensajes de error en rojo si los hubiera.
+        setSugerencias([]); // Cerramos cualquier lista de búsqueda abierta
     };
     
     // 7. LO QUE DEVUELVE MI HOOK
@@ -133,8 +168,11 @@ export const useNewConsultation = () => {
         showSuccess,
         errorMsg,
         isSubmitting,
+        sugerencias, 
+        buscandoSugerencias, 
         handleChange,
         handleSubmit,
-        handleCancel
+        handleCancel,
+        seleccionarPaciente 
     };
 };

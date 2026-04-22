@@ -2,21 +2,24 @@
 import React from 'react';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
-import { ClipboardList, User, FileText, Save, X } from 'lucide-react';
+import { ClipboardList, User, FileText, Save, X, Search } from 'lucide-react'; // Agregamos Search para el icono de lupa
 import { useNewConsultation } from '../../hooks/useNewConsultation'; 
 
 // Componente visual principal para registrar una nueva consulta médica.
 const NewConsultation = () => {
   // Extrae toda la lógica (datos, errores, funciones de guardado/limpieza) desde nuestro Custom Hook.
+  // Agregamos: sugerencias y seleccionarPaciente que vienen del cerebro (Hook) actualizado.
   const {
     formData,
     errors,
     showSuccess,
     errorMsg,
     isSubmitting,
+    sugerencias,        
     handleChange,
     handleSubmit,
-    handleCancel
+    handleCancel,
+    seleccionarPaciente
   } = useNewConsultation();
 
   return (
@@ -50,11 +53,58 @@ const NewConsultation = () => {
                     <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Fecha de la consulta</label>
                     <input type="date" name="fechaconsulta" value={formData.fechaconsulta} onChange={handleChange} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors scheme-dark" />
                 </div>
+
+                {/* --- CAMBIO: SECCIÓN DNI CON AUTOCOMPLETE --- */}
                 <div>
                     <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Paciente (DNI)</label>
-                    <input type="text" name="dnipaciente" value={formData.dnipaciente} onChange={handleChange} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors" placeholder="Ej: 10230..." />
+                    
+                    {/* Contenedor relativo para que la lista de sugerencias flote debajo del input */}
+                    <div className="relative">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600">
+                            <Search size={16} />
+                        </div>
+                        <input 
+                            type="text" 
+                            name="dnipaciente" 
+                            value={formData.dnipaciente} 
+                            onChange={handleChange} 
+                            autoComplete="off" // Desactiva el menú nativo del navegador para usar el nuestro
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors" 
+                            placeholder="Buscar por DNI..." 
+                        />
+
+                        {/* LISTA DE SUGERENCIAS FLOTANTE */}
+                        {/* Se muestra solo si el Hook encontró coincidencias en la DB */}
+                        {sugerencias.length > 0 && (
+                            <ul className="absolute z-50 w-full mt-2 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-200">
+                                {sugerencias.map((paciente) => (
+                                    <li 
+                                        key={paciente.id}
+                                        onClick={() => seleccionarPaciente(paciente)}
+                                        className="px-4 py-3 hover:bg-cyan-500/10 cursor-pointer border-b border-slate-800/50 last:border-none group transition-colors"
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-200 group-hover:text-cyan-400">
+                                                    {paciente.nombreCompleto}
+                                                </p>
+                                                <p className="text-[10px] text-slate-500 uppercase font-mono">
+                                                    DNI: {paciente.dni}
+                                                </p>
+                                            </div>
+                                            <span className="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-400 group-hover:bg-cyan-500/20 group-hover:text-cyan-400 transition-colors">
+                                                {paciente.edad} años
+                                            </span>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                     {errors.dnipaciente && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.dnipaciente}</p>}
                 </div>
+                {/* --- FIN CAMBIO DNI --- */}
+
                 <div>
                     <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Motivo de Consulta</label>
                     <textarea name="motivo" value={formData.motivo} onChange={handleChange} rows="2" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors resize-none" placeholder="Descripción breve..." />

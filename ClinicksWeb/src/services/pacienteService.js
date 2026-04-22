@@ -24,5 +24,16 @@ export const pacienteService = {
             console.error(`Error al obtener pacientes del médico ${medicoId}:`, error);
             throw error;
         }
+    },
+
+    // Llama al endpoint de búsqueda predictiva mandando los números que el médico escribe.
+    buscarPorDni: async (dni) => {
+        try {
+            const respuesta = await clinicksApi.get(`/pacientes/buscar?dni=${dni}`);
+            return respuesta.data; // Devuelve la lista de 5 coincidencias.
+        } catch (error) {
+            console.error("Error al buscar sugerencias de DNI:", error);
+            return [];
+        }
     }
 };
