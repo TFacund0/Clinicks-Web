@@ -49,5 +49,20 @@ namespace ClinicksApi.Controllers
             var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(medicoId);
             return Ok(pacientes);
         }
+
+        // GET: api/pacientes/buscar?dni=123
+        [HttpGet("buscar")]
+        // Endpoint para buscar pacientes por DNI. Recibe el DNI como query parameter (?dni=123).
+        public async Task<IActionResult> BuscarPorDni([FromQuery] string dni)
+        {
+            // Si el usuario borra todo y el DNI viene vacío, devolvemos una lista vacía para no procesar nada.
+            if (string.IsNullOrWhiteSpace(dni))
+                return Ok(new List<PacienteDto>());
+
+            var resultados = await _pacienteService.BuscarPorDniPartial(dni);
+
+            // Respondemos con los 5 pacientes encontrados
+            return Ok(resultados);
+        }
     }
 }

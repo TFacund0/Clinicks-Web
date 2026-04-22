@@ -50,13 +50,8 @@ namespace ClinicksApi.Business.Services
             return new PacienteDto
             {
                 Id = dato.IdPaciente,
-
-                // Unimos Nombre y Apellido en un solo campo para que React no tenga que hacerlo.
                 NombreCompleto = $"{dato.Nombre} {dato.Apellido}",
-
                 Dni = dato.Dni,
-
-                // Calculamos la edad al vuelo restando el año actual menos el año de nacimiento.
                 Edad = DateTime.Now.Year - dato.FechaNacimiento.Year,
 
                 // Lógica para la fecha: Si tiene turnos, agarramos el más reciente y lo pasamos a texto ("dd/mm/yyyy"). Si no, mandamos "Sin consultas".
@@ -67,6 +62,16 @@ namespace ClinicksApi.Business.Services
                 // Verificamos si la palabra "activo" está en la tabla de estados asociada a este paciente.
                 EstaActivo = dato.IdEstadoPacienteNavigation?.Nombre.ToLower() == "activo"
             };
+        }
+
+        public async Task<IEnumerable<PacienteDto>> BuscarPorDniPartial(string dni)
+        {
+            // 1. Le pide al repositorio los 5 pacientes que coincidan con los números escritos.
+            var pacientesEncontrados = await _repository.GetByDniPartialAsync(dni);
+
+            // 2. Convierte (mapea) cada paciente de la base de datos al formato DTO para el Frontend.
+            // Reutilizamos la función 'MapToDto' que ya teníamos para mantener los nombres y la edad.
+            return pacientesEncontrados.Select(MapToDto);
         }
     }
 }

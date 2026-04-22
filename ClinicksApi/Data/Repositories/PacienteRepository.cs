@@ -34,7 +34,7 @@ namespace ClinicksApi.Data.Repositories
             return await _context.Pacientes
                 .Include(p => p.IdEstadoPacienteNavigation)
                 .Include(p => p.IdDireccionNavigation)
-                .FirstOrDefaultAsync(p => p.Dni == dni);
+                .FirstOrDefaultAsync(p => p.Dni == dni);    
         }
 
         public async Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId)
@@ -44,6 +44,14 @@ namespace ClinicksApi.Data.Repositories
                 .Include(p => p.IdDireccionNavigation)
                 .Include(p => p.Turnos)
                 .Where(p => p.Turnos.Any(t => t.IdMedico == medicoId && t.IdEstadoTurno == 3))
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Paciente>> GetByDniPartialAsync(string dni)
+        {
+            return await _context.Pacientes
+                .Where(p => p.Dni.Contains(dni))
+                .Take(5)
                 .ToListAsync();
         }
     }

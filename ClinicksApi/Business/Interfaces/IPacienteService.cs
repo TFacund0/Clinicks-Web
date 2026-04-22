@@ -7,5 +7,6 @@ namespace ClinicksApi.Business.Interfaces
         Task<IEnumerable<PacienteDto>> ObtenerListado();
         Task<PacienteDto?> ObtenerPorId(int id);
         Task<IEnumerable<PacienteDto>> ObtenerAtendidosPorMedico(int medicoId);
+        Task<IEnumerable<PacienteDto>> BuscarPorDniPartial(string dni);
     }
 }

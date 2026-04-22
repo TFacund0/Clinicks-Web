@@ -8,5 +8,6 @@ namespace ClinicksApi.Data.Interfaces
         Task<Paciente?> GetByIdAsync(int id);
         Task<Paciente?> GetByDniAsync(string dni);
         Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId);
+        Task<IEnumerable<Paciente>> GetByDniPartialAsync(string dni);
     }
 }
