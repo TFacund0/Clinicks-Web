@@ -26,7 +26,7 @@ const Sidebar = () => {
     { 
       icon: <Activity size={20} />, 
       label: 'Nuevo Procedimiento', 
-      path: '/procedimiento' 
+      path: '/acceso-procedimiento' 
     },
     { 
       icon: <Calendar size={20} />, 

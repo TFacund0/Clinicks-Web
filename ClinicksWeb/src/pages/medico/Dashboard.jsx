@@ -2,7 +2,7 @@
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
-import { usePatients } from '../../hooks/usePatients'; 
+//import { usePatients } from '../../hooks/usePatients'; 
 import { ClipboardPlus, Activity, ExternalLink, User } from 'lucide-react';
 
 // Vista principal que muestra un resumen rápido de acciones, agenda y los últimos pacientes atendidos.
@@ -15,10 +15,10 @@ const Dashboard = () => {
   const MEDICO_ID_ACTUAL = parseInt(idGuardado) || 1; 
 
   // Obtiene los pacientes atendidos por este médico manejando estados de carga y error.
-  const { pacientesFiltrados, cargando, error } = usePatients(MEDICO_ID_ACTUAL);
+ // const {cargando, error } = usePatients(MEDICO_ID_ACTUAL);
 
   // Limita la lista a solo 5 pacientes para no sobrecargar la pantalla del panel de control.
-  const pacientesRecientes = pacientesFiltrados.slice(0, 5);
+  //const pacientesRecientes = pacientesFiltrados.slice(0, 5);
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
@@ -93,7 +93,7 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
-                  {cargando ? (
+                  {/* {cargando ? (
                     <tr><td colSpan="4" className="p-10 text-center text-slate-500">Cargando datos...</td></tr>
                   ) : error ? (
                     <tr><td colSpan="4" className="p-10 text-center text-red-500">{error}</td></tr>
@@ -128,7 +128,7 @@ const Dashboard = () => {
                     ))
                   ) : (
                     <tr><td colSpan="4" className="p-10 text-center text-slate-600 italic">No se encontraron pacientes atendidos.</td></tr>
-                  )}
+                  )}*/}
                 </tbody>
               </table>
             </div>

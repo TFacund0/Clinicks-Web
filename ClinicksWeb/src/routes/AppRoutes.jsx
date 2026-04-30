@@ -5,6 +5,7 @@ import Patients from '../pages/medico/Patients';
 import NewConsultation from '../pages/medico/NewConsultation';
 import PatientHistory from '../pages/medico/PatientHistory'; 
 import AccessConsultation from '../pages/medico/accessConsultation';
+import NewProcess from '../pages/medico/NewProcess';
 
 // Componente central que funciona como el "mapa" de nuestra aplicación.
 // Conecta cada URL del navegador con la pantalla (componente) que debe dibujarse.
@@ -21,7 +22,11 @@ const AppRoutes = () => {
       {/* Ruta para el formulario de atención médica */}
       <Route path="/nueva-consulta" element={<NewConsultation />} />
 
-      <Route path="/acceso-consulta" element={<AccessConsultation />} />
+      <Route path="/nuevo-procedimiento" element={<NewProcess />} />
+      {/* Ruta para acceder al formulario de consulta o procedimiento según el botón que se presionó */}
+      <Route path="/acceso-consulta" element={<AccessConsultation acceso='consulta' />} />
+      <Route path="/acceso-procedimiento" element={<AccessConsultation acceso='proceso' />} />
+
   
       
       {/* Ruta dinámica: El ":id" es una variable en la URL que nos permite saber el historial de qué paciente buscar (ej. /pacientes/5/historial) */}
