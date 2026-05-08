@@ -1,4 +1,4 @@
-﻿using ClinicksApi.Business.Interfaces;
+using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,7 +34,12 @@ namespace ClinicksApi.Controllers
                 return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
             }
 
-            return Ok(new { /* info del medico */ });
+            return Ok(new { 
+                idMedico = medico.IdMedico,
+                nombre = medico.Nombre,
+                apellido = medico.Apellido,
+                matricula = medico.Matricula
+            });
         }
     }
 }

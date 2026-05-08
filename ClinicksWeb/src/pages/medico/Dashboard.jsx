@@ -1,3 +1,9 @@
+/**
+ * COMPONENTE: Dashboard (Panel Principal)
+ * PROPÓSITO: Vista principal del médico al iniciar sesión. 
+ * Muestra un resumen de actividad diaria, accesos rápidos a funciones clave y pacientes recientes.
+ */
+
 // 1. IMPORTACIONES
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';

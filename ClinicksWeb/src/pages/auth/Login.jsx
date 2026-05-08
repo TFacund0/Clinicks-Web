@@ -1,3 +1,9 @@
+/**
+ * COMPONENTE: Login (Vista de Autenticación)
+ * PROPÓSITO: Maneja el inicio de sesión de los médicos en el sistema,
+ * validando credenciales y guardando la información de sesión en el almacenamiento local.
+ */
+
 import { useState } from 'react';
 import { Activity, Lock, User, AlertCircle } from 'lucide-react';
 import clinicksApi from '../../api/clinicksApi'; 

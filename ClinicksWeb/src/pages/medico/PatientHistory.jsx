@@ -1,3 +1,9 @@
+/**
+ * COMPONENTE: PatientHistory (Historial Clínico)
+ * PROPÓSITO: Muestra el detalle del historial clínico de un paciente específico,
+ * incluyendo sus datos personales y una línea de tiempo (timeline) con el registro de sus consultas.
+ */
+
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 
