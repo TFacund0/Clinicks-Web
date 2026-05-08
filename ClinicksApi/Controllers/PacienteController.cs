@@ -1,10 +1,12 @@
-﻿using ClinicksApi.Business.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicksApi.Controllers;
 
 // Controlador para manejar las operaciones relacionadas con los pacientes
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class PacientesController : ControllerBase

@@ -1,4 +1,4 @@
-﻿using ClinicksApi.Business.Dtos;
+using ClinicksApi.Business.Dtos;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
@@ -17,8 +17,11 @@ namespace ClinicksApi.Business.Services
         // Implementamos el método para obtener pacientes atendidos por un médico específico
         public async Task<IEnumerable<PacienteDto>> ObtenerAtendidosPorMedico(int medicoId)
         {
+            // El estado 3 representa "Atendido" (regla de negocio en la capa de servicios)
+            int estadoAtendido = 3;
+
             // Obtenemos los pacientes atendidos por el médico usando el repositorio
-            var datos = await _repository.GetAtendidosByMedicoAsync(medicoId);
+            var datos = await _repository.GetAtendidosByMedicoAsync(medicoId, estadoAtendido);
 
             // Mapeamos cada paciente a su DTO correspondiente
             return datos.Select(MapToDto);

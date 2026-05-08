@@ -1,10 +1,13 @@
-﻿using ClinicksApi.Data.Entities;
+using ClinicksApi.Data.Entities;
+using ClinicksApi.Business.Dtos;
 
 namespace ClinicksApi.Business.Interfaces
 {
     public interface IAuthService
     {
-        // El servicio devuelve la entidad pero podría devolver un "LoginResponseDTO"
-        Task<Medico?> AuthenticateAsync(string username, string password);
+        Task<LoginResponseDto?> AuthenticateAsync(string username, string password);
+        
+        // Método temporal para migración
+        Task<int> HashExistingPasswordsAsync();
     }
 }

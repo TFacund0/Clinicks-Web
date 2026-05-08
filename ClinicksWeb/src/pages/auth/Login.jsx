@@ -28,7 +28,8 @@ const Login = () => {
 
       const data = response.data;
       
-      // Guardamos la info real del médico que viene de C#
+      // Guardamos la info real del médico que viene de C# y el token JWT
+      localStorage.setItem('token', data.token);
       localStorage.setItem('medicoId', data.idMedico);
       localStorage.setItem('medicoNombre', `${data.nombre} ${data.apellido}`);
       localStorage.setItem('medicoMatricula', data.matricula);

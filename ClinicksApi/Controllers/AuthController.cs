@@ -30,16 +30,27 @@ namespace ClinicksApi.Controllers
 
             if (medico == null)
             {
-                Console.WriteLine("DEBUG: El servicio no encontró al médico en la DB.");
+                Console.WriteLine("DEBUG: El servicio no encontró al médico en la DB o las credenciales son inválidas.");
                 return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
             }
 
-            return Ok(new { 
-                idMedico = medico.IdMedico,
-                nombre = medico.Nombre,
-                apellido = medico.Apellido,
-                matricula = medico.Matricula
-            });
+            // Devolvemos el DTO proporcionado por la capa de negocio
+            return Ok(medico);
         }
+
+        [HttpGet("hash-passwords")]
+        public async Task<IActionResult> HashPasswords()
+        {
+            try
+            {
+                int count = await _authService.HashExistingPasswordsAsync();
+                return Ok(new { message = $"Se han encriptado {count} contraseñas exitosamente. Ya puedes iniciar sesión con normalidad." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al migrar contraseñas", detail = ex.Message });
+            }
+        }
+
     }
 }

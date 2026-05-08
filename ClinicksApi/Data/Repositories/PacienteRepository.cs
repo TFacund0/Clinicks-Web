@@ -1,4 +1,4 @@
-﻿using ClinicksApi.Data.Entities;
+using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +19,7 @@ public class PacienteRepository : IPacienteRepository
         return await _context.Pacientes
             .Include(p => p.IdEstadoPacienteNavigation) // <--- CARGA LA TABLA DE ESTADOS
             .Include(p => p.IdDireccionNavigation) // <--- CARGA LA TABLA DE DIRECCIONES
+            .Include(p => p.Turnos) // <--- CARGA LOS TURNOS PARA EL DTO
             .ToListAsync();
     }
 
@@ -38,14 +39,14 @@ public class PacienteRepository : IPacienteRepository
             .FirstOrDefaultAsync(p => p.Dni == dni);
     }
 
-    public async Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId)
+    public async Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId, int estadoTurnoId)
     {
-        // Buscamos los pacientes que tengan al menos un turno con ese médicoId
+        // Buscamos los pacientes que tengan al menos un turno con ese médicoId y con el estado requerido
         return await _context.Pacientes
             .Include(p => p.IdEstadoPacienteNavigation)
             .Include(p => p.IdDireccionNavigation)
             .Include(p => p.Turnos) // Cargamos los turnos para poder filtrar por médico
-            .Where(p => p.Turnos.Any(t => t.IdMedico == medicoId && t.IdEstadoTurno == 3))
+            .Where(p => p.Turnos.Any(t => t.IdMedico == medicoId && t.IdEstadoTurno == estadoTurnoId))
             .ToListAsync();
     }
 }

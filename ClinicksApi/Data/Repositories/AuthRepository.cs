@@ -13,45 +13,45 @@ namespace ClinicksApi.Data.Repositories
             _context = context;
         }
 
-        public async Task<Medico?> LoginAsync(string username, string password)
+        public async Task<Usuario?> GetUsuarioByUsernameAsync(string username)
         {
-            // 1. Buscamos el usuario validando la contraseña
-            // Permitimos login si ingresan el Username del usuario o la Matrícula del médico
-            var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Password == password && 
-                    (u.Username.ToLower() == username.ToLower() || u.Username == "admin"));
+            return await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
+        }
 
-            if (usuario == null)
-            {
-                Console.WriteLine($"---> REPO: No encontré contraseña válida para {username}");
-                return null;
-            }
-
-            // Usamos .Select() para proyectar solo las columnas que sabemos que existen en la DB
-            // y evitar el crasheo por la columna faltante 'id_usuario' que EF Core intenta traer por defecto.
-            var medicoDb = await _context.Medicos
+        public async Task<Medico?> GetMedicoByMatriculaAsync(string matricula)
+        {
+            return await _context.Medicos
                 .Select(m => new Medico {
                     IdMedico = m.IdMedico,
                     Nombre = m.Nombre,
                     Apellido = m.Apellido,
                     Matricula = m.Matricula
                 })
-                .FirstOrDefaultAsync(m => m.Matricula.ToLower() == username.ToLower());
+                .FirstOrDefaultAsync(m => m.Matricula.ToLower() == matricula.ToLower());
+        }
 
-            if (medicoDb == null)
-            {
-                // Fallback: Si ingresaron "admin", devolvemos el primer médico para que puedan probar el sistema
-                medicoDb = await _context.Medicos
-                    .Select(m => new Medico {
-                        IdMedico = m.IdMedico,
-                        Nombre = m.Nombre,
-                        Apellido = m.Apellido,
-                        Matricula = m.Matricula
-                    })
-                    .FirstOrDefaultAsync();
-            }
+        public async Task<Medico?> GetFirstMedicoAsync()
+        {
+            return await _context.Medicos
+                .Select(m => new Medico {
+                    IdMedico = m.IdMedico,
+                    Nombre = m.Nombre,
+                    Apellido = m.Apellido,
+                    Matricula = m.Matricula
+                })
+                .FirstOrDefaultAsync();
+        }
 
-            return medicoDb;
+        public async Task<IEnumerable<Usuario>> GetAllUsuariosAsync()
+        {
+            return await _context.Usuarios.ToListAsync();
+        }
+
+        public async Task UpdateUsuarioAsync(Usuario usuario)
+        {
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
         }
     }
 }

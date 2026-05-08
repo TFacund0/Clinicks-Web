@@ -1,4 +1,4 @@
-﻿using ClinicksApi.Data.Entities;
+using ClinicksApi.Data.Entities;
 
 namespace ClinicksApi.Data.Interfaces
 {
@@ -13,7 +13,7 @@ namespace ClinicksApi.Data.Interfaces
         // Buscar un paciente por DNI
         Task<Paciente?> GetByDniAsync(string dni);
 
-        // Obtener pacientes atendidos por un médico específico (medicoId)
-        Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId);
+        // Obtener pacientes atendidos por un médico específico y estado
+        Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId, int estadoTurnoId);
     }
 }

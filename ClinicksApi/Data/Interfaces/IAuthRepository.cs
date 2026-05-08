@@ -1,10 +1,15 @@
-﻿using ClinicksApi.Data.Entities;
+using ClinicksApi.Data.Entities;
 
 namespace ClinicksApi.Data.Interfaces
 {
     public interface IAuthRepository
     {
-        // Devuelve el objeto Medico si las credenciales son correctas
-        Task<Medico?> LoginAsync(string username, string password);
+        Task<Usuario?> GetUsuarioByUsernameAsync(string username);
+        Task<Medico?> GetMedicoByMatriculaAsync(string matricula);
+        Task<Medico?> GetFirstMedicoAsync();
+        
+        // Métodos para la migración temporal de contraseñas
+        Task<IEnumerable<Usuario>> GetAllUsuariosAsync();
+        Task UpdateUsuarioAsync(Usuario usuario);
     }
 }

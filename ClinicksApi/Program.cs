@@ -5,11 +5,13 @@ using ClinicksApi.Data;
 using ClinicksApi.Data.Interfaces;
 using ClinicksApi.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Obtener la cadena de conexi�n del appsettings.json
+// Obtener la cadena de conexión del appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("ClinicksDataBase");
 
 // Registrar el DbContext para que use PostgreSQL
@@ -25,6 +27,22 @@ builder.Services.AddCors(options => {
     });
 });
 
+// Configurar Autenticación con JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+    });
+
 // Add services to the container.
 
 // CONEXIONES DE LAS INTERFACES
@@ -32,6 +50,7 @@ builder.Services.AddCors(options => {
 // Capa de Negocio (Servicios)
 builder.Services.AddScoped<IPacienteService, PacienteService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IWeatherForecastService, WeatherForecastService>();
 
 // Capa de Datos
 builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
@@ -45,6 +64,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseMiddleware<ClinicksApi.Middlewares.ExceptionMiddleware>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -56,6 +77,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
