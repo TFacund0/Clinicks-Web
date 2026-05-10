@@ -1,5 +1,4 @@
-using ClinicksApi.Data.Entities;
-using ClinicksApi.Business.Dtos;
+using ClinicksApi.Business.DTOs;
 
 namespace ClinicksApi.Business.Interfaces
 {

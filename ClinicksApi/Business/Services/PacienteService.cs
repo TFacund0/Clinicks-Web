@@ -1,11 +1,7 @@
-using ClinicksApi.Business.Dtos;
+using ClinicksApi.Business.DTOs;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System;
 
 namespace ClinicksApi.Business.Services
 {
@@ -59,12 +55,17 @@ namespace ClinicksApi.Business.Services
         /// </summary>
         private PacienteDto MapToDto(Paciente dato)
         {
+            // Calcula la edad correctamente: resta 1 si el cumpleaños todavía no pasó este año.
+            var hoy = DateOnly.FromDateTime(DateTime.Now);
+            var edad = hoy.Year - dato.FechaNacimiento.Year;
+            if (dato.FechaNacimiento > hoy.AddYears(-edad)) edad--;
+
             return new PacienteDto
             {
-                Id = dato.IdPaciente,
-                NombreCompleto = $"{dato.Nombre} {dato.Apellido}",
-                Dni = dato.Dni,
-                Edad = DateTime.Now.Year - dato.FechaNacimiento.Year,
+                Id              = dato.IdPaciente,
+                NombreCompleto  = $"{dato.Nombre} {dato.Apellido}",
+                Dni             = dato.Dni,
+                Edad            = edad,
                 FechaUltimaConsulta = dato.Turnos?.Any() == true
                     ? dato.Turnos.OrderByDescending(t => t.FechaTurno).First().FechaTurno.ToShortDateString()
                     : "Sin consultas",

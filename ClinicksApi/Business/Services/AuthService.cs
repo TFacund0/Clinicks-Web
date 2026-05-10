@@ -1,5 +1,5 @@
 using ClinicksApi.Business.Interfaces;
-using ClinicksApi.Business.Dtos;
+using ClinicksApi.Business.DTOs;
 using Microsoft.Extensions.Configuration;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
@@ -20,6 +20,11 @@ namespace ClinicksApi.Business.Services
         private readonly IAuthRepository _authRepository;
         private readonly IConfiguration _config;
 
+        /// <summary>
+        /// Constructor del servicio. Recibe las dependencias inyectadas por el contenedor de .NET.
+        /// </summary>
+        /// <param name="authRepository">Repositorio que ejecuta las consultas SQL de autenticación.</param>
+        /// <param name="config">Configuración de la aplicación, usada para leer las claves JWT del appsettings.</param>
         public AuthService(IAuthRepository authRepository, IConfiguration config)
         {
             _authRepository = authRepository;
@@ -36,39 +41,28 @@ namespace ClinicksApi.Business.Services
         /// <returns>DTO con los datos del médico y el Token JWT, o null si falla.</returns>
         public async Task<LoginResponseDto?> AuthenticateAsync(string username, string password)
         {
-            // 1. Obtener el usuario por Username
+            // 1. Buscar el usuario en la tabla 'usuario' por su nombre de usuario exacto.
             var usuario = await _authRepository.GetUsuarioByUsernameAsync(username);
-            
-            if (usuario == null)
-            {
-                var checkMedico = await _authRepository.GetMedicoByMatriculaAsync(username);
-                if (checkMedico != null)
-                {
-                    usuario = await _authRepository.GetUsuarioByUsernameAsync("admin");
-                }
-            }
-
-            // 2. Si no existe o la contraseña no coincide con el Hash, denegar
             if (usuario == null) return null;
-            
+
             bool isPasswordValid = false;
             try {
                 isPasswordValid = BCrypt.Net.BCrypt.Verify(password, usuario.Password);
             } catch {
-                // Fallback temporal si la DB sigue con texto plano (solo para que no crashee, pero obligará a migrar)
-                isPasswordValid = usuario.Password == password;
+                // Si el hash en BD no tiene formato BCrypt válido, denegamos el acceso.
+                // Ejecutar GET /api/Auth/hash-passwords para migrar las contraseñas.
+                isPasswordValid = false;
             }
 
             if (!isPasswordValid) return null;
 
-            // 3. Obtener los datos del médico
+            // 3. Obtener los datos del médico asociado al usuario por su matrícula.
             var medico = await _authRepository.GetMedicoByMatriculaAsync(username);
-            
-            if (medico == null && username.ToLower() == "admin")
-            {
-                // Fallback (Regla de negocio para modo pruebas)
+
+            // Si el usuario no tiene un médico asociado (ej: usuario administrativo sin matrícula),
+            // obtenemos el primer médico disponible como representación de la sesión.
+            if (medico == null)
                 medico = await _authRepository.GetFirstMedicoAsync();
-            }
 
             if (medico == null) return null;
 

@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ClinicksApi.Business.Interfaces;
-using ClinicksApi.Business.Dtos;
-using System.Threading.Tasks;
+using ClinicksApi.Business.DTOs;
 
 namespace ClinicksApi.Controllers;
 
@@ -56,13 +55,19 @@ public class PacientesController : ControllerBase
     }
 
     /// <summary>
-    /// Obtiene una lista de los pacientes que han sido atendidos por un médico en particular.
+    /// Obtiene la lista de pacientes que han sido atendidos por el médico que está actualmente logueado.
+    /// El ID del médico se extrae del Token JWT para garantizar que cada médico solo pueda ver sus propios pacientes.
     /// </summary>
-    /// <param name="medicoId">El ID numérico del médico (extraído de la URL).</param>
-    /// <returns>Lista de pacientes filtrados. Si el médico no tiene pacientes, devuelve una lista vacía (200 OK).</returns>
-    [HttpGet("atendidos/{medicoId}")]
-    public async Task<IActionResult> GetAtendidosByMedico(int medicoId)
+    /// <returns>Lista de pacientes del médico autenticado. Si no tiene, devuelve lista vacía (200 OK).</returns>
+    [HttpGet("atendidos")]
+    public async Task<IActionResult> GetAtendidosByMedico()
     {
+        // Leemos el ID del médico directamente del Token JWT para prevenir que un médico
+        // consulte los pacientes de otro médico cambiando el ID en la URL.
+        var idMedicoStr = User.FindFirst("idMedico")?.Value;
+        if (!int.TryParse(idMedicoStr, out int medicoId))
+            return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
+
         var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(medicoId);
         return Ok(pacientes);
     }

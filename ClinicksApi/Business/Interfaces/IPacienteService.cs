@@ -1,4 +1,4 @@
-using ClinicksApi.Business.Dtos;
+using ClinicksApi.Business.DTOs;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 

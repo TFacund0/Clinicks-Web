@@ -1,19 +1,27 @@
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
 
 namespace ClinicksApi.Data.Repositories
 {
+    /// <summary>
+    /// Implementación concreta del repositorio de procedimientos médicos utilizando Entity Framework Core.
+    /// Gestiona la persistencia en las tablas <c>procedimiento</c>, <c>turno</c> y <c>estado_turno</c>.
+    /// </summary>
     public class ProcesoRepository : IProcesoRepository
     {
         private readonly ClinicksDbContext _context;
 
+        /// <summary>
+        /// Constructor del repositorio. Recibe el contexto de base de datos inyectado por .NET.
+        /// </summary>
+        /// <param name="context">El contexto de EF Core que representa la sesión activa con PostgreSQL.</param>
         public ProcesoRepository(ClinicksDbContext context)
         {
             _context = context;
         }
 
+        /// <inheritdoc/>
         public async Task<Procedimiento> CrearProcedimiento(Procedimiento procedimiento)
         {
             _context.Procedimientos.Add(procedimiento);
@@ -21,6 +29,7 @@ namespace ClinicksApi.Data.Repositories
             return procedimiento;
         }
 
+        /// <inheritdoc/>
         public async Task<Turno> CrearTurnoVinculado(Turno turno)
         {
             _context.Turnos.Add(turno);
@@ -28,45 +37,38 @@ namespace ClinicksApi.Data.Repositories
             return turno;
         }
 
+        /// <inheritdoc/>
         public async Task AsegurarEstadoTurnoExiste(int idEstadoTurno, string nombreEstado)
         {
-            var existe = await _context.EstadoTurnos.AnyAsync(e => e.IdEstadoTurno == idEstadoTurno);
-            if (!existe)
+            // Si el estado ya existe por ID, no hacemos nada.
+            var existePorId = await _context.EstadoTurnos.AnyAsync(e => e.IdEstadoTurno == idEstadoTurno);
+            if (existePorId) return;
+
+            // Intentamos insertar el estado forzando el ID. En PostgreSQL con columna IDENTITY, 
+            // esto puede fallar si la secuencia no lo permite, por eso capturamos el error.
+            var nuevoEstado = new EstadoTurno
             {
-                var nuevoEstado = new EstadoTurno
+                IdEstadoTurno = idEstadoTurno,
+                Nombre        = nombreEstado
+            };
+
+            try
+            {
+                _context.EstadoTurnos.Add(nuevoEstado);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                // Si falló el insert con ID forzado (ej: columna auto-incremental), 
+                // desvinculamos la entidad para no corromper el tracking de EF Core.
+                _context.Entry(nuevoEstado).State = EntityState.Detached;
+
+                // Como fallback, verificamos si existe por nombre y si no, lo creamos sin forzar el ID.
+                var existePorNombre = await _context.EstadoTurnos.AnyAsync(e => e.Nombre == nombreEstado);
+                if (!existePorNombre)
                 {
-                    // Asumiendo que la base de datos permite forzar el Id (Identity insert o generacin manual dependiendo del config)
-                    // Si falla por identity insert, no le mandamos el Id si es identity, pero como la firma dice IdEstadoTurno, lo seteamos.
-                    IdEstadoTurno = idEstadoTurno,
-                    Nombre = nombreEstado
-                };
-                
-                // Si la columna IdEstadoTurno es auto-incremental (Identity) en Postgres, asignar el ID a mano dar error. 
-                // Sin embargo, para no romper la base vaca, usamos una tcnica segura:
-                // Intentamos buscar por nombre, si no existe lo creamos sin forzar ID si da error, pero aca forzaremos para estar seguros.
-                
-                // En Entity Framework, si el ID es autogenerado, EF ignorar el seteo si no se permite.
-                // Como es una operacin paliativa:
-                try
-                {
-                    _context.EstadoTurnos.Add(nuevoEstado);
+                    _context.EstadoTurnos.Add(new EstadoTurno { Nombre = nombreEstado });
                     await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateException)
-                {
-                    // Si hubo error (ej: el id es auto incremental o ya existe por concurrencia), 
-                    // limpiamos el tracking para no romper futuros inserts.
-                    _context.Entry(nuevoEstado).State = EntityState.Detached;
-                    
-                    // Verificamos si existe por nombre
-                    var estadoExistente = await _context.EstadoTurnos.FirstOrDefaultAsync(e => e.Nombre == nombreEstado);
-                    if (estadoExistente == null)
-                    {
-                         // Insertamos sin ID para que la DB se encargue
-                         var estadoSinId = new EstadoTurno { Nombre = nombreEstado };
-                         _context.EstadoTurnos.Add(estadoSinId);
-                         await _context.SaveChangesAsync();
-                    }
                 }
             }
         }

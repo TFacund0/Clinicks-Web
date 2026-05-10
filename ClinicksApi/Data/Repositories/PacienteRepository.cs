@@ -34,8 +34,9 @@ namespace ClinicksApi.Data.Repositories
         public async Task<Paciente?> GetByIdAsync(int id)
         {
             return await _context.Pacientes
-                .Include(p => p.IdEstadoPacienteNavigation) // <--- CARGA LA TABLA DE ESTADOS
-                .Include(p => p.IdDireccionNavigation) // <--- CARGA LA TABLA DE DIRECCIONES
+                .Include(p => p.IdEstadoPacienteNavigation)
+                .Include(p => p.IdDireccionNavigation)
+                .Include(p => p.Turnos) // Necesario para calcular FechaUltimaConsulta en el DTO
                 .FirstOrDefaultAsync(p => p.IdPaciente == id);
         }
 
@@ -43,19 +44,27 @@ namespace ClinicksApi.Data.Repositories
         public async Task<Paciente?> GetByDniAsync(string dni)
         {
             return await _context.Pacientes
-                .Include(p => p.IdEstadoPacienteNavigation) // <--- CARGA LA TABLA DE ESTADOS
-                .Include(p => p.IdDireccionNavigation) // <--- CARGA LA TABLA DE DIRECCIONES
+                .Include(p => p.IdEstadoPacienteNavigation)
+                .Include(p => p.IdDireccionNavigation)
+                .Include(p => p.Turnos) // Necesario para calcular FechaUltimaConsulta en el DTO
                 .FirstOrDefaultAsync(p => p.Dni == dni);
         }
 
         /// <inheritdoc/>
         public async Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId)
         {
+            // Obtenemos el ID del estado "Realizado" desde la BD para no depender de un número hardcodeado.
+            // Si la tabla está vacía o el estado no existe aún, usamos -1 para que la query no devuelva nada.
+            var idEstadoRealizado = await _context.EstadoTurnos
+                .Where(e => e.Nombre.ToLower() == "realizado")
+                .Select(e => e.IdEstadoTurno)
+                .FirstOrDefaultAsync();
+
             return await _context.Pacientes
                 .Include(p => p.IdEstadoPacienteNavigation)
                 .Include(p => p.IdDireccionNavigation)
-                .Include(p => p.Turnos) // Cargamos los turnos para poder filtrar por médico
-                .Where(p => p.Turnos.Any(t => t.IdMedico == medicoId && t.IdEstadoTurno == 3)) // Estado 3 = Atendido
+                .Include(p => p.Turnos)
+                .Where(p => p.Turnos.Any(t => t.IdMedico == medicoId && t.IdEstadoTurno == idEstadoRealizado))
                 .ToListAsync();
         }
 

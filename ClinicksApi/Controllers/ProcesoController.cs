@@ -1,34 +1,55 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Security.Claims;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.DTOs;
 
 namespace ClinicksApi.Controllers
 {
+    /// <summary>
+    /// Controlador responsable de gestionar los procedimientos médicos del sistema.
+    /// Un procedimiento es una intervención clínica (cirugía, estudio de imagen, etc.) 
+    /// que se registra vinculada a un paciente y un médico mediante un Turno.
+    /// Requiere autenticación con Token JWT válido para acceder a cualquier endpoint.
+    /// </summary>
+    [Authorize]
     [ApiController]
-    [Route("api/[controller]")] // La URL base será /api/procesos
+    [Route("api/[controller]")]
     public class ProcesosController : ControllerBase
     {
         private readonly IProcesoService _procesoService;
 
+        /// <summary>
+        /// Constructor del controlador. Recibe el servicio inyectado por el contenedor de dependencias de .NET.
+        /// </summary>
+        /// <param name="procesoService">Servicio con la lógica de negocio de procedimientos médicos.</param>
         public ProcesosController(IProcesoService procesoService)
         {
             _procesoService = procesoService;
         }
 
+        /// <summary>
+        /// Registra un nuevo procedimiento médico vinculado al paciente y al médico autenticado.
+        /// Crea automáticamente un Turno en la base de datos para asociar el procedimiento con ambas partes.
+        /// </summary>
+        /// <param name="dto">DTO con los datos del procedimiento (tipo, descripción, DNI del paciente, fecha, resultado).</param>
+        /// <returns>
+        /// <see cref="OkResult"/> (200) con un mensaje de éxito si el procedimiento se registró correctamente.
+        /// <see cref="BadRequestResult"/> (400) si los datos son inválidos o el paciente no existe.
+        /// <see cref="UnauthorizedResult"/> (401) si el token JWT no es válido o no se proporcionó.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> RegistrarProceso([FromBody] ProcesoAltaDto dto)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
-            // Mantenemos el ID hardcodeado temporalmente porque no hay login conectado aún.
-            int idMedicoPrueba = 2;
+            // Lee el ID del médico directamente del Token JWT para evitar suplantaciones.
+            var idMedicoStr = User.FindFirst("idMedico")?.Value;
+            if (!int.TryParse(idMedicoStr, out int idMedico))
+                return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
 
-            var resultado = await _procesoService.RegistrarProceso(dto, idMedicoPrueba);
+            var resultado = await _procesoService.RegistrarProceso(dto, idMedico);
 
             if (resultado.Success)
             {
@@ -46,10 +67,15 @@ namespace ClinicksApi.Controllers
             });
         }
 
+        /// <summary>
+        /// Devuelve el catálogo de tipos de procedimiento disponibles en el sistema.
+        /// La lista está definida en código ya que la base de datos no posee una tabla específica para este catálogo.
+        /// </summary>
+        /// <returns><see cref="OkResult"/> (200) con la lista de tipos de procedimiento disponibles.</returns>
         [HttpGet("tipos")]
         public IActionResult GetTiposProceso()
         {
-            // Devolvemos una lista harcodeada ya que la base de datos no tiene una tabla específica para esto
+            // Lista predefinida de categorías clínicas. A futuro podría moverse a la base de datos.
             var tipos = new List<object>
             {
                 new { id = 1, nombre = "Cirugía Menor" },
