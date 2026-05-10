@@ -4,16 +4,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClinicksApi.Data.Repositories;
 
+/// <summary>
+/// Implementación concreta del repositorio de Pacientes.
+/// Utiliza Entity Framework Core para traducir llamadas de C# a comandos SQL en PostgreSQL.
+/// </summary>
 public class PacienteRepository : IPacienteRepository
 {
     private readonly ClinicksDbContext _context;
 
-    // Inyectamos el DbContext que configuramos antes
+    /// <summary>
+    /// Inyecta el contexto de base de datos (sesión física con PostgreSQL).
+    /// </summary>
     public PacienteRepository(ClinicksDbContext context)
     {
         _context = context;
     }
 
+    /// <inheritdoc/>
     public async Task<IEnumerable<Paciente>> GetAllAsync()
     {
         return await _context.Pacientes
@@ -23,6 +30,7 @@ public class PacienteRepository : IPacienteRepository
             .ToListAsync();
     }
 
+    /// <inheritdoc/>
     public async Task<Paciente?> GetByIdAsync(int id)
     {
         return await _context.Pacientes
@@ -31,6 +39,7 @@ public class PacienteRepository : IPacienteRepository
             .FirstOrDefaultAsync(p => p.IdPaciente == id);
     }
 
+    /// <inheritdoc/>
     public async Task<Paciente?> GetByDniAsync(string dni)
     {
         return await _context.Pacientes
@@ -39,9 +48,9 @@ public class PacienteRepository : IPacienteRepository
             .FirstOrDefaultAsync(p => p.Dni == dni);
     }
 
+    /// <inheritdoc/>
     public async Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId, int estadoTurnoId)
     {
-        // Buscamos los pacientes que tengan al menos un turno con ese médicoId y con el estado requerido
         return await _context.Pacientes
             .Include(p => p.IdEstadoPacienteNavigation)
             .Include(p => p.IdDireccionNavigation)

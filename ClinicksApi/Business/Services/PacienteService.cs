@@ -5,6 +5,10 @@ using ClinicksApi.Data.Interfaces;
 
 namespace ClinicksApi.Business.Services
 {
+    /// <summary>
+    /// Servicio especialista en aplicar reglas de negocio sobre la información de los pacientes.
+    /// Transforma los datos brutos de la Base de Datos (Entidades) en formatos ligeros (DTOs) para la web.
+    /// </summary>
     public class PacienteService : IPacienteService
     {
         private readonly IPacienteRepository _repository;
@@ -14,7 +18,9 @@ namespace ClinicksApi.Business.Services
             _repository = repository;
         }
 
-        // Implementamos el método para obtener pacientes atendidos por un médico específico
+        /// <summary>
+        /// Lógica de negocio para buscar a los pacientes asignados a un médico.
+        /// </summary>
         public async Task<IEnumerable<PacienteDto>> ObtenerAtendidosPorMedico(int medicoId)
         {
             // El estado 3 representa "Atendido" (regla de negocio en la capa de servicios)
@@ -27,7 +33,9 @@ namespace ClinicksApi.Business.Services
             return datos.Select(MapToDto);
         }
 
-        // Implementamos el método para obtener el listado de pacientes
+        /// <summary>
+        /// Recupera y mapea la lista completa de pacientes activos e inactivos.
+        /// </summary>
         public async Task<IEnumerable<PacienteDto>> ObtenerListado()
         {
             // Obtenemos todos los pacientes usando el repositorio
@@ -35,6 +43,9 @@ namespace ClinicksApi.Business.Services
             return datos.Select(MapToDto);
         }
 
+        /// <summary>
+        /// Recupera un paciente puntual y lo convierte en su DTO correspondiente.
+        /// </summary>
         public async Task<PacienteDto?> ObtenerPorId(int id)
         {
             // Obtenemos el paciente por su ID usando el repositorio
@@ -43,7 +54,13 @@ namespace ClinicksApi.Business.Services
             return MapToDto(dato);
         }
 
-        // Método privado para mapear un objeto Paciente a PacienteDto
+        /// <summary>
+        /// Método auxiliar (Privado) que realiza la conversión de Entidad a DTO.
+        /// Aquí se ejecutan cálculos al vuelo como la "Edad" basada en la fecha de nacimiento
+        /// y la última fecha de turno usando LINQ.
+        /// </summary>
+        /// <param name="dato">Objeto pesado y completo de base de datos.</param>
+        /// <returns>Objeto ligero listo para enviar por la web.</returns>
         private PacienteDto MapToDto(Paciente dato)
         {
             return new PacienteDto

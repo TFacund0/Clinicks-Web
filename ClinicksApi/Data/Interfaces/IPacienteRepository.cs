@@ -2,18 +2,26 @@ using ClinicksApi.Data.Entities;
 
 namespace ClinicksApi.Data.Interfaces
 {
+    /// <summary>
+    /// Contrato exclusivo para el acceso a la tabla Pacientes en PostgreSQL.
+    /// </summary>
     public interface IPacienteRepository
     {
-        // Obtener todos los pacientes
+        /// <summary>Ejecuta un SELECT * FROM Pacientes incluyendo las tablas relacionadas por defecto.</summary>
         Task<IEnumerable<Paciente>> GetAllAsync();
 
-        // Obtener un paciente por su ID (Primary Key)
+        /// <summary>Busca un paciente único por su Primary Key (IdPaciente).</summary>
         Task<Paciente?> GetByIdAsync(int id);
 
-        // Buscar un paciente por DNI
+        /// <summary>Busca un paciente filtrando por la columna DNI.</summary>
         Task<Paciente?> GetByDniAsync(string dni);
 
-        // Obtener pacientes atendidos por un médico específico y estado
+        /// <summary>
+        /// Busca pacientes cruzando la tabla Turnos para encontrar aquellos que han sido
+        /// atendidos por un médico específico y que su turno tenga un estado en particular.
+        /// </summary>
+        /// <param name="medicoId">Primary key del médico a filtrar.</param>
+        /// <param name="estadoTurnoId">ID del estado del turno (ej. 3 para "Atendido").</param>
         Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId, int estadoTurnoId);
     }
 }

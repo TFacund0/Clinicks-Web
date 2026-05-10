@@ -4,23 +4,38 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClinicksApi.Controllers
 {
+    /// <summary>
+    /// Controlador responsable de gestionar la autenticación y seguridad de la API.
+    /// Es el "Recepcionista" que verifica credenciales y entrega los Tokens JWT (Gafetes).
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
 
+        /// <summary>
+        /// Constructor del controlador. Aquí se aplica la Inyección de Dependencias.
+        /// </summary>
+        /// <param name="authService">El servicio (Especialista) que contiene la lógica real de autenticación.</param>
         public AuthController(IAuthService authService)
         {
             _authService = authService;
         }
 
+        /// <summary>
+        /// Endpoint para iniciar sesión en el sistema.
+        /// Recibe las credenciales y, si son válidas, devuelve los datos del médico junto con su Token JWT.
+        /// </summary>
+        /// <param name="request">DTO que contiene el Username y Password enviados por el cliente (ej. React).</param>
+        /// <returns>
+        /// <see cref="OkResult"/> (200) con los datos del médico si el login es exitoso.
+        /// <see cref="BadRequestResult"/> (400) si el formato de la petición es incorrecto.
+        /// <see cref="UnauthorizedResult"/> (401) si las credenciales son inválidas.
+        /// </returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            // ESTO TE VA A DECIR TODO:
-            Console.WriteLine($"DEBUG: Recibido User='{request.Username}' Pass='{request.Password}'");
-
             if (string.IsNullOrEmpty(request.Username))
             {
                 return BadRequest(new { message = "C# recibió el nombre de usuario VACÍO. Revisá el JsonPropertyName." });
@@ -34,10 +49,14 @@ namespace ClinicksApi.Controllers
                 return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
             }
 
-            // Devolvemos el DTO proporcionado por la capa de negocio
             return Ok(medico);
         }
 
+        /// <summary>
+        /// Endpoint de utilidad para encriptar contraseñas antiguas que estaban en texto plano en la base de datos.
+        /// Se usa generalmente una sola vez durante migraciones de seguridad.
+        /// </summary>
+        /// <returns>Un mensaje indicando cuántas contraseñas fueron encriptadas exitosamente.</returns>
         [HttpGet("hash-passwords")]
         public async Task<IActionResult> HashPasswords()
         {

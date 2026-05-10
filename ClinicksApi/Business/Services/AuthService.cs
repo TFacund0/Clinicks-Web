@@ -11,6 +11,10 @@ using System.Text;
 
 namespace ClinicksApi.Business.Services
 {
+    /// <summary>
+    /// Servicio centralizado para manejar la seguridad, encriptación y emisión de tokens.
+    /// Representa la "Recepción" del sistema, donde se validan los credenciales antes de permitir acceso.
+    /// </summary>
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;
@@ -22,13 +26,19 @@ namespace ClinicksApi.Business.Services
             _config = config;
         }
 
+        /// <summary>
+        /// Proceso principal de inicio de sesión.
+        /// Valida las credenciales contra la BD y genera un Token JWT firmado si son correctas.
+        /// Contiene lógicas de fallback por si la base de datos está en proceso de migración de seguridad.
+        /// </summary>
+        /// <param name="username">Nombre de usuario o matrícula ingresada.</param>
+        /// <param name="password">Contraseña en texto plano a verificar.</param>
+        /// <returns>DTO con los datos del médico y el Token JWT, o null si falla.</returns>
         public async Task<LoginResponseDto?> AuthenticateAsync(string username, string password)
         {
             // 1. Obtener el usuario por Username
             var usuario = await _authRepository.GetUsuarioByUsernameAsync(username);
             
-            // Fallback por BD desconectada: Si el usuario ingresó una Matrícula (ej: MN-12345) 
-            // en vez de un Username, validamos la contraseña usando la cuenta maestra "admin".
             if (usuario == null)
             {
                 var checkMedico = await _authRepository.GetMedicoByMatriculaAsync(username);
@@ -91,6 +101,10 @@ namespace ClinicksApi.Business.Services
             };
         }
 
+        /// <summary>
+        /// Tarea de mantenimiento que escanea todos los usuarios y encripta con BCrypt
+        /// las contraseñas que detecta como texto plano.
+        /// </summary>
         public async Task<int> HashExistingPasswordsAsync()
         {
             var usuarios = await _authRepository.GetAllUsuariosAsync();

@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace ClinicksApi.Controllers;
 
 // Controlador para manejar las operaciones relacionadas con los pacientes
+/// <summary>
+/// Controlador responsable de gestionar la información de los pacientes de la clínica.
+/// Requiere que el usuario esté autenticado con un Token JWT válido para acceder a cualquier método.
+/// </summary>
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
@@ -13,14 +17,19 @@ public class PacientesController : ControllerBase
 {
     private readonly IPacienteService _pacienteService;
 
-    // Inyectamos el servicio de pacientes para poder usarlo en los endpoints
+    /// <summary>
+    /// Constructor del controlador. Recibe el servicio inyectado por .NET.
+    /// </summary>
+    /// <param name="pacienteService">Servicio que contiene las reglas de negocio para los pacientes.</param>
     public PacientesController(IPacienteService pacienteService)
     {
         _pacienteService = pacienteService;
     }
 
-    // Endpoint para obtener el listado completo de pacientes
-    // GET: api/pacientes
+    /// <summary>
+    /// Obtiene el listado completo de todos los pacientes registrados en el sistema.
+    /// </summary>
+    /// <returns>Una lista de DTOs de pacientes con código de estado 200 (OK).</returns>
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -28,8 +37,13 @@ public class PacientesController : ControllerBase
         return Ok(pacientes);
     }
 
-    // Endpoint para obtener un paciente por su ID
-    // GET: api/pacientes/5
+    /// <summary>
+    /// Busca un paciente específico utilizando su identificador único.
+    /// </summary>
+    /// <param name="id">El ID numérico del paciente a buscar (extraído de la URL).</param>
+    /// <returns>
+    /// El paciente encontrado (200 OK) o un mensaje de error (404 Not Found) si no existe.
+    /// </returns>
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -41,8 +55,11 @@ public class PacientesController : ControllerBase
         return Ok(paciente);
     }
 
-    // Endpoint para obtener los pacientes atendidos por un médico específico
-    // GET: api/pacientes/atendidos/1
+    /// <summary>
+    /// Obtiene una lista de los pacientes que han sido atendidos por un médico en particular.
+    /// </summary>
+    /// <param name="medicoId">El ID numérico del médico (extraído de la URL).</param>
+    /// <returns>Lista de pacientes filtrados. Si el médico no tiene pacientes, devuelve una lista vacía (200 OK).</returns>
     [HttpGet("atendidos/{medicoId}")]
     public async Task<IActionResult> GetAtendidosByMedico(int medicoId)
     {

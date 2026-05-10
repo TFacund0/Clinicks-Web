@@ -9,6 +9,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+// ====================================================================
+// FASE 1: CONSTRUCCIÓN DEL SERVIDOR (BUILDER)
+// Aquí configuramos todas las "herramientas" que nuestro servidor 
+// necesitará antes de arrancar (Base de datos, CORS, JWT, etc.)
+// ====================================================================
 var builder = WebApplication.CreateBuilder(args);
 
 // Obtener la cadena de conexión del appsettings.json
@@ -18,10 +23,12 @@ var connectionString = builder.Configuration.GetConnectionString("ClinicksDataBa
 builder.Services.AddDbContext<ClinicksDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Configurar CORS para que React pueda conectarse
+// Configurar CORS para que React pueda conectarse usando configuración
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5173" };
+
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowReactApp", policy => {
-        policy.WithOrigins("http://localhost:5173") // El puerto de tu React
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
@@ -43,14 +50,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add services to the container.
-
-// CONEXIONES DE LAS INTERFACES
+// ====================================================================
+// INYECCIÓN DE DEPENDENCIAS (LA FÁBRICA DE OBJETOS)
+// Le enseñamos a .NET cómo crear los Servicios y Repositorios 
+// cuando los Controladores los pidan en sus constructores.
+// ====================================================================
 
 // Capa de Negocio (Servicios)
 builder.Services.AddScoped<IPacienteService, PacienteService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IWeatherForecastService, WeatherForecastService>();
 
 // Capa de Datos
 builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
@@ -62,8 +70,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// ====================================================================
+// FASE 2: ENSAMBLAJE Y EJECUCIÓN DE LA APLICACIÓN (APP)
+// El servidor ya está construido. Ahora configuramos el "Pipeline"
+// (El tubo por donde pasan las peticiones HTTP antes de llegar al código)
+// ====================================================================
 var app = builder.Build();
 
+// 1. MIDDLEWARE GLOBAL DE EXCEPCIONES: Atrapa cualquier error fatal (Ej: Error 500)
+// para que el servidor no explote y le devuelva un JSON limpio a React.
 app.UseMiddleware<ClinicksApi.Middlewares.ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
@@ -72,8 +87,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
 
 app.UseCors("AllowReactApp");
 
