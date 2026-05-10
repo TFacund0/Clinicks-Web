@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import pacienteService from '../services/pacienteService';
 
-export const useAccessConsultation = (acceso) => {
+export const useAccessConsultation = (destino) => {
     const navigate = useNavigate();
 
     // 1. Un solo estado para el formulario
@@ -53,19 +53,13 @@ export const useAccessConsultation = (acceso) => {
             console.log("paciente encontrado:", res);
             setTimeout(() => setShowSuccess(false), 3000);
 
-            if(acceso == 'consulta') {
-            // Navegamos pasando el DNI
             setTimeout(() => {
-                navigate('/nueva-consulta', { state: { dniIngresado: formData.dnipaciente } });
+                navigate(destino, { state: { dniIngresado: formData.dnipaciente } });
             }, 1500);
-            } else if (acceso == 'proceso') {
-                setTimeout(() => {
-                    navigate('/nuevo-procedimiento', { state: { dniIngresado: formData.dnipaciente } });
-                }, 1500);
-            }             
+            
         } catch (error) {
             console.error("Error al crear la consulta:", error);
-            setErrorMsg(error.response?.data?.message || "dni no registrado en la base de datos.");
+            setErrorMsg(error.response?.data?.message || error.response?.data?.mensaje || "dni no registrado en la base de datos.");
             setTimeout(() => setErrorMsg(null), 4000);
         } finally {
             setIsSubmitting(false);

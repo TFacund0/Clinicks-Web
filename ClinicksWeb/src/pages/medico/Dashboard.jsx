@@ -44,15 +44,16 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 gap-4">
                 <button 
                   onClick={() => navigate('/acceso-consulta')} 
-                  className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-cyan-500/50 transition-all group shadow-sm"
-                >
+                  className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-cyan-500/50 transition-all group shadow-sm">
                   <div className="p-4 bg-cyan-500/10 rounded-full text-cyan-400 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-colors">
                     <ClipboardPlus size={32} />
                   </div>
                   <span className="font-bold text-sm text-center">Nueva Consulta</span>
                 </button>
 
-                <button className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-purple-500/50 transition-all group shadow-sm">
+                <button 
+                  onClick={() => navigate('/acceso-procedimiento')} 
+                  className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-purple-500/50 transition-all group shadow-sm">
                   <div className="p-4 bg-purple-500/10 rounded-full text-purple-400 group-hover:bg-purple-500 group-hover:text-slate-950 transition-colors">
                     <Activity size={32} />
                   </div>

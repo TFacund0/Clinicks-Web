@@ -11,11 +11,13 @@ namespace ClinicksApi.Controllers
     public class ConsultasController : ControllerBase
     {
         private readonly IConsultaService _consultaService;
+        private readonly IPacienteService _pacienteService;
 
-        // Inyecci�n de dependencias: Le damos el servicio de consultas al controlador al momento de crearse.
-        public ConsultasController(IConsultaService consultaService)
+        // Inyeccin de dependencias: Le damos el servicio de consultas al controlador al momento de crearse.
+        public ConsultasController(IConsultaService consultaService, IPacienteService pacienteService)
         {
             _consultaService = consultaService;
+            _pacienteService = pacienteService;
         }
 
         [HttpPost]
@@ -23,12 +25,21 @@ namespace ClinicksApi.Controllers
         public async Task<IActionResult> RegistrarConsulta([FromBody] ConsultaAltaDto dto)
         {
             // Mantenemos el ID hardcodeado temporalmente porque no hay login conectado a�n.
-            int idMedicoPrueba = 1;
+            int idMedicoPrueba = 2;
+            var pacienteExiste = await _pacienteService.ExistePaciente(dto.dnipaciente);
+            if (!pacienteExiste.Success)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    mensaje = "El paciente no existe"
+                });
+            }
 
-            // Delega la validaci�n y guardado en base de datos al servicio de negocio.
+            // Delega la validacin y guardado en base de datos al servicio de negocio.
             var resultado = await _consultaService.RegistrarConsulta(dto, idMedicoPrueba);
 
-            // Si se guard� bien, devuelve un 200 OK con un mensaje de �xito.
+            // Si se guarda bien, devuelve un 200 OK con un mensaje de exito.
             if (resultado.Success)
             {
                 return Ok(new
@@ -49,7 +60,15 @@ namespace ClinicksApi.Controllers
         [HttpGet("historial/{pacienteId}")]
         // Endpoint din�mico (/api/consultas/historial/5) que devuelve todas las consultas previas de un paciente.
         public async Task<IActionResult> GetHistorial(int pacienteId)
-        {
+        {   
+            if (pacienteId <= 0)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    mensaje = "El Id del paciente debe ser mayor a cero."
+                });
+            }
             var historial = await _consultaService.ObtenerHistorialPaciente(pacienteId);
             return Ok(historial); // Devuelve la lista en formato JSON al frontend.
         }

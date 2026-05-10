@@ -9,7 +9,7 @@ export const useNewConsultation = (dniInicial = '') => {
     const [formData, setFormData] = useState({
         dnipaciente: dniInicial,
         motivo: '',
-        fechaconsulta: '', 
+        fechaconsulta: '',
         diagnostico: '',
         tratamiento: '',
         observaciones: '',
@@ -25,11 +25,11 @@ export const useNewConsultation = (dniInicial = '') => {
     // Cada vez que el médico teclea algo, esta función se ejecuta.
     const handleChange = (e) => {
         // Extraigo el 'name' (ej: 'motivo') y el 'value' (lo que escribió) del input que disparó el evento.
-        const { name, value } = e.target; 
-        
+        const { name, value } = e.target;
+
         // Actualizo mi objeto formData copiando lo que ya tenía y pisando solo el campo que cambió.
         setFormData({ ...formData, [name]: value });
-        
+
         // Un toque de experiencia de usuario (UX): si el campo tenía un error en rojo, 
         // apenas el médico empieza a escribir para corregirlo, le borro el mensaje de error.
         if (errors[name]) {
@@ -41,7 +41,7 @@ export const useNewConsultation = (dniInicial = '') => {
     // Antes de molestar al backend, reviso localmente que el médico haya llenado lo obligatorio.
     const validarFormulario = () => {
         let erroresTemporales = {};
-        
+
         // Uso .trim() para evitar que me engañen mandando espacios en blanco.
         if (!formData.motivo.trim()) erroresTemporales.motivo = "El motivo de la consulta es obligatorio.";
         if (!formData.diagnostico.trim()) erroresTemporales.diagnostico = "El diagnóstico es obligatorio.";
@@ -52,7 +52,7 @@ export const useNewConsultation = (dniInicial = '') => {
 
         // Guardo los errores encontrados en mi estado para que la vista los muestre en rojo.
         setErrors(erroresTemporales);
-        
+
         // Si la cantidad de errores es 0, devuelvo 'true' (el formulario es válido). Si hay errores, devuelvo 'false'.
         return Object.keys(erroresTemporales).length === 0;
     };
@@ -61,7 +61,7 @@ export const useNewConsultation = (dniInicial = '') => {
     // Esta función se dispara cuando el médico hace clic en "Guardar Consulta".
     const handleSubmit = async (e) => {
         e.preventDefault(); // Evito que el navegador recargue la página por defecto.
-        
+
         // Corto la ejecución acá si la validación falla (si validarFormulario devuelve false).
         if (!validarFormulario()) return;
 
@@ -74,7 +74,7 @@ export const useNewConsultation = (dniInicial = '') => {
             const dataLimpia = {
                 ...formData,
                 fechaconsulta: formData.fechaconsulta || null,
-                idMedico: 1 // TODO: Reemplazar con el ID del contexto/localStorage cuando haya login
+                idMedico: 2 // TODO: Reemplazar con el ID del contexto/localStorage cuando haya login
             };
 
             // Le paso los datos a mi servicio para que haga el POST mediante axios.
@@ -88,15 +88,15 @@ export const useNewConsultation = (dniInicial = '') => {
 
             // Vacío el formulario para que el médico pueda cargar otra consulta.
             setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '' });
-            
+
             setTimeout(() => {
-                navigate('/dashboard'); 
-                }, 1500);
+                navigate('/dashboard');
+            }, 1500);
         } catch (error) {
             // Si el backend me rechaza (ej: el DNI no existe en la base de datos), atrapo el error acá.
             console.error("Error al crear la consulta:", error);
             // Seteo el mensaje de error que me mandó C# o pongo uno genérico si se cayó el servidor.
-            setErrorMsg(error.response?.data?.message || "Error al conectar con la base de datos.");
+            setErrorMsg(error.response?.data?.message || error.response?.data?.mensaje || "Error al conectar con la base de datos.");
             // Borro el cartel de error a los 4 segundos.
             setTimeout(() => setErrorMsg(null), 4000);
         } finally {
@@ -112,7 +112,7 @@ export const useNewConsultation = (dniInicial = '') => {
         setFormData({
             dnipaciente: '',
             motivo: '',
-            fechaconsulta: '', 
+            fechaconsulta: '',
             diagnostico: '',
             tratamiento: '',
             observaciones: '',
@@ -120,7 +120,7 @@ export const useNewConsultation = (dniInicial = '') => {
         });
         setErrors({}); // También limpio los mensajes de error en rojo si los hubiera.
     };
-    
+
     // 7. LO QUE DEVUELVE MI HOOK
     // Exponemos hacia afuera (hacia la vista visual NewConsultation.jsx) 
     // solo los datos y funciones que necesita para funcionar. Lo demás queda privado acá adentro.

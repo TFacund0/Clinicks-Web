@@ -26,11 +26,13 @@ builder.Services.AddCors(options => {
 // 3. INYECCIÓN DE DEPENDENCIAS (DATA LAYER) - ¡Sin duplicados!
 builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
+builder.Services.AddScoped<IProcesoRepository, ProcesoRepository>();
 
 // 4. INYECCIÓN DE DEPENDENCIAS (BUSINESS LAYER)
 // (Ajustaremos esto cuando pasemos a la capa de Servicios)
 builder.Services.AddScoped<IConsultaService, ConsultaService>();
 builder.Services.AddScoped<IPacienteService, PacienteService>();
+builder.Services.AddScoped<IProcesoService, ProcesoService>();
 
 // 5. CONFIGURACIÓN DE LA API
 builder.Services.AddControllers();

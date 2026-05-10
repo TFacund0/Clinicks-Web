@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import procesoService from '../services/procesoService';
 
@@ -10,6 +10,7 @@ export const useNewProcess = (dniInicial = '') => {
         tipoproceso: '',
         descripcion: '',
         fechaproceso: '',
+        resultado: '',
     });
     const [errors, setErrors] = useState({});
     const [showSuccess, setShowSuccess] = useState(false);
@@ -33,7 +34,7 @@ export const useNewProcess = (dniInicial = '') => {
         if (!formData.dnipaciente.trim()) erroresTemporales.dnipaciente = "El DNI del paciente es obligatorio.";
         if (!formData.tipoproceso.trim()) erroresTemporales.tipoproceso = "El tipo de proceso es obligatorio.";
         if (!formData.descripcion.trim()) erroresTemporales.descripcion = "La descripción del proceso es obligatoria.";
-        if (!formData.fechaproceso.trim()) erroresTemporales.fechaproceso = "La fecha del proceso es obligatoria.";
+
 
         setErrors(erroresTemporales);
         return Object.keys(erroresTemporales).length === 0;
@@ -47,7 +48,11 @@ export const useNewProcess = (dniInicial = '') => {
         setIsSubmitting(true);
         setErrorMsg(null);
         try {
-            const res = await procesoService.crearProceso(formData);
+            const dataLimpia = {
+                ...formData,
+                fechaproceso: formData.fechaproceso || null
+            };
+            const res = await procesoService.crearProceso(dataLimpia);
             console.log("Proceso creado:", res);
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
@@ -58,7 +63,7 @@ export const useNewProcess = (dniInicial = '') => {
 
             console.error("Error al crear proceso:", error);
 
-            setErrorMsg(error.response?.data?.message || "Error al conectar con la base de datos.");
+            setErrorMsg(error.response?.data?.message || error.response?.data?.mensaje || "Error al conectar con la base de datos.");
 
             setTimeout(() => setErrorMsg(null), 3000);
         } finally {
@@ -71,7 +76,8 @@ export const useNewProcess = (dniInicial = '') => {
             dnipaciente: '', 
             tipoproceso: '', 
             descripcion: '', 
-            fechaproceso: ''
+            fechaproceso: '',
+            resultado: ''
         });
         setErrors({});
     };
@@ -84,7 +90,7 @@ export const useNewProcess = (dniInicial = '') => {
             console.error("Error al cargar tipos de proceso:", error);
         }
     };
-    useState(() => {
+    useEffect(() => {
         cargarTiposDisponibles();
     }, []);
 

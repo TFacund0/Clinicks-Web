@@ -85,8 +85,9 @@ namespace ClinicksApi.Business.Services
             }
             catch (Exception ex)
             {
-                // Si la base de datos explota (ej: se cortó internet), atrapamos el error y avisamos sin romper la API.
-                return (false, $"Error interno: {ex.Message}", null);
+                // Extraemos el detalle real del error de base de datos si existe (ej: violación de foreign key)
+                var detalle = ex.InnerException != null ? $" Detalle: {ex.InnerException.Message}" : "";
+                return (false, $"Error interno: {ex.Message}{detalle}", null);
             }
         }
     }

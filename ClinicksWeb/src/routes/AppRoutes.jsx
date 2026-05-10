@@ -24,8 +24,8 @@ const AppRoutes = () => {
 
       <Route path="/nuevo-procedimiento" element={<NewProcess />} />
       {/* Ruta para acceder al formulario de consulta o procedimiento según el botón que se presionó */}
-      <Route path="/acceso-consulta" element={<AccessConsultation acceso='consulta' />} />
-      <Route path="/acceso-procedimiento" element={<AccessConsultation acceso='proceso' />} />
+      <Route path="/acceso-consulta" element={<AccessConsultation key="consulta" destino="/nueva-consulta" />} />
+      <Route path="/acceso-procedimiento" element={<AccessConsultation key="proceso" destino="/nuevo-procedimiento" />} />
 
   
       

@@ -3,7 +3,7 @@ import Header from '../../components/Header';
 import { UserSearch, ArrowRight } from 'lucide-react';
 import { useAccessConsultation } from '../../hooks/useAccessConsultation';
 
-const AccessConsultation = (acceso) => {
+const AccessConsultation = ({ destino }) => {
     // Usamos EXACTAMENTE lo que devuelve tu nuevo useAccessConsultation
     const { 
         formData, 
@@ -13,7 +13,7 @@ const AccessConsultation = (acceso) => {
         handleChange, 
         errorMsg,
         handleSubmit 
-    } = useAccessConsultation(acceso);
+    } = useAccessConsultation(destino);
 
     return (
         <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">

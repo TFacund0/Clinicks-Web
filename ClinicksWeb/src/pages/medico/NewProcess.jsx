@@ -46,6 +46,8 @@ const NewProcess = () => {
                                 <div>
                                     <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Fecha del proceso</label>
                                     <input type="date" name="fechaproceso" value={formData.fechaproceso} onChange={handleChange} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors scheme-dark" />
+                                    {errors.fechaproceso && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.fechaproceso}</p>}
+                                    {errors.dnipaciente && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.dnipaciente} (Vuelve al inicio para ingresar el paciente)</p>}
                                 </div>
 
                                 <div>
@@ -62,14 +64,18 @@ const NewProcess = () => {
                                 </h3>
                                 <div>
                                     <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Tipo de Proceso</label>
-                                    <select name="tipoproceso" value={formData.tipoproceso} onChange={handleChange} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors scheme-dark" />
+                                    <select name="tipoproceso" value={formData.tipoproceso} onChange={handleChange} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors scheme-dark">
                                         <option value="">Selecciona un tipo</option>
-                                        {tiposDisponibles.map((tipo) => (
+                                        {Array.isArray(tiposDisponibles) && tiposDisponibles.map((tipo) => (
                                         <option key={tipo.id} value={tipo.nombre}>
                                         {tipo.nombre}
                                         </option>))}
+                                    </select>
                                     {errors.tipoproceso && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.tipoproceso}</p>}      
-                                    
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Resultado</label>
+                                    <textarea name="resultado" value={formData.resultado} onChange={handleChange} rows="2" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors resize-none" placeholder="Resultado del procedimiento..." />
                                 </div>
                                     
                             </div>
