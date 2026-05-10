@@ -2,6 +2,10 @@ using ClinicksApi.Business.Dtos;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System;
 
 namespace ClinicksApi.Business.Services
 {
@@ -13,6 +17,9 @@ namespace ClinicksApi.Business.Services
     {
         private readonly IPacienteRepository _repository;
 
+        /// <summary>
+        /// Inyección de dependencias: ASP.NET nos da el repositorio listo para usar.
+        /// </summary>
         public PacienteService(IPacienteRepository repository)
         {
             _repository = repository;
@@ -23,13 +30,7 @@ namespace ClinicksApi.Business.Services
         /// </summary>
         public async Task<IEnumerable<PacienteDto>> ObtenerAtendidosPorMedico(int medicoId)
         {
-            // El estado 3 representa "Atendido" (regla de negocio en la capa de servicios)
-            int estadoAtendido = 3;
-
-            // Obtenemos los pacientes atendidos por el médico usando el repositorio
-            var datos = await _repository.GetAtendidosByMedicoAsync(medicoId, estadoAtendido);
-
-            // Mapeamos cada paciente a su DTO correspondiente
+            var datos = await _repository.GetAtendidosByMedicoAsync(medicoId);
             return datos.Select(MapToDto);
         }
 
@@ -38,7 +39,6 @@ namespace ClinicksApi.Business.Services
         /// </summary>
         public async Task<IEnumerable<PacienteDto>> ObtenerListado()
         {
-            // Obtenemos todos los pacientes usando el repositorio
             var datos = await _repository.GetAllAsync();
             return datos.Select(MapToDto);
         }
@@ -48,37 +48,43 @@ namespace ClinicksApi.Business.Services
         /// </summary>
         public async Task<PacienteDto?> ObtenerPorId(int id)
         {
-            // Obtenemos el paciente por su ID usando el repositorio
             var dato = await _repository.GetByIdAsync(id);
             if (dato == null) return null;
+
             return MapToDto(dato);
         }
 
         /// <summary>
         /// Método auxiliar (Privado) que realiza la conversión de Entidad a DTO.
-        /// Aquí se ejecutan cálculos al vuelo como la "Edad" basada en la fecha de nacimiento
-        /// y la última fecha de turno usando LINQ.
         /// </summary>
-        /// <param name="dato">Objeto pesado y completo de base de datos.</param>
-        /// <returns>Objeto ligero listo para enviar por la web.</returns>
         private PacienteDto MapToDto(Paciente dato)
         {
             return new PacienteDto
             {
-                // Mapeamos las propiedades básicas
                 Id = dato.IdPaciente,
                 NombreCompleto = $"{dato.Nombre} {dato.Apellido}",
                 Dni = dato.Dni,
                 Edad = DateTime.Now.Year - dato.FechaNacimiento.Year,
-
-                // Aquí calculamos la fecha de la última consulta si la relación de Turnos existe
                 FechaUltimaConsulta = dato.Turnos?.Any() == true
                     ? dato.Turnos.OrderByDescending(t => t.FechaTurno).First().FechaTurno.ToShortDateString()
                     : "Sin consultas",
-
-                // Determinamos si el paciente está activo basándonos en su estado
                 EstaActivo = dato.IdEstadoPacienteNavigation?.Nombre.ToLower() == "activo"
             };
+        }
+
+        /// <summary>
+        /// Verifica la existencia de un paciente por su DNI.
+        /// </summary>
+        public async Task<(bool Success, string Message)> ExistePaciente(string dni)
+        { 
+            var existe = await _repository.ExistePacientePorDniAsync(dni);
+
+            if (existe)
+            {
+                return (true, "Paciente encontrado");
+            }
+
+            return (false, "Paciente no encontrado");
         }
     }
 }

@@ -1,9 +1,10 @@
 // src/services/pacienteService.js
 import clinicksApi from '../api/clinicksApi';
 
+// Servicio que concentra y maneja todas las peticiones a la API relacionadas con los pacientes.
 export const pacienteService = {
     
-    // Trae todos los pacientes
+    // Pide al servidor el listado completo de todos los pacientes registrados en el sistema (GET).
     obtenerTodos: async () => {
         try {
             const respuesta = await clinicksApi.get('/pacientes');
@@ -14,7 +15,7 @@ export const pacienteService = {
         }
     },
 
-    // Trae solo los pacientes que atendió un médico específico
+    // Busca exclusivamente a los pacientes que ya fueron atendidos por el médico actual usando su ID (GET).
     obtenerAtendidosPorMedico: async (medicoId) => {
         try {
             const respuesta = await clinicksApi.get(`/pacientes/atendidos/${medicoId}`);
@@ -23,5 +24,17 @@ export const pacienteService = {
             console.error(`Error al obtener pacientes del médico ${medicoId}:`, error);
             throw error;
         }
+    },
+
+    validarPacientePorDni: async (dni) => {
+        try {
+            // Mandamos el DNI como parámetro de ruta o query según tu API
+            const respuesta = await clinicksApi.get(`/pacientes/validar/${dni}`);
+            return respuesta.data; // Debería devolver { success: true, mensaje: "..." }
+        } catch (error) {
+            console.error("Error al validar paciente:", error.response?.data || error.message);
+            throw error;
+        }
     }
 };
+export default pacienteService;

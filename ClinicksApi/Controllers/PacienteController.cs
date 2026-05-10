@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.Dtos;
-using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace ClinicksApi.Controllers;
 
-// Controlador para manejar las operaciones relacionadas con los pacientes
 /// <summary>
 /// Controlador responsable de gestionar la información de los pacientes de la clínica.
 /// Requiere que el usuario esté autenticado con un Token JWT válido para acceder a cualquier método.
@@ -63,10 +63,30 @@ public class PacientesController : ControllerBase
     [HttpGet("atendidos/{medicoId}")]
     public async Task<IActionResult> GetAtendidosByMedico(int medicoId)
     {
-        // Obtenemos los pacientes atendidos por el médico usando el servicio
         var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(medicoId);
-
-        // Si no se encuentran pacientes, devolvemos una lista vacía (en lugar de un error)
         return Ok(pacientes);
+    }
+
+    /// <summary>
+    /// Verifica si existe un paciente registrado en la base de datos a partir de su DNI.
+    /// </summary>
+    /// <param name="dni">DNI del paciente.</param>
+    [HttpGet("validar/{dni}")]
+    public async Task<IActionResult> ValidarPaciente(string dni)
+    {
+        var resultado = await _pacienteService.ExistePaciente(dni);
+
+        if (resultado.Success)
+        {
+            return Ok(new { 
+                success = true, 
+                mensaje = "Paciente verificado correctamente." 
+            });
+        }
+
+        return NotFound(new { 
+            success = false, 
+            mensaje = "El DNI ingresado no corresponde a un paciente registrado." 
+        });
     }
 }

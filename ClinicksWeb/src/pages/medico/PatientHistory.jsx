@@ -1,20 +1,19 @@
-/**
- * COMPONENTE: PatientHistory (Historial Clínico)
- * PROPÓSITO: Muestra el detalle del historial clínico de un paciente específico,
- * incluyendo sus datos personales y una línea de tiempo (timeline) con el registro de sus consultas.
- */
-
+// src/pages/medico/PatientHistory.jsx
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, FileText, Activity } from 'lucide-react';
 
+// Vista que muestra la línea de tiempo cronológica con todas las atenciones médicas de un paciente específico.
 const PatientHistory = () => {
-  const { id } = useParams(); // Obtenemos el ID del paciente de la URL
+  // Extrae el "id" directamente desde la URL del navegador
+  const { id } = useParams(); 
+  
+  // Herramienta para movernos de pantalla sin recargar.
   const navigate = useNavigate();
 
-  // Datos de ejemplo
+  // Datos temporales de prueba (Mock).
   const historialEjemplo = {
     nombre: "Juan Pérez",
     dni: "32.123.456",
@@ -53,7 +52,7 @@ const PatientHistory = () => {
               </div>
             </div>
 
-            {/* LISTADO DE CONSULTAS (Timeline) */}
+            {/* LISTADO DE CONSULTAS (Línea de Tiempo) */}
             <div className="space-y-6">
               <h2 className="text-lg font-bold flex items-center gap-2 mb-4">
                 <Clock size={20} className="text-slate-400" /> Registro de Consultas
@@ -61,17 +60,15 @@ const PatientHistory = () => {
 
               {historialEjemplo.consultas.map((consulta, index) => (
                 <div key={consulta.id} className="relative pl-8 group">
-                  {/* Línea vertical decorativa */}
+                  
                   {index !== historialEjemplo.consultas.length - 1 && (
                     <div className="absolute left-2.75 top-8 -bottom-6 w-0.5 bg-slate-800 group-hover:bg-cyan-500/30 transition-colors"></div>
                   )}
                   
-                  {/* Punto de la línea de tiempo */}
                   <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-slate-950 border-2 border-slate-800 group-hover:border-cyan-500 transition-colors flex items-center justify-center">
                     <div className="w-2 h-2 rounded-full bg-slate-700 group-hover:bg-cyan-500 transition-colors"></div>
                   </div>
 
-                  {/* Tarjeta de consulta */}
                   <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-2xl group-hover:border-slate-700 group-hover:bg-slate-900 transition-all shadow-sm">
                     <div className="flex justify-between items-start mb-4">
                       <span className="text-xs font-bold text-cyan-500 bg-cyan-500/10 px-3 py-1 rounded-full">{consulta.fecha}</span>

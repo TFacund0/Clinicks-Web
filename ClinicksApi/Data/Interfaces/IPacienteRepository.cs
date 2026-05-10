@@ -21,7 +21,9 @@ namespace ClinicksApi.Data.Interfaces
         /// atendidos por un médico específico y que su turno tenga un estado en particular.
         /// </summary>
         /// <param name="medicoId">Primary key del médico a filtrar.</param>
-        /// <param name="estadoTurnoId">ID del estado del turno (ej. 3 para "Atendido").</param>
-        Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId, int estadoTurnoId);
+        Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId);
+
+        /// <summary>Verifica si existe un paciente registrado con el DNI proporcionado.</summary>
+        Task<bool> ExistePacientePorDniAsync(string dni);
     }
 }

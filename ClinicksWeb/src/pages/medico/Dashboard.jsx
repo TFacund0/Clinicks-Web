@@ -1,29 +1,23 @@
-/**
- * COMPONENTE: Dashboard (Panel Principal)
- * PROPÓSITO: Vista principal del médico al iniciar sesión. 
- * Muestra un resumen de actividad diaria, accesos rápidos a funciones clave y pacientes recientes.
- */
-
-// 1. IMPORTACIONES
+// src/pages/medico/Dashboard.jsx
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
-import { usePatients } from '../../hooks/usePatients'; // Reutilizamos el cerebro
+//import { usePatients } from '../../hooks/usePatients'; 
 import { ClipboardPlus, Activity, ExternalLink, User } from 'lucide-react';
 
+// Vista principal que muestra un resumen rápido de acciones, agenda y los últimos pacientes atendidos.
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // 2. LÓGICA DE SESIÓN
-  const idGuardado = localStorage.getItem('medicoId');
-  const medicoNombre = localStorage.getItem('medicoNombre') || "Alex Carter";
-  const MEDICO_ID_ACTUAL = parseInt(idGuardado) || 1; 
+  // Recupera la información del médico logueado
+  // (Nota: Ajustado temporalmente hasta integrar completamente los claims del JWT en el front)
+  const medicoNombre = "Doctor/a";
 
-  // 3. CONSUMO DE DATOS REALES
-  const { pacientesFiltrados, cargando, error } = usePatients(MEDICO_ID_ACTUAL);
+  // Obtiene los pacientes atendidos por este médico manejando estados de carga y error.
+ // const {cargando, error } = usePatients(1);
 
-  // Tomamos solo los últimos 5 para que el Dashboard no sea gigante
-  const pacientesRecientes = pacientesFiltrados.slice(0, 5);
+  // Limita la lista a solo 5 pacientes para no sobrecargar la pantalla del panel de control.
+  //const pacientesRecientes = pacientesFiltrados.slice(0, 5);
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
@@ -34,7 +28,7 @@ const Dashboard = () => {
 
         <main className="p-8 overflow-y-auto">
           
-          {/* BIENVENIDA DINÁMICA */}
+          {/* Mensaje de bienvenida personalizado con el nombre del médico */}
           <div className="flex justify-between items-end mb-8">
             <div>
               <h1 className="text-4xl font-bold text-white">Buenos días, {medicoNombre}</h1>
@@ -44,17 +38,21 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            {/* COLUMNA IZQUIERDA: Acciones y Agenda */}
+            {/* Botones de acceso rápido para crear consultas o procedimientos */}
             <div className="space-y-8">
               <div className="grid grid-cols-2 gap-4">
-                <button className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-cyan-500/50 transition-all group shadow-sm">
+                <button 
+                  onClick={() => navigate('/acceso-consulta')} 
+                  className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-cyan-500/50 transition-all group shadow-sm">
                   <div className="p-4 bg-cyan-500/10 rounded-full text-cyan-400 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-colors">
                     <ClipboardPlus size={32} />
                   </div>
                   <span className="font-bold text-sm text-center">Nueva Consulta</span>
                 </button>
 
-                <button className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-purple-500/50 transition-all group shadow-sm">
+                <button 
+                  onClick={() => navigate('/acceso-procedimiento')} 
+                  className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-purple-500/50 transition-all group shadow-sm">
                   <div className="p-4 bg-purple-500/10 rounded-full text-purple-400 group-hover:bg-purple-500 group-hover:text-slate-950 transition-colors">
                     <Activity size={32} />
                   </div>
@@ -62,7 +60,7 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              {/* Agenda Simulada */}
+              {/* Sección reservada para mostrar los turnos del día */}
               <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-sm">
                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <div className="w-1 h-6 bg-cyan-500 rounded-full"></div> Mi Agenda
@@ -73,7 +71,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* COLUMNA DERECHA: Tabla con DATOS REALES */}
+            {/* Tabla que lista los últimos pacientes atendidos y permite ir a su historial */}
             <div className="lg:col-span-2 bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl flex flex-col">
               <div className="p-6 border-b border-slate-800 flex justify-between items-center">
                 <h3 className="text-xl font-bold">Pacientes Recientes</h3>
@@ -95,7 +93,7 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
-                  {cargando ? (
+                  {/* {cargando ? (
                     <tr><td colSpan="4" className="p-10 text-center text-slate-500">Cargando datos...</td></tr>
                   ) : error ? (
                     <tr><td colSpan="4" className="p-10 text-center text-red-500">{error}</td></tr>
@@ -130,7 +128,7 @@ const Dashboard = () => {
                     ))
                   ) : (
                     <tr><td colSpan="4" className="p-10 text-center text-slate-600 italic">No se encontraron pacientes atendidos.</td></tr>
-                  )}
+                  )}*/}
                 </tbody>
               </table>
             </div>

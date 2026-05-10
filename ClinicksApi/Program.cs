@@ -1,4 +1,3 @@
-using ClinicksApi.Business;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.Services;
 using ClinicksApi.Data;
@@ -18,8 +17,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Obtener la cadena de conexión del appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("ClinicksDataBase");
-
-// Registrar el DbContext para que use PostgreSQL
 builder.Services.AddDbContext<ClinicksDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -52,36 +49,32 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // ====================================================================
 // INYECCIÓN DE DEPENDENCIAS (LA FÁBRICA DE OBJETOS)
-// Le enseñamos a .NET cómo crear los Servicios y Repositorios 
-// cuando los Controladores los pidan en sus constructores.
 // ====================================================================
+
+// Capa de Datos (Repositorios)
+builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
+builder.Services.AddScoped<IProcesoRepository, ProcesoRepository>();
 
 // Capa de Negocio (Servicios)
 builder.Services.AddScoped<IPacienteService, PacienteService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
-// Capa de Datos
-builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IConsultaService, ConsultaService>();
+builder.Services.AddScoped<IProcesoService, ProcesoService>();
 
 builder.Services.AddControllers();
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // ====================================================================
 // FASE 2: ENSAMBLAJE Y EJECUCIÓN DE LA APLICACIÓN (APP)
-// El servidor ya está construido. Ahora configuramos el "Pipeline"
-// (El tubo por donde pasan las peticiones HTTP antes de llegar al código)
 // ====================================================================
 var app = builder.Build();
 
-// 1. MIDDLEWARE GLOBAL DE EXCEPCIONES: Atrapa cualquier error fatal (Ej: Error 500)
-// para que el servidor no explote y le devuelva un JSON limpio a React.
+// 1. MIDDLEWARE GLOBAL DE EXCEPCIONES: Atrapa cualquier error fatal
 app.UseMiddleware<ClinicksApi.Middlewares.ExceptionMiddleware>();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -89,10 +82,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowReactApp");
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

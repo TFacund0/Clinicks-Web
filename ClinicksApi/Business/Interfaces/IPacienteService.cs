@@ -1,6 +1,6 @@
 using ClinicksApi.Business.Dtos;
-using ClinicksApi.Business.Services;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace ClinicksApi.Business.Interfaces;
 
@@ -12,4 +12,6 @@ public interface IPacienteService
     Task<IEnumerable<PacienteDto>> ObtenerListado();
     Task<PacienteDto?> ObtenerPorId(int id);
     Task<IEnumerable<PacienteDto>> ObtenerAtendidosPorMedico(int medicoId);
+
+    Task<(bool Success, string Message)> ExistePaciente(string dni);
 }
