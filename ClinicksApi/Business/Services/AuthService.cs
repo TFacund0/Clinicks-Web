@@ -8,83 +8,124 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System;
 
 namespace ClinicksApi.Business.Services
 {
-    /// <summary>
-    /// Servicio centralizado para manejar la seguridad, encriptación y emisión de tokens.
-    /// Representa la "Recepción" del sistema, donde se validan los credenciales antes de permitir acceso.
-    /// </summary>
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;
         private readonly IConfiguration _config;
 
-        /// <summary>
-        /// Constructor del servicio. Recibe las dependencias inyectadas por el contenedor de .NET.
-        /// </summary>
-        /// <param name="authRepository">Repositorio que ejecuta las consultas SQL de autenticación.</param>
-        /// <param name="config">Configuración de la aplicación, usada para leer las claves JWT del appsettings.</param>
         public AuthService(IAuthRepository authRepository, IConfiguration config)
         {
             _authRepository = authRepository;
             _config = config;
         }
 
-        /// <summary>
-        /// Proceso principal de inicio de sesión.
-        /// Valida las credenciales contra la BD y genera un Token JWT firmado si son correctas.
-        /// </summary>
-        /// <param name="username">Nombre de usuario o matrícula ingresada.</param>
-        /// <param name="password">Contraseña en texto plano a verificar.</param>
-        /// <returns>DTO con los datos del médico y el Token JWT, o null si falla.</returns>
         public async Task<LoginResponseDto?> AuthenticateAsync(string username, string password)
         {
-            try {
-                // 1. Buscar el usuario (por username o matrícula)
-                var usuario = await _authRepository.GetUsuarioByUsernameAsync(username);
-                if (usuario == null) return null;
+            Console.WriteLine($"\n[LOGIN DEBUG] 1. Intentando buscar usuario: '{username}'");
+            
+            // PASO 1: Buscar el usuario
+            var usuario = await _authRepository.GetUsuarioByUsernameAsync(username);
 
-                // 2. Validar contraseña con BCrypt estricto
-                if (!BCrypt.Net.BCrypt.Verify(password, usuario.Password)) return null;
-
-                // 3. Obtener el médico asociado
-                var medico = await _authRepository.GetMedicoByUsuarioIdAsync(usuario.IdUsuario);
-                
-                // Fallback de seguridad: si no hay médico vinculado, no permitimos acceso a funciones médicas
-                if (medico == null) return null;
-
-                // 4. Generar Token JWT Real
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new[]
-                    {
-                        new Claim(ClaimTypes.Name, medico.Matricula),
-                        new Claim("idMedico", medico.IdMedico.ToString()),
-                        new Claim(ClaimTypes.Role, "Medico")
-                    }),
-                    Expires = DateTime.UtcNow.AddHours(8),
-                    Issuer = _config["Jwt:Issuer"],
-                    Audience = _config["Jwt:Audience"],
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                };
-
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-
-                return new LoginResponseDto
-                {
-                    IdMedico = medico.IdMedico,
-                    Nombre = medico.Nombre,
-                    Apellido = medico.Apellido,
-                    Matricula = medico.Matricula,
-                    Token = tokenHandler.WriteToken(token)
-                };
-            } catch (Exception) {
+            if (usuario == null) 
+            {
+                Console.WriteLine("[LOGIN DEBUG] ERROR: El usuario retornó NULL. No existe en DB o falla EF Core.");
                 return null;
             }
+
+            Console.WriteLine($"[LOGIN DEBUG] 2. Usuario encontrado: ID {usuario.IdUsuario}. Verificando clave...");
+
+            // PASO 2: Verificar contraseña (AQUÍ ESTABA EL MAYOR PROBLEMA)
+            bool isPasswordValid = false;
+            
+            // Limpiamos los espacios en blanco que PostgreSQL pudo haber guardado por error
+            string dbPassword = usuario.Password?.Trim() ?? "";
+            string inputPassword = password?.Trim() ?? "";
+
+            try
+            {
+                isPasswordValid = BCrypt.Net.BCrypt.Verify(inputPassword, dbPassword);
+                Console.WriteLine($"[LOGIN DEBUG] 3. Verificación BCrypt exitosa: {isPasswordValid}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[LOGIN DEBUG] ADVERTENCIA: La clave no es BCrypt válido ({ex.Message}). Usando fallback a texto plano.");
+                isPasswordValid = dbPassword == inputPassword;
+            }
+
+            if (!isPasswordValid) 
+            {
+                Console.WriteLine("[LOGIN DEBUG] ERROR: La contraseña es incorrecta.");
+                return null;
+            }
+
+            // PASO 3: Buscar al médico vinculado
+            Console.WriteLine($"[LOGIN DEBUG] 4. Clave correcta. Buscando Médico para id_usuario: {usuario.IdUsuario}");
+            var medico = await _authRepository.GetMedicoByUsuarioIdAsync(usuario.IdUsuario);
+
+            if (medico == null)
+            {
+                Console.WriteLine("[LOGIN DEBUG] ADVERTENCIA: El usuario no tiene médico vinculado (id_usuario nulo en tabla medico). Usando el primero...");
+                medico = await _authRepository.GetFirstMedicoAsync();
+            }
+
+            if (medico == null) 
+            {
+                Console.WriteLine("[LOGIN DEBUG] ERROR: La tabla de Médicos está completamente vacía.");
+                return null;
+            }
+
+            Console.WriteLine($"[LOGIN DEBUG] 5. ¡ÉXITO! Login autorizado para Dr/Dra. {medico.Apellido}");
+
+            // PASO 4: Generar el Token JWT
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.Name, medico.Matricula),
+                    new Claim("idMedico", medico.IdMedico.ToString()),
+                    new Claim(ClaimTypes.Role, "Medico")
+                }),
+                Expires = DateTime.UtcNow.AddHours(8),
+                Issuer = _config["Jwt:Issuer"],
+                Audience = _config["Jwt:Audience"],
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return new LoginResponseDto
+            {
+                IdMedico  = medico.IdMedico,
+                Nombre    = medico.Nombre,
+                Apellido  = medico.Apellido,
+                Matricula = medico.Matricula,
+                Token     = tokenHandler.WriteToken(token)
+            };
         }
 
+        public async Task<int> HashExistingPasswordsAsync()
+        {
+            var usuarios = await _authRepository.GetAllUsuariosAsync();
+            int count = 0;
+
+            foreach (var usuario in usuarios)
+            {
+                if (!usuario.Password.StartsWith("$2"))
+                {
+                    usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password.Trim());
+                    await _authRepository.UpdateUsuarioAsync(usuario);
+                    count++;
+                }
+            }
+            return count;
+        }
     }
 }

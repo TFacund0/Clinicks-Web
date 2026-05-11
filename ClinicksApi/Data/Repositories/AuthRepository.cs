@@ -4,41 +4,31 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClinicksApi.Data.Repositories
 {
-    /// <summary>
-    /// Implementación concreta del repositorio de Autenticación utilizando Entity Framework Core.
-    /// Es la única clase autorizada para ejecutar consultas SQL sobre Usuarios y Médicos para el Login.
-    /// </summary>
     public class AuthRepository : IAuthRepository
     {
         private readonly ClinicksDbContext _context;
 
-        /// <summary>
-        /// Inyecta el contexto de base de datos que representa la sesión física con PostgreSQL.
-        /// </summary>
         public AuthRepository(ClinicksDbContext context)
         {
             _context = context;
         }
 
-        /// <inheritdoc/>
         public async Task<Usuario?> GetUsuarioByUsernameAsync(string username)
         {
             var cleanUsername = username.Trim().ToLower();
-            
-            // 1. Buscamos por username
             var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Username.Trim().ToLower() == cleanUsername);
+                .FirstOrDefaultAsync(u => u.Username.ToLower() == cleanUsername);
 
-            // 2. Si no existe, buscamos por matrícula
+            // Intento 2 (fallback)
             if (usuario == null)
             {
                 var medico = await _context.Medicos
-                    .FirstOrDefaultAsync(m => m.Matricula.Trim().ToLower() == cleanUsername);
+                    .FirstOrDefaultAsync(m => m.Matricula.ToLower() == cleanUsername);
                 
-                if (medico != null)
+                if (medico != null && medico.IdUsuario.HasValue)
                 {
                     usuario = await _context.Usuarios
-                        .FirstOrDefaultAsync(u => u.IdUsuario == medico.IdUsuario);
+                        .FirstOrDefaultAsync(u => u.IdUsuario == medico.IdUsuario.Value);
                 }
             }
 
@@ -54,6 +44,17 @@ namespace ClinicksApi.Data.Repositories
         public async Task<Medico?> GetFirstMedicoAsync()
         {
             return await _context.Medicos.FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<Usuario>> GetAllUsuariosAsync()
+        {
+            return await _context.Usuarios.ToListAsync();
+        }
+
+        public async Task UpdateUsuarioAsync(Usuario usuario)
+        {
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
         }
     }
 }

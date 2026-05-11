@@ -10,9 +10,13 @@ namespace ClinicksApi.Business.Interfaces
         /// <summary>
         /// Verifica las credenciales de un usuario y, si son válidas, emite un Token JWT.
         /// </summary>
-        /// <param name="username">El nombre de usuario (ej. Matrícula).</param>
+        /// <param name="username">El nombre de usuario o matrícula.</param>
         /// <param name="password">La contraseña en texto plano para verificar.</param>
         Task<LoginResponseDto?> AuthenticateAsync(string username, string password);
-        
+
+        /// <summary>
+        /// Escanea todos los usuarios y encripta con BCrypt las contraseñas en texto plano.
+        /// </summary>
+        Task<int> HashExistingPasswordsAsync();
     }
 }

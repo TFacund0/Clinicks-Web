@@ -48,5 +48,14 @@ namespace ClinicksApi.Controllers
             return Ok(medico);
         }
 
+        /// <summary>
+        /// Endpoint temporal de mantenimiento para encriptar claves en texto plano.
+        /// </summary>
+        [HttpPost("encriptar-claves")]
+        public async Task<IActionResult> EncriptarClaves()
+        {
+            var cantidad = await _authService.HashExistingPasswordsAsync();
+            return Ok(new { message = $"Se han encriptado {cantidad} contraseñas exitosamente." });
+        }
     }
 }
