@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import pacienteService from '../services/pacienteService';
 
-export const useAccessConsultation = () => {
+export const useAccessConsultation = (destino) => {
     const navigate = useNavigate();
 
     // 1. Un solo estado para el formulario
@@ -13,9 +13,14 @@ export const useAccessConsultation = () => {
     // 2. Un solo estado de carga y notificaciones
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
-    // Manejador de cambios en el input
+    // Manejador de cambios en el input con filtro numérico
     const handleChange = (e) => {
         const { name, value } = e.target;
+        
+        // Filtro: Solo permitimos que el estado se actualice si el valor son números.
+        // Esto evita que el médico pueda siquiera escribir letras.
+        if (value !== '' && !/^\d+$/.test(value)) return;
+
         setFormData({ ...formData, [name]: value });
         
         // Limpiamos error si el usuario escribe
@@ -47,21 +52,16 @@ export const useAccessConsultation = () => {
         setIsSubmitting(true);
 
         try {
-            // Llamada al servicio que creamos
-            const res = await pacienteService.validarPacientePorDni(formData.dnipaciente);
+            await pacienteService.validarPacientePorDni(formData.dnipaciente);
             setShowSuccess(true);
-            console.log("paciente encontrado:", res);
             setTimeout(() => setShowSuccess(false), 3000);
 
-
-            // Navegamos pasando el DNI
             setTimeout(() => {
-                navigate('/nueva-consulta', { state: { dniIngresado: formData.dnipaciente } });
+                navigate(destino, { state: { dniIngresado: formData.dnipaciente } });
             }, 1500);
-
+            
         } catch (error) {
-            console.error("Error al crear la consulta:", error);
-            setErrorMsg(error.response?.data?.message || "dni no registrado en la base de datos.");
+            setErrorMsg(error.response?.data?.message || error.response?.data?.mensaje || "dni no registrado en la base de datos.");
             setTimeout(() => setErrorMsg(null), 4000);
         } finally {
             setIsSubmitting(false);

@@ -1,34 +1,35 @@
-// src/routes/AppRoutes.jsx (o donde lo tengas guardado)
 import { Routes, Route, Navigate } from 'react-router-dom';
+import ProtectedRoute from './ProtectedRoute';
+import Login from '../pages/auth/Login';
 import Dashboard from '../pages/medico/Dashboard';
 import Patients from '../pages/medico/Patients';
 import NewConsultation from '../pages/medico/NewConsultation';
 import PatientHistory from '../pages/medico/PatientHistory'; 
 import AccessConsultation from '../pages/medico/accessConsultation';
+import NewProcess from '../pages/medico/NewProcess';
 
-// Componente central que funciona como el "mapa" de nuestra aplicación.
-// Conecta cada URL del navegador con la pantalla (componente) que debe dibujarse.
 const AppRoutes = () => {
+  const estaAutenticado = !!localStorage.getItem('token');
+
   return (
     <Routes>
-      {/* Rutas principales que apuntan a la pantalla de inicio */}
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      {/* Rutas Públicas */}
+      <Route path="/login" element={estaAutenticado ? <Navigate to="/dashboard" /> : <Login />} />
       
-      {/* Ruta para el listado general de pacientes */}
-      <Route path="/pacientes" element={<Patients />} />
-      
-      {/* Ruta para el formulario de atención médica */}
-      <Route path="/nueva-consulta" element={<NewConsultation />} />
+      {/* Rutas Protegidas (Agrupadas) */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/pacientes" element={<Patients />} />
+        <Route path="/pacientes/:id/historial" element={<PatientHistory />} />
+        <Route path="/nueva-consulta" element={<NewConsultation />} />
+        <Route path="/nuevo-procedimiento" element={<NewProcess />} />
+        <Route path="/acceso-consulta" element={<AccessConsultation key="consulta" destino="/nueva-consulta" />} />
+        <Route path="/acceso-procedimiento" element={<AccessConsultation key="proceso" destino="/nuevo-procedimiento" />} />
+      </Route>
 
-      <Route path="/acceso-consulta" element={<AccessConsultation />} />
-  
-      
-      {/* Ruta dinámica: El ":id" es una variable en la URL que nos permite saber el historial de qué paciente buscar (ej. /pacientes/5/historial) */}
-      <Route path="/pacientes/:id/historial" element={<PatientHistory />} />
-
-      {/* Ruta salvavidas: Si el usuario escribe a mano una URL que no existe, lo redirige automáticamente al inicio */}
-      <Route path="*" element={<Navigate to="/" />} />
+      {/* Redirecciones por defecto */}
+      <Route path="/" element={<Navigate to={estaAutenticado ? "/dashboard" : "/login"} />} />
+      <Route path="*" element={<Navigate to={estaAutenticado ? "/dashboard" : "/login"} />} />
     </Routes>
   );
 };

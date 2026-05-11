@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using ClinicksApi.Data.Entities;
 
 namespace ClinicksApi.Data.Entities;
 

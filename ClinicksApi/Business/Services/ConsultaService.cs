@@ -5,41 +5,46 @@ using ClinicksApi.Data.Interfaces;
 
 namespace ClinicksApi.Business.Services
 {
-    // El "Cerebro" de las consultas médicas. 
-    // Esta capa de Servicio se encarga de aplicar las reglas de negocio y validaciones antes de dejar que los datos toquen la base de datos.
+    /// <summary>
+    /// Implementación del servicio de negocio para las consultas médicas.
+    /// Es la capa intermedia entre el Controlador (que recibe las peticiones de React) 
+    /// y el Repositorio (que habla directamente con PostgreSQL).
+    /// Se encarga de aplicar las reglas de negocio y validaciones antes de que los datos toquen la base de datos.
+    /// </summary>
     public class ConsultaService : IConsultaService
     {
-        // Traemos a los "obreros" (Repositorios) que saben cómo hablar con PostgreSQL.
         private readonly IConsultaRepository _consultaRepo;
         private readonly IPacienteRepository _pacienteRepo;
 
-        // Inyección de dependencias. ASP.NET nos pasa automáticamente los repositorios configurados.
+        /// <summary>
+        /// Constructor del servicio. Recibe los repositorios inyectados por el contenedor de dependencias de .NET.
+        /// </summary>
+        /// <param name="consultaRepo">Repositorio que ejecuta operaciones SQL sobre la tabla consulta_medica.</param>
+        /// <param name="pacienteRepo">Repositorio para verificar la existencia del paciente por DNI antes de registrar.</param>
         public ConsultaService(IConsultaRepository consultaRepo, IPacienteRepository pacienteRepo)
         {
             _consultaRepo = consultaRepo;
             _pacienteRepo = pacienteRepo;
         }
 
-        // Pasa directamente la petición al repositorio para traer todas las consultas.
+        /// <inheritdoc/>
         public async Task<List<ConsultaMedica>> ObtenerListaConsultas()
         {
             return await _consultaRepo.ListaConsultas();
         }
 
-        // Pasa la petición al repositorio para traer la línea de tiempo de un paciente específico.
+        /// <inheritdoc/>
         public async Task<List<ConsultaMedica>> ObtenerHistorialPaciente(int pacienteId)
         {
             return await _consultaRepo.HistorialPaciente(pacienteId);
         }
 
-        // El método más importante: Valida, prepara y guarda una nueva atención médica.
-        // Devuelve una "Tupla" (tres valores a la vez) para que el Controlador sepa qué responder a React.
+        /// <inheritdoc/>
         public async Task<(bool Success, string Message, ConsultaMedica? Data)> RegistrarConsulta(ConsultaAltaDto dto, int idMedicoLogueado)
         {
             try
             {
-                // 1. REGLAS DE NEGOCIO (Validaciones de seguridad)
-                // Chequeamos que React no nos haya mandado campos vacíos que son obligatorios.
+                // 1. REGLAS DE NEGOCIO — Validaciones de campos obligatorios.
                 if (string.IsNullOrWhiteSpace(dto.motivo))
                     return (false, "El Motivo es obligatorio.", null);
 
@@ -50,43 +55,40 @@ namespace ClinicksApi.Business.Services
                 if (dto.fechaconsulta != null && dto.fechaconsulta > DateTime.Now)
                     return (false, "La fecha de consulta no puede ser futura.", null);
 
-                // El médico debe existir y ser válido.
+                // El médico debe ser válido y provenir del Token JWT.
                 if (idMedicoLogueado <= 0)
                     return (false, "El Id del Médico logueado es obligatorio y debe ser mayor a cero.", null);
 
-                // 2. VERIFICACIÓN CRUZADA
-                // Usamos el repo de pacientes para ver si el DNI que tipeó el médico realmente existe.
+                // 2. VERIFICACIÓN CRUZADA — Validamos que el DNI ingresado exista realmente en el sistema.
                 var paciente = await _pacienteRepo.GetByDniAsync(dto.dnipaciente);
-
                 if (paciente == null)
-                    return (false, "Paciente no encontrado", null); // Rebotamos la petición si el DNI es falso.
+                    return (false, "Paciente no encontrado.", null);
 
-                // 3. MAPEO (Transformación)
-                // Convertimos el "DTO" (el JSON que mandó React) en una "Entidad" (El objeto que entiende Entity Framework/PostgreSQL).
+                // 3. MAPEO — Convertimos el DTO (JSON de React) en una Entidad que entiende Entity Framework.
                 var nuevaConsulta = new ConsultaMedica
                 {
-                    Motivo = dto.motivo,
-                    Diagnostico = dto.diagnostico,
-                    // Si mandaron estos campos nulos, les ponemos un texto por defecto usando el operador "??".
-                    Tratamiento = dto.tratamiento ?? "sin definir",
-                    Observacion = dto.observaciones ?? "sin observaciones relevantes",
-                    Recomendacion = dto.recomendacion ?? "sin recomendaciones",
-                    FechaConsulta = dto.fechaconsulta ?? DateTime.Now,
-                    IdMedico = idMedicoLogueado,
-                    IdPaciente = paciente.IdPaciente // Sacamos el ID real de la base de datos, no confiamos en el DNI.
+                    Motivo          = dto.motivo,
+                    Diagnostico     = dto.diagnostico,
+                    // Si el frontend no mandó estos campos, usamos valores por defecto con el operador "??".
+                    Tratamiento     = dto.tratamiento   ?? "sin definir",
+                    Observacion     = dto.observaciones ?? "sin observaciones relevantes",
+                    Recomendacion   = dto.recomendacion ?? "sin recomendaciones",
+                    FechaConsulta   = dto.fechaconsulta ?? DateTime.Now,
+                    IdMedico        = idMedicoLogueado,
+                    // Usamos el ID real de la BD; no confiamos en el DNI como identificador.
+                    IdPaciente      = paciente.IdPaciente
                 };
 
-                // 4. GUARDADO
-                // Le damos la entidad ya perfecta al Repositorio para que haga el "INSERT" en SQL.
+                // 4. GUARDADO — El repositorio ejecuta el INSERT en PostgreSQL.
                 var resultado = await _consultaRepo.CrearConsulta(nuevaConsulta);
 
-                // Respondemos que todo salió espectacular.
-                return (true, "Consulta registrada con éxito", resultado);
+                return (true, "Consulta registrada con éxito.", resultado);
             }
             catch (Exception ex)
             {
-                // Si la base de datos explota (ej: se cortó internet), atrapamos el error y avisamos sin romper la API.
-                return (false, $"Error interno: {ex.Message}", null);
+                // Capturamos la causa raíz del error de base de datos (ej: violación de clave foránea).
+                var detalle = ex.InnerException != null ? $" Detalle: {ex.InnerException.Message}" : "";
+                return (false, $"Error interno: {ex.Message}{detalle}", null);
             }
         }
     }

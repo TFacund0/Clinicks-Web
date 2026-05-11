@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using ClinicksApi.Data.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +46,7 @@ public partial class ClinicksDbContext : DbContext
 
     public virtual DbSet<Paciente> Pacientes { get; set; }
 
-    public virtual DbSet<Pais> Pais { get; set; }
+    public virtual DbSet<Pai> Pais { get; set; }
 
     public virtual DbSet<Piso> Pisos { get; set; }
 
@@ -359,6 +359,7 @@ public partial class ClinicksDbContext : DbContext
                 .HasColumnName("dni");
             entity.Property(e => e.IdDireccion).HasColumnName("id_direccion");
             entity.Property(e => e.IdEspecialidad).HasColumnName("id_especialidad");
+            entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
             entity.Property(e => e.Matricula)
                 .HasMaxLength(30)
                 .HasColumnName("matricula");
@@ -375,6 +376,10 @@ public partial class ClinicksDbContext : DbContext
                 .HasForeignKey(d => d.IdEspecialidad)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("medico_id_especialidad_fkey");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Medicos)
+                .HasForeignKey(d => d.IdUsuario)
+                .HasConstraintName("fk_medico_usuario");
         });
 
         modelBuilder.Entity<Paciente>(entity =>
@@ -420,7 +425,7 @@ public partial class ClinicksDbContext : DbContext
                 .HasConstraintName("paciente_id_estado_paciente_fkey");
         });
 
-        modelBuilder.Entity<Pais>(entity =>
+        modelBuilder.Entity<Pai>(entity =>
         {
             entity.HasKey(e => e.IdPais).HasName("pais_pkey");
 

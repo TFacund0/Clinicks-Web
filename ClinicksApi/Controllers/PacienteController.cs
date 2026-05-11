@@ -1,59 +1,85 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.DTOs;
 
-namespace ClinicksApi.Controllers
+namespace ClinicksApi.Controllers;
+
+/// <summary>
+/// Controlador responsable de gestionar la información de los pacientes de la clínica.
+/// Requiere que el usuario esté autenticado con un Token JWT válido para acceder a cualquier método.
+/// </summary>
+[Authorize]
+[ApiController]
+[Route("api/[controller]")]
+public class PacientesController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")] // La URL base será /api/pacientes
+    private readonly IPacienteService _pacienteService;
 
-    // Controlador que gestiona las peticiones desde React (Frontend) relacionadas con los pacientes.
-    public class PacientesController : ControllerBase
+    /// <summary>
+    /// Constructor del controlador. Recibe el servicio inyectado por .NET.
+    /// </summary>
+    /// <param name="pacienteService">Servicio que contiene las reglas de negocio para los pacientes.</param>
+    public PacientesController(IPacienteService pacienteService)
     {
-        private readonly IPacienteService _pacienteService;
+        _pacienteService = pacienteService;
+    }
 
-        // Inyección de dependencias: Recibimos el servicio (el "Cerebro") configurado desde Program.cs.
-        public PacientesController(IPacienteService pacienteService)
-        {
-            _pacienteService = pacienteService;
-        }
+    /// <summary>
+    /// Obtiene el listado completo de todos los pacientes registrados en el sistema.
+    /// </summary>
+    /// <returns>Una lista de DTOs de pacientes con código de estado 200 (OK).</returns>
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var pacientes = await _pacienteService.ObtenerListado();
+        return Ok(pacientes);
+    }
 
-        // GET: api/pacientes
-        [HttpGet]
-        // Endpoint genérico para traer a TODOS los pacientes de la base de datos.
-        public async Task<IActionResult> GetAll()
-        {
-            var pacientes = await _pacienteService.ObtenerListado();
-            return Ok(pacientes); // Devuelve HTTP 200 con el listado en formato JSON.
-        }
+    /// <summary>
+    /// Busca un paciente específico utilizando su identificador único.
+    /// </summary>
+    /// <param name="id">El ID numérico del paciente a buscar (extraído de la URL).</param>
+    /// <returns>
+    /// El paciente encontrado (200 OK) o un mensaje de error (404 Not Found) si no existe.
+    /// </returns>
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var paciente = await _pacienteService.ObtenerPorId(id);
 
-        // GET: api/pacientes/5
-        [HttpGet("{id}")]
-        // Endpoint para buscar a un único paciente por su número de ID.
-        public async Task<IActionResult> GetById(int id)
-        {
-            var paciente = await _pacienteService.ObtenerPorId(id);
+        if (paciente == null)
+            return NotFound(new { message = "Paciente no encontrado" });
 
-            // Si el servicio no encuentra a nadie con ese ID, cortamos acá y mandamos un error 404.
-            if (paciente == null)
-                return NotFound(new { message = "Paciente no encontrado" });
+        return Ok(paciente);
+    }
 
-            return Ok(paciente);
-        }
+    /// <summary>
+    /// Obtiene la lista de pacientes que han sido atendidos por el médico que está actualmente logueado.
+    /// El ID del médico se extrae del Token JWT para garantizar que cada médico solo pueda ver sus propios pacientes.
+    /// </summary>
+    /// <returns>Lista de pacientes del médico autenticado. Si no tiene, devuelve lista vacía (200 OK).</returns>
+    [HttpGet("atendidos")]
+    public async Task<IActionResult> GetAtendidosByMedico()
+    {
+        // Leemos el ID del médico directamente del Token JWT para prevenir que un médico
+        // consulte los pacientes de otro médico cambiando el ID en la URL.
+        var idMedicoStr = User.FindFirst("idMedico")?.Value;
+        if (!int.TryParse(idMedicoStr, out int medicoId))
+            return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
 
-        // GET: api/pacientes/atendidos/1
-        [HttpGet("atendidos/{medicoId}")]
-        // Endpoint personalizado para la vista del Dashboard. Devuelve solo los pacientes que fueron vistos por un médico específico.
-        public async Task<IActionResult> GetAtendidosByMedico(int medicoId)
-        {
-            var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(medicoId);
-            return Ok(pacientes);
-        }
-        [HttpGet("validar/{dni}")]
-        public async Task<IActionResult> ValidarPaciente(string dni)
-        {
-        // Llamamos al service para ver si existe
-            var resultado = await _pacienteService.ExistePaciente(dni);
+        var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(medicoId);
+        return Ok(pacientes);
+    }
+
+    /// <summary>
+    /// Verifica si existe un paciente registrado en la base de datos a partir de su DNI.
+    /// </summary>
+    /// <param name="dni">DNI del paciente.</param>
+    [HttpGet("validar/{dni}")]
+    public async Task<IActionResult> ValidarPaciente(string dni)
+    {
+        var resultado = await _pacienteService.ExistePaciente(dni);
 
         if (resultado.Success)
         {
@@ -67,6 +93,5 @@ namespace ClinicksApi.Controllers
             success = false, 
             mensaje = "El DNI ingresado no corresponde a un paciente registrado." 
         });
-    }
     }
 }
