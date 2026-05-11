@@ -1,44 +1,75 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.DTOs;
 
 namespace ClinicksApi.Controllers
 {
+    /// <summary>
+    /// Controlador responsable de gestionar las consultas médicas del sistema.
+    /// Permite registrar nuevas atenciones y consultar el historial clínico de un paciente.
+    /// Requiere autenticación con Token JWT válido para acceder a cualquier endpoint.
+    /// </summary>
+    [Authorize]
     [ApiController]
-    [Route("api/[controller]")] // La URL base ser� /api/consultas
-
-    // Controlador que recibe las peticiones de React (Frontend) y se las pasa al "Cerebro" (Service) de C#.
+    [Route("api/[controller]")]
     public class ConsultasController : ControllerBase
     {
         private readonly IConsultaService _consultaService;
+        private readonly IPacienteService _pacienteService;
 
-        // Inyecci�n de dependencias: Le damos el servicio de consultas al controlador al momento de crearse.
-        public ConsultasController(IConsultaService consultaService)
+        /// <summary>
+        /// Constructor del controlador. Recibe los servicios inyectados por el contenedor de dependencias de .NET.
+        /// </summary>
+        /// <param name="consultaService">Servicio con la lógica de negocio de consultas médicas.</param>
+        /// <param name="pacienteService">Servicio para validar la existencia del paciente antes de registrar una consulta.</param>
+        public ConsultasController(IConsultaService consultaService, IPacienteService pacienteService)
         {
             _consultaService = consultaService;
+            _pacienteService = pacienteService;
         }
 
+        /// <summary>
+        /// Registra una nueva consulta médica en el sistema.
+        /// Valida que el paciente exista por DNI antes de persistir la información.
+        /// </summary>
+        /// <param name="dto">DTO con los datos de la consulta enviados por el frontend (motivo, diagnóstico, DNI del paciente, etc.).</param>
+        /// <returns>
+        /// <see cref="OkResult"/> (200) con un mensaje de éxito si la consulta se registró correctamente.
+        /// <see cref="BadRequestResult"/> (400) si el paciente no existe o faltan campos obligatorios.
+        /// <see cref="UnauthorizedResult"/> (401) si el token JWT no es válido o no se proporcionó.
+        /// </returns>
         [HttpPost]
-        // Recibe el JSON desde React (ConsultaAltaDto) y guarda una nueva atenci�n m�dica.
         public async Task<IActionResult> RegistrarConsulta([FromBody] ConsultaAltaDto dto)
         {
-            // Mantenemos el ID hardcodeado temporalmente porque no hay login conectado a�n.
-            int idMedicoPrueba = 1;
+            // Lee el ID del médico directamente del Token JWT (claim "idMedico") para evitar suplantaciones.
+            var idMedicoStr = User.FindFirst("idMedico")?.Value;
+            if (!int.TryParse(idMedicoStr, out int idMedico))
+                return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
 
-            // Delega la validaci�n y guardado en base de datos al servicio de negocio.
-            var resultado = await _consultaService.RegistrarConsulta(dto, idMedicoPrueba);
+            var pacienteExiste = await _pacienteService.ExistePaciente(dto.dnipaciente);
+            if (!pacienteExiste.Success)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    mensaje = "El paciente no existe en el sistema."
+                });
+            }
 
-            // Si se guard� bien, devuelve un 200 OK con un mensaje de �xito.
+            // Delega la validación completa y el guardado en base de datos al servicio de negocio.
+            var resultado = await _consultaService.RegistrarConsulta(dto, idMedico);
+
             if (resultado.Success)
             {
                 return Ok(new
                 {
                     success = true,
-                    mensaje = "Consulta guardada correctamente"
+                    mensaje = "Consulta guardada correctamente."
                 });
             }
 
-            // Si fall� (ej: paciente no existe), devuelve un error 400 (Bad Request) para que React lo muestre.
             return BadRequest(new
             {
                 success = false,
@@ -46,12 +77,28 @@ namespace ClinicksApi.Controllers
             });
         }
 
+        /// <summary>
+        /// Obtiene el historial clínico completo de un paciente ordenado por fecha descendente.
+        /// </summary>
+        /// <param name="pacienteId">El ID numérico del paciente (extraído de la URL, ej: /api/consultas/historial/5).</param>
+        /// <returns>
+        /// <see cref="OkResult"/> (200) con la lista de consultas del paciente (puede ser vacía si no tiene).
+        /// <see cref="BadRequestResult"/> (400) si el ID proporcionado es inválido (menor o igual a cero).
+        /// </returns>
         [HttpGet("historial/{pacienteId}")]
-        // Endpoint din�mico (/api/consultas/historial/5) que devuelve todas las consultas previas de un paciente.
         public async Task<IActionResult> GetHistorial(int pacienteId)
         {
+            if (pacienteId <= 0)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    mensaje = "El Id del paciente debe ser mayor a cero."
+                });
+            }
+
             var historial = await _consultaService.ObtenerHistorialPaciente(pacienteId);
-            return Ok(historial); // Devuelve la lista en formato JSON al frontend.
+            return Ok(historial);
         }
     }
 }

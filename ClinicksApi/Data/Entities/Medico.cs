@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using ClinicksApi.Data.Entities;
 
 namespace ClinicksApi.Data.Entities;
 
@@ -22,11 +21,15 @@ public partial class Medico
 
     public int IdDireccion { get; set; }
 
+    public int? IdUsuario { get; set; }
+
     public virtual ICollection<ConsultaMedica> ConsultaMedicas { get; set; } = new List<ConsultaMedica>();
 
     public virtual Direccion IdDireccionNavigation { get; set; } = null!;
 
     public virtual Especialidad IdEspecialidadNavigation { get; set; } = null!;
+
+    public virtual Usuario? IdUsuarioNavigation { get; set; }
 
     public virtual ICollection<Internacion> Internacions { get; set; } = new List<Internacion>();
 

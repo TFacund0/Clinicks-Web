@@ -9,16 +9,15 @@ import { ClipboardPlus, Activity, ExternalLink, User } from 'lucide-react';
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // Recupera la información del médico logueado desde el almacenamiento del navegador.
-  const idGuardado = localStorage.getItem('medicoId');
-  const medicoNombre = localStorage.getItem('medicoNombre') || "Alex Carter";
-  const MEDICO_ID_ACTUAL = parseInt(idGuardado) || 1; 
+  // Recupera la información del médico logueado para personalizar el saludo.
+  const medicoNombre = localStorage.getItem('medicoNombre') || "Doctor/a";
 
   // Obtiene los pacientes atendidos por este médico manejando estados de carga y error.
-  const { pacientesFiltrados, cargando, error } = usePatients(MEDICO_ID_ACTUAL);
+  const { pacientesFiltrados, cargando, error } = usePatients();
 
   // Limita la lista a solo 5 pacientes para no sobrecargar la pantalla del panel de control.
-  const pacientesRecientes = pacientesFiltrados.slice(0, 5);
+  // Aseguramos que pacientesFiltrados sea un array antes de hacer slice
+  const pacientesRecientes = pacientesFiltrados ? pacientesFiltrados.slice(0, 5) : [];
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
@@ -44,15 +43,16 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 gap-4">
                 <button 
                   onClick={() => navigate('/acceso-consulta')} 
-                  className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-cyan-500/50 transition-all group shadow-sm"
-                >
+                  className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-cyan-500/50 transition-all group shadow-sm">
                   <div className="p-4 bg-cyan-500/10 rounded-full text-cyan-400 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-colors">
                     <ClipboardPlus size={32} />
                   </div>
                   <span className="font-bold text-sm text-center">Nueva Consulta</span>
                 </button>
 
-                <button className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-purple-500/50 transition-all group shadow-sm">
+                <button 
+                  onClick={() => navigate('/acceso-procedimiento')} 
+                  className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-purple-500/50 transition-all group shadow-sm">
                   <div className="p-4 bg-purple-500/10 rounded-full text-purple-400 group-hover:bg-purple-500 group-hover:text-slate-950 transition-colors">
                     <Activity size={32} />
                   </div>

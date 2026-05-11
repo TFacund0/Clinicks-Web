@@ -3,16 +3,11 @@ import clinicksApi from '../api/clinicksApi';
 
 // Servicio que centraliza todas las peticiones a la API relacionadas con las consultas médicas.
 const consultaService = {
-    
+
     // Envía los datos del formulario al backend para guardar una nueva consulta en la base de datos (POST).
     crearConsulta: async (consultaData) => {
-        try {
-            const respuesta = await clinicksApi.post('/consultas', consultaData);
-            return respuesta.data;
-        } catch (error) {
-            console.error("Error en consultaService.crearConsulta:", error.response?.data || error.message);
-            throw error;
-        }
+        const respuesta = await clinicksApi.post('/consultas', consultaData);
+        return respuesta.data;
     },
 
     // Recupera el listado completo de todas las consultas médicas registradas (GET).

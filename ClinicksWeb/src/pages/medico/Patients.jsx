@@ -12,10 +12,8 @@ const Patients = () => {
   // Inicializa la herramienta para cambiar de página (ej. ir al historial).
   const navigate = useNavigate();
 
-  // 2. GESTIÓN DE SESIÓN DEL MÉDICO
-  // Recupera el ID del médico desde el almacenamiento local o usa 1 por defecto.
-  const idGuardado = localStorage.getItem('medicoId');
-  const MEDICO_ID_ACTUAL = parseInt(idGuardado) || 1; 
+  // 2. GESTIÓN DE SESIÓN
+  // (El ID del médico ya no se requiere aquí, se maneja vía JWT en el backend)
 
   // 3. CONSUMO DEL CUSTOM HOOK 'usePatients'
   // Extrae los datos procesados, estados de carga y controles de búsqueda desde nuestro "cerebro".
@@ -25,7 +23,7 @@ const Patients = () => {
     error,              
     searchTerm,         
     setSearchTerm       
-  } = usePatients(MEDICO_ID_ACTUAL);
+  } = usePatients();
 
   // 4. RENDERIZADO DE LA INTERFAZ
   return (
