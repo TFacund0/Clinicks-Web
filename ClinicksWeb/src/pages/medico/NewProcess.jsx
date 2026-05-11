@@ -3,10 +3,11 @@ import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { ClipboardList, User, FileText, Save, X } from 'lucide-react';
 import { useNewProcess } from '../../hooks/useNewProcess';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const NewProcess = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const dniEntrante = location.state?.dniIngresado || '';
 
     const {

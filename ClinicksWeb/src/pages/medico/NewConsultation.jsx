@@ -4,12 +4,13 @@ import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { ClipboardList, User, FileText, Save, X } from 'lucide-react';
 import { useNewConsultation } from '../../hooks/useNewConsultation'; 
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 // Componente visual principal para registrar una nueva consulta médica.
 const NewConsultation = () => {
   // Destructuramos (extraemos) todo lo que nos devuelve el hook
   const location = useLocation();
+  const navigate = useNavigate();
   const dniEntrante = location.state?.dniIngresado || '';
 
   const {
