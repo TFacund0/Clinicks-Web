@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import { pacienteService } from '../services/pacienteService';
 
-// Este Hook sirve como el "cerebro" para cargar y buscar pacientes. 
-// Le pasamos el ID del médico logueado para que sepa de quién traer la lista.
-export const usePatients = (medicoId) => {
+// Este Hook gestiona la carga y búsqueda de pacientes del médico logueado.
+// El ID del médico ya no es necesario aquí porque el backend lo extrae del Token JWT.
+export const usePatients = () => {
 
   // 1. ESTADOS
   const [pacientes, setPacientes] = useState([]);
@@ -12,39 +12,31 @@ export const usePatients = (medicoId) => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 2. EFECTO DE CARGA (Conexión con la API)
+  // 2. FUNCIÓN DE CARGA (Conexión con la API)
+  const fetchData = async () => {
+    try {
+      setCargando(true);
+      setError(null);
+      const datos = await pacienteService.obtenerAtendidosPorMedico();
+      setPacientes(Array.isArray(datos) ? datos : []);
+    } catch (err) {
+      setError("No se pudo cargar tu listado de pacientes.");
+      setPacientes([]);
+    } finally {
+      setCargando(false);
+    }
+  };
+
   useEffect(() => {
-    let montado = true;
-
-    const fetchData = async () => {
-      if (!medicoId) return;
-
-      try {
-        setCargando(true);
-        const datos = await pacienteService.obtenerAtendidosPorMedico(medicoId);
-
-        if (montado) {
-          setPacientes(datos);
-          setCargando(false);
-        }
-      } catch (err) {
-        if (montado) {
-          console.error("Error en usePatients:", err);
-          setError("No se pudo cargar tu listado de pacientes.");
-          setCargando(false);
-        }
-      }
-    };
-
     fetchData();
-    return () => { montado = false; };
-  }, [medicoId]);
+  }, []);
 
   // 3. LÓGICA DE FILTRADO EN TIEMPO REAL
-  const pacientesFiltrados = pacientes.filter((p) => {
+  const pacientesFiltrados = (pacientes || []).filter((p) => {
+    if (!p) return false;
     const busqueda = searchTerm.toLowerCase();
-    const nombre = p.nombreCompleto?.toLowerCase() || "";
-    const dni = p.dni || "";
+    const nombre = (p.nombreCompleto || "").toLowerCase();
+    const dni = (p.dni || "").toString();
     return nombre.includes(busqueda) || dni.includes(busqueda);
   });
 
@@ -54,6 +46,7 @@ export const usePatients = (medicoId) => {
     cargando,
     error,
     searchTerm,
-    setSearchTerm
+    setSearchTerm,
+    refetch: fetchData // Exponemos la función de recarga por si queremos un botón de "Refresh"
   };
 };

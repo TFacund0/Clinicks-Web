@@ -8,8 +8,8 @@ import { ArrowLeft, Clock, FileText, Activity } from 'lucide-react';
 // Vista que muestra la línea de tiempo cronológica con todas las atenciones médicas de un paciente específico.
 const PatientHistory = () => {
   // Extrae el "id" directamente desde la URL del navegador
-  const { id } = useParams(); 
-  
+  const { id } = useParams();
+
   // Herramienta para movernos de pantalla sin recargar.
   const navigate = useNavigate();
 
@@ -27,13 +27,13 @@ const PatientHistory = () => {
     <div className="flex h-screen w-full bg-slate-950 text-slate-200 overflow-hidden font-sans">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        <Header paginaActual='Historial Clínico de paciente'/>
-        
+        <Header paginaActual='Historial Clínico de paciente' />
+
         <main className="flex-1 p-8 overflow-y-auto">
           <div className="max-w-4xl mx-auto">
-            
+
             {/* BOTÓN VOLVER */}
-            <button 
+            <button
               onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-slate-500 hover:text-cyan-400 transition-colors mb-6 text-sm font-medium"
             >
@@ -60,11 +60,11 @@ const PatientHistory = () => {
 
               {historialEjemplo.consultas.map((consulta, index) => (
                 <div key={consulta.id} className="relative pl-8 group">
-                  
+
                   {index !== historialEjemplo.consultas.length - 1 && (
                     <div className="absolute left-2.75 top-8 -bottom-6 w-0.5 bg-slate-800 group-hover:bg-cyan-500/30 transition-colors"></div>
                   )}
-                  
+
                   <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-slate-950 border-2 border-slate-800 group-hover:border-cyan-500 transition-colors flex items-center justify-center">
                     <div className="w-2 h-2 rounded-full bg-slate-700 group-hover:bg-cyan-500 transition-colors"></div>
                   </div>

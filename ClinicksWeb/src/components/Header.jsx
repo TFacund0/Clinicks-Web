@@ -24,10 +24,16 @@ const Header = ({ paginaActual = "Panel de Control" }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Obtenemos el nombre del médico logueado. Como aún no tenemos sistema de Login conectado, si no encuentra un nombre, usa "Alex Carter" de prueba.
-  const medicoNombre = localStorage.getItem('medicoNombre') || "Alex Carter";
+  // Obtenemos el nombre del médico logueado.
+  const medicoNombre = localStorage.getItem('medicoNombre') || "Médico";
 
-  // Aquí formateamos la hora bruta de JavaScript a algo fácil de leer, como "08:23 AM".
+  // Generamos las iniciales de forma segura para evitar errores si el nombre es corto o nulo.
+  const iniciales = medicoNombre
+    .split(' ')
+    .filter(n => n.length > 0)
+    .map(n => n[0].toUpperCase())
+    .slice(0, 2)
+    .join('');
   const horaFormateada = currentTime.toLocaleTimeString('en-US', { 
     hour: '2-digit', 
     minute: '2-digit', 
@@ -66,7 +72,7 @@ const Header = ({ paginaActual = "Panel de Control" }) => {
           
           {/* Un truquito visual: Tomo el nombre del médico (ej. "Alex Carter"), lo separo por espacios y extraigo la primera letra de cada parte para formar un "Avatar" de iniciales (ej. "AC"). */}
           <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-cyan-500 text-xs font-bold shadow-inner">
-            {medicoNombre.split(' ').map(n => n[0]).join('')}
+            {iniciales}
           </div>
 
           <div className="text-sm">

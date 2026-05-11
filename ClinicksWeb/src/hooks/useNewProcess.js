@@ -9,7 +9,7 @@ export const useNewProcess = (dniInicial = '') => {
         dnipaciente: dniInicial,
         tipoproceso: '',
         descripcion: '',
-        fechaproceso: '',
+        fechaproceso: new Date().toISOString().split('T')[0], // Fecha de hoy por defecto
         resultado: '',
     });
     const [errors, setErrors] = useState({});
@@ -30,11 +30,16 @@ export const useNewProcess = (dniInicial = '') => {
 
     const validarFormulario = () => {
         let erroresTemporales = {};
+        const hoy = new Date().toISOString().split('T')[0];
 
         if (!formData.dnipaciente.trim()) erroresTemporales.dnipaciente = "El DNI del paciente es obligatorio.";
         if (!formData.tipoproceso.trim()) erroresTemporales.tipoproceso = "El tipo de proceso es obligatorio.";
         if (!formData.descripcion.trim()) erroresTemporales.descripcion = "La descripción del proceso es obligatoria.";
 
+        // Validación de fecha (no puede ser futura)
+        if (formData.fechaproceso && formData.fechaproceso > hoy) {
+            erroresTemporales.fechaproceso = "La fecha no puede ser posterior a hoy.";
+        }
 
         setErrors(erroresTemporales);
         return Object.keys(erroresTemporales).length === 0;
@@ -52,19 +57,14 @@ export const useNewProcess = (dniInicial = '') => {
                 ...formData,
                 fechaproceso: formData.fechaproceso || null
             };
-            const res = await procesoService.crearProceso(dataLimpia);
-            console.log("Proceso creado:", res);
+            await procesoService.crearProceso(dataLimpia);
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 3000);
             setTimeout(() => {
                 navigate('/dashboard');
             }, 1500);
         } catch (error) {
-
-            console.error("Error al crear proceso:", error);
-
             setErrorMsg(error.response?.data?.message || error.response?.data?.mensaje || "Error al conectar con la base de datos.");
-
             setTimeout(() => setErrorMsg(null), 3000);
         } finally {
             setIsSubmitting(false);
@@ -73,10 +73,10 @@ export const useNewProcess = (dniInicial = '') => {
 
     const handleCancel = () => {
         setFormData({
-            dnipaciente: '', 
+            ...formData,
             tipoproceso: '', 
             descripcion: '', 
-            fechaproceso: '',
+            fechaproceso: new Date().toISOString().split('T')[0],
             resultado: ''
         });
         setErrors({});
@@ -87,7 +87,7 @@ export const useNewProcess = (dniInicial = '') => {
             const res = await procesoService.obtenerTiposProceso();
             setTiposDisponibles(res);
         } catch (error) {
-            console.error("Error al cargar tipos de proceso:", error);
+            // Manejo de error silencioso o mediante estado de UI si fuera necesario
         }
     };
     useEffect(() => {

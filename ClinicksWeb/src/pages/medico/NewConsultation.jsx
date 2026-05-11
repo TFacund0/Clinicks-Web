@@ -23,6 +23,13 @@ const NewConsultation = () => {
     handleCancel
   } = useNewConsultation(dniEntrante);
 
+  // PROTECCIÓN DE RUTA: Si no hay DNI (acceso directo por URL), volvemos al buscador.
+  React.useEffect(() => {
+    if (!dniEntrante) {
+      navigate('/acceso-consulta');
+    }
+  }, [dniEntrante, navigate]);
+
   return (
     // Contenedor principal que estructura la pantalla: Sidebar a la izquierda y contenido a la derecha.
     <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
@@ -45,17 +52,25 @@ const NewConsultation = () => {
               {/* Panel Izquierdo: Datos básicos de contexto (DNI, Motivo, Fecha) */}
               <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
                 <h3 className="text-lg font-bold flex items-center gap-2 border-b border-slate-800 pb-3">
-                    <User size={20} className="text-cyan-400" />
+                    <ClipboardList size={20} className="text-cyan-400" />
                     Contexto de la Consulta
                 </h3>
-                <div>
-                    <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Fecha de la consulta</label>
-                    <input type="date" name="fechaconsulta" value={formData.fechaconsulta} onChange={handleChange} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors scheme-dark" />
+                
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">DNI Paciente</label>
+                        <input type="text" name="dnipaciente" value={formData.dnipaciente} disabled className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed font-mono" />
+                    </div>
+                    <div>
+                        <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Fecha de consulta</label>
+                        <input type="date" name="fechaconsulta" value={formData.fechaconsulta} onChange={handleChange} className={`w-full bg-slate-950 border ${errors.fechaconsulta ? 'border-red-500' : 'border-slate-800'} rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors scheme-dark`} />
+                        {errors.fechaconsulta && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.fechaconsulta}</p>}
+                    </div>
                 </div>
                 
                 <div>
                     <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Motivo de Consulta</label>
-                    <textarea name="motivo" value={formData.motivo} onChange={handleChange} rows="2" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors resize-none" placeholder="Descripción breve..." />
+                    <textarea name="motivo" value={formData.motivo} onChange={handleChange} rows="2" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors resize-none" placeholder="Descripción breve del motivo de la visita..." />
                     {errors.motivo && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.motivo}</p>}      
                 </div>
               </div>

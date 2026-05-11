@@ -9,13 +9,11 @@ import { ClipboardPlus, Activity, ExternalLink, User } from 'lucide-react';
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // Recupera la información del médico logueado
-  const idGuardado = localStorage.getItem('medicoId');
+  // Recupera la información del médico logueado para personalizar el saludo.
   const medicoNombre = localStorage.getItem('medicoNombre') || "Doctor/a";
-  const MEDICO_ID_ACTUAL = parseInt(idGuardado) || 1; 
 
   // Obtiene los pacientes atendidos por este médico manejando estados de carga y error.
-  const { pacientesFiltrados, cargando, error } = usePatients(MEDICO_ID_ACTUAL);
+  const { pacientesFiltrados, cargando, error } = usePatients();
 
   // Limita la lista a solo 5 pacientes para no sobrecargar la pantalla del panel de control.
   // Aseguramos que pacientesFiltrados sea un array antes de hacer slice

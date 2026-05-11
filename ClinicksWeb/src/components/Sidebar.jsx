@@ -3,9 +3,10 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Users, ClipboardPlus, Activity, Calendar, LogOut } from 'lucide-react';
 
 const Sidebar = () => {
-  
+
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    // Borramos absolutamente toda la información de sesión para mayor seguridad.
+    localStorage.clear();
     window.location.href = '/login';
   };
 
@@ -19,23 +20,22 @@ const Sidebar = () => {
 
   return (
     <div className="w-64 bg-slate-900 h-screen text-slate-300 flex flex-col border-r border-slate-800 shrink-0">
-      
+
       {/* Cabecera de la barra lateral con el logo y nombre "Clinicks" */}
       <div className="p-6 flex items-center gap-2 text-cyan-400 font-bold text-2xl border-b border-slate-800/50 mb-4">
         <Activity size={32} /> <span>Clinicks</span>
       </div>
-      
+
       {/* Contenedor de la lista de botones de navegación */}
       <nav className="flex-1 px-4 space-y-2">
         {menuItems.map((item, index) => (
-          <NavLink 
-            key={index} 
+          <NavLink
+            key={index}
             to={item.path}
-            className={({ isActive }) => 
-              `flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${
-                isActive 
-                  ? 'bg-cyan-500 text-slate-950 font-bold shadow-lg shadow-cyan-500/20' 
-                  : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'
+            className={({ isActive }) =>
+              `flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${isActive
+                ? 'bg-cyan-500 text-slate-950 font-bold shadow-lg shadow-cyan-500/20'
+                : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200'
               }`
             }
           >
@@ -46,7 +46,7 @@ const Sidebar = () => {
 
       {/* BOTÓN CERRAR SESIÓN */}
       <div className="p-4 border-t border-slate-800 mt-auto">
-        <button 
+        <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 p-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all duration-200 group"
         >

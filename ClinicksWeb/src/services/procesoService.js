@@ -3,13 +3,8 @@ import clinicksApi from '../api/clinicksApi';
 const procesoService = {
     // Envía los datos del formulario al backend para guardar un nuevo proceso en la base de datos (POST).
     crearProceso: async (procesoData) => {
-        try {
-            const respuesta = await clinicksApi.post('/procesos', procesoData);
-            return respuesta.data;
-        } catch (error) {
-            console.error("Error en procesoService.crearProceso:", error.response?.data || error.message);
-            throw error;
-        }
+        const respuesta = await clinicksApi.post('/procesos', procesoData);
+        return respuesta.data;
     },
 
     // Recupera el listado completo de todos los procesos médicos registrados (GET).

@@ -23,47 +23,37 @@ namespace ClinicksApi.Data.Repositories
         /// <inheritdoc/>
         public async Task<Usuario?> GetUsuarioByUsernameAsync(string username)
         {
-            return await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
+            var cleanUsername = username.Trim().ToLower();
+            
+            // 1. Buscamos por username
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Username.Trim().ToLower() == cleanUsername);
+
+            // 2. Si no existe, buscamos por matrícula
+            if (usuario == null)
+            {
+                var medico = await _context.Medicos
+                    .FirstOrDefaultAsync(m => m.Matricula.Trim().ToLower() == cleanUsername);
+                
+                if (medico != null)
+                {
+                    usuario = await _context.Usuarios
+                        .FirstOrDefaultAsync(u => u.IdUsuario == medico.IdUsuario);
+                }
+            }
+
+            return usuario;
         }
 
-        /// <inheritdoc/>
-        public async Task<Medico?> GetMedicoByMatriculaAsync(string matricula)
+        public async Task<Medico?> GetMedicoByUsuarioIdAsync(int usuarioId)
         {
             return await _context.Medicos
-                .Select(m => new Medico {
-                    IdMedico = m.IdMedico,
-                    Nombre = m.Nombre,
-                    Apellido = m.Apellido,
-                    Matricula = m.Matricula
-                })
-                .FirstOrDefaultAsync(m => m.Matricula.ToLower() == matricula.ToLower());
+                .FirstOrDefaultAsync(m => m.IdUsuario == usuarioId);
         }
 
-        /// <inheritdoc/>
         public async Task<Medico?> GetFirstMedicoAsync()
         {
-            return await _context.Medicos
-                .Select(m => new Medico {
-                    IdMedico = m.IdMedico,
-                    Nombre = m.Nombre,
-                    Apellido = m.Apellido,
-                    Matricula = m.Matricula
-                })
-                .FirstOrDefaultAsync();
-        }
-
-        /// <inheritdoc/>
-        public async Task<IEnumerable<Usuario>> GetAllUsuariosAsync()
-        {
-            return await _context.Usuarios.ToListAsync();
-        }
-
-        /// <inheritdoc/>
-        public async Task UpdateUsuarioAsync(Usuario usuario)
-        {
-            _context.Usuarios.Update(usuario);
-            await _context.SaveChangesAsync();
+            return await _context.Medicos.FirstOrDefaultAsync();
         }
     }
 }

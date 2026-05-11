@@ -14,9 +14,5 @@ namespace ClinicksApi.Business.Interfaces
         /// <param name="password">La contraseña en texto plano para verificar.</param>
         Task<LoginResponseDto?> AuthenticateAsync(string username, string password);
         
-        /// <summary>
-        /// Encripta todas las contraseñas en la base de datos que aún se encuentren en texto plano.
-        /// </summary>
-        Task<int> HashExistingPasswordsAsync();
     }
 }

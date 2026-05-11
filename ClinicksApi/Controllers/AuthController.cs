@@ -1,6 +1,7 @@
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ClinicksApi.Controllers
 {
@@ -45,27 +46,6 @@ namespace ClinicksApi.Controllers
                 return Unauthorized(new { message = "Usuario o contraseña incorrectos." });
 
             return Ok(medico);
-        }
-
-        /// <summary>
-        /// Endpoint de utilidad para encriptar contraseñas que están en texto plano en la base de datos.
-        /// Se ejecuta una única vez durante la migración de seguridad inicial.
-        /// Requiere autenticación para evitar ejecuciones no autorizadas.
-        /// </summary>
-        /// <returns>Un mensaje indicando cuántas contraseñas fueron encriptadas exitosamente.</returns>
-        [Authorize]
-        [HttpGet("hash-passwords")]
-        public async Task<IActionResult> HashPasswords()
-        {
-            try
-            {
-                int count = await _authService.HashExistingPasswordsAsync();
-                return Ok(new { message = $"Se han encriptado {count} contraseñas exitosamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error al migrar contraseñas.", detail = ex.Message });
-            }
         }
 
     }

@@ -38,22 +38,22 @@ export const useNewConsultation = (dniInicial = '') => {
     };
 
     // 4. LÓGICA DE VALIDACIÓN
-    // Antes de molestar al backend, reviso localmente que el médico haya llenado lo obligatorio.
     const validarFormulario = () => {
         let erroresTemporales = {};
+        const hoy = new Date().toISOString().split('T')[0];
 
-        // Uso .trim() para evitar que me engañen mandando espacios en blanco.
+        // Validaciones de obligatoriedad
+        if (!formData.dnipaciente.trim()) erroresTemporales.dnipaciente = "El DNI del paciente es obligatorio.";
         if (!formData.motivo.trim()) erroresTemporales.motivo = "El motivo de la consulta es obligatorio.";
         if (!formData.diagnostico.trim()) erroresTemporales.diagnostico = "El diagnóstico es obligatorio.";
-        if (!formData.dnipaciente.trim()) erroresTemporales.dnipaciente = "El DNI del paciente es obligatorio.";
         if (!formData.tratamiento.trim()) erroresTemporales.tratamiento = "El tratamiento indicado es obligatorio.";
-        if (!formData.observaciones.trim()) erroresTemporales.observaciones = "Las observaciones son obligatorias.";
-        if (!formData.recomendacion.trim()) erroresTemporales.recomendacion = "Las recomendaciones son obligatorias.";
+        
+        // Validación de fecha (no puede ser futura)
+        if (formData.fechaconsulta && formData.fechaconsulta > hoy) {
+            erroresTemporales.fechaconsulta = "La fecha no puede ser posterior a hoy.";
+        }
 
-        // Guardo los errores encontrados en mi estado para que la vista los muestre en rojo.
         setErrors(erroresTemporales);
-
-        // Si la cantidad de errores es 0, devuelvo 'true' (el formulario es válido). Si hay errores, devuelvo 'false'.
         return Object.keys(erroresTemporales).length === 0;
     };
 
@@ -70,37 +70,25 @@ export const useNewConsultation = (dniInicial = '') => {
         setErrorMsg(null);
 
         try {
-            // Preparo los datos exactamente como los espera mi backend en C#.
             const dataLimpia = {
                 ...formData,
-                fechaconsulta: formData.fechaconsulta || null,
-                idMedico: 2 // TODO: Reemplazar con el ID del contexto/localStorage cuando haya login
+                fechaconsulta: formData.fechaconsulta || null
             };
 
-            // Le paso los datos a mi servicio para que haga el POST mediante axios.
-            const respuesta = await consultaService.crearConsulta(dataLimpia);
-            console.log("Consulta creada con éxito:", respuesta);
+            await consultaService.crearConsulta(dataLimpia);
 
-            // Si todo salió bien, muestro el cartel verde de éxito.
             setShowSuccess(true);
-            // Lo oculto automáticamente después de 3 segundos para que no quede ahí para siempre.
             setTimeout(() => setShowSuccess(false), 3000);
 
-            // Vacío el formulario para que el médico pueda cargar otra consulta.
             setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '' });
 
             setTimeout(() => {
                 navigate('/dashboard');
             }, 1500);
         } catch (error) {
-            // Si el backend me rechaza (ej: el DNI no existe en la base de datos), atrapo el error acá.
-            console.error("Error al crear la consulta:", error);
-            // Seteo el mensaje de error que me mandó C# o pongo uno genérico si se cayó el servidor.
             setErrorMsg(error.response?.data?.message || error.response?.data?.mensaje || "Error al conectar con la base de datos.");
-            // Borro el cartel de error a los 4 segundos.
             setTimeout(() => setErrorMsg(null), 4000);
         } finally {
-            // Ya sea que haya funcionado (try) o fallado (catch), apago el estado de carga para liberar el botón.
             setIsSubmitting(false);
         }
     };

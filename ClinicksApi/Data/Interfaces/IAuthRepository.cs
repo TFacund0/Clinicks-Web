@@ -12,15 +12,9 @@ namespace ClinicksApi.Data.Interfaces
         Task<Usuario?> GetUsuarioByUsernameAsync(string username);
 
         /// <summary>Busca un médico en la tabla Medicos filtrando por su matrícula.</summary>
-        Task<Medico?> GetMedicoByMatriculaAsync(string matricula);
+        Task<Medico?> GetMedicoByUsuarioIdAsync(int usuarioId);
 
         /// <summary>Método de fallback temporal para obtener el primer médico disponible en desarrollo.</summary>
         Task<Medico?> GetFirstMedicoAsync();
-        
-        /// <summary>Obtiene absolutamente todos los usuarios. Usado únicamente para el script de migración a BCrypt.</summary>
-        Task<IEnumerable<Usuario>> GetAllUsuariosAsync();
-
-        /// <summary>Actualiza los datos de un usuario existente (ej. guardar su nueva contraseña hasheada).</summary>
-        Task UpdateUsuarioAsync(Usuario usuario);
     }
 }

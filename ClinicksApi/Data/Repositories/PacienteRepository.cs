@@ -36,7 +36,7 @@ namespace ClinicksApi.Data.Repositories
             return await _context.Pacientes
                 .Include(p => p.IdEstadoPacienteNavigation)
                 .Include(p => p.IdDireccionNavigation)
-                .Include(p => p.Turnos) // Necesario para calcular FechaUltimaConsulta en el DTO
+                .Include(p => p.Turnos)
                 .FirstOrDefaultAsync(p => p.IdPaciente == id);
         }
 
@@ -56,7 +56,7 @@ namespace ClinicksApi.Data.Repositories
             // Obtenemos el ID del estado "Realizado" desde la BD para no depender de un número hardcodeado.
             // Si la tabla está vacía o el estado no existe aún, usamos -1 para que la query no devuelva nada.
             var idEstadoRealizado = await _context.EstadoTurnos
-                .Where(e => e.Nombre.ToLower() == "realizado")
+                .Where(e => e.Nombre.ToLower() == "atendido")
                 .Select(e => e.IdEstadoTurno)
                 .FirstOrDefaultAsync();
 
