@@ -7,6 +7,7 @@ import NewConsultation from '../pages/medico/NewConsultation';
 import PatientHistory from '../pages/medico/PatientHistory'; 
 import AccessConsultation from '../pages/medico/accessConsultation';
 import NewProcess from '../pages/medico/NewProcess';
+import Agenda from '../pages/medico/Agenda';
 
 const AppRoutes = () => {
   const estaAutenticado = !!localStorage.getItem('token');
@@ -25,6 +26,7 @@ const AppRoutes = () => {
         <Route path="/nuevo-procedimiento" element={<NewProcess />} />
         <Route path="/acceso-consulta" element={<AccessConsultation key="consulta" destino="/nueva-consulta" />} />
         <Route path="/acceso-procedimiento" element={<AccessConsultation key="proceso" destino="/nuevo-procedimiento" />} />
+        <Route path="/agenda" element={<Agenda />} />
       </Route>
 
       {/* Redirecciones por defecto */}
