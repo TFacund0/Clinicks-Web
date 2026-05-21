@@ -1,35 +1,31 @@
+// src/pages/auth/Login.jsx
+// VUL-1 CORREGIDO: Ya no importa ni usa clinicksApi directamente.
+// VUL-3 CORREGIDO: No escribe en localStorage. Delega todo al AuthContext que llama a authService.
+// Esta página solo maneja el estado del formulario y la UI.
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Activity, Lock, User, AlertCircle } from 'lucide-react';
-import clinicksApi from '../../api/clinicksApi';
+import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
-    if (loading) return; 
+    if (loading) return;
 
     setLoading(true);
     setError("");
 
     try {
-      const response = await clinicksApi.post('/Auth/login', {
-        username: credentials.username.trim(),
-        password: credentials.password
-      });
-
-      const data = response.data;
-      localStorage.clear();
-
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('medicoId', data.idMedico);
-      localStorage.setItem('medicoNombre', `${data.nombre} ${data.apellido}`);
-      localStorage.setItem('medicoMatricula', data.matricula);
-      
+      // La lógica de qué endpoint llamar y qué guardar en localStorage
+      // la maneja authService a través del contexto. La página solo pide "iniciar sesión".
+      await login(credentials.username, credentials.password);
       navigate('/dashboard', { replace: true });
 
     } catch (err) {
@@ -46,7 +42,7 @@ const Login = () => {
 
   const handleInputChange = (field, value) => {
     setCredentials({ ...credentials, [field]: value });
-    if (error) setError(""); 
+    if (error) setError("");
   };
 
   return (

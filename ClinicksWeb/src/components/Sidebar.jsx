@@ -1,13 +1,19 @@
 // src/components/Sidebar.jsx
-import { NavLink } from 'react-router-dom';
+// SOC-3 CORREGIDO: Sidebar ya no ejecuta lógica de autenticación directamente.
+// El logout se delega a useAuth(), que internamente llama a authService.logout().
+import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, ClipboardPlus, Activity, Calendar, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Borramos absolutamente toda la información de sesión para mayor seguridad.
-    localStorage.clear();
-    window.location.href = '/login';
+    // Delega la destrucción de la sesión al authService (a través del contexto).
+    logout();
+    // El Context ya marcó isAuthenticated=false; AppRoutes redirigirá al login automáticamente.
+    navigate('/login', { replace: true });
   };
 
   const menuItems = [
