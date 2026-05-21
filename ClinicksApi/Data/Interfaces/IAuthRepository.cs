@@ -20,9 +20,6 @@ namespace ClinicksApi.Data.Interfaces
         /// </summary>
         Task<Medico?> GetMedicoByUsuarioIdAsync(int usuarioId);
 
-        /// <summary>Método de fallback para obtener el primer médico disponible.</summary>
-        Task<Medico?> GetFirstMedicoAsync();
-
         /// <summary>Obtiene todos los usuarios (para el proceso de migración de contraseñas).</summary>
         Task<IEnumerable<Usuario>> GetAllUsuariosAsync();
 

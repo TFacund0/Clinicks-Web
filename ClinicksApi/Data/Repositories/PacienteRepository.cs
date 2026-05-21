@@ -26,7 +26,7 @@ namespace ClinicksApi.Data.Repositories
             return await _context.Pacientes
                 .Include(p => p.IdEstadoPacienteNavigation) // <--- CARGA LA TABLA DE ESTADOS
                 .Include(p => p.IdDireccionNavigation) // <--- CARGA LA TABLA DE DIRECCIONES
-                .Include(p => p.Turnos) // <--- CARGA LOS TURNOS PARA EL DTO
+                .Include(p => p.Turnos.OrderByDescending(t => t.FechaTurno).Take(1)) // <--- CARGA SOLO EL ÚLTIMO TURNO PARA EL DTO
                 .ToListAsync();
         }
 
@@ -36,7 +36,7 @@ namespace ClinicksApi.Data.Repositories
             return await _context.Pacientes
                 .Include(p => p.IdEstadoPacienteNavigation)
                 .Include(p => p.IdDireccionNavigation)
-                .Include(p => p.Turnos)
+                .Include(p => p.Turnos.OrderByDescending(t => t.FechaTurno).Take(1))
                 .FirstOrDefaultAsync(p => p.IdPaciente == id);
         }
 
@@ -46,7 +46,7 @@ namespace ClinicksApi.Data.Repositories
             return await _context.Pacientes
                 .Include(p => p.IdEstadoPacienteNavigation)
                 .Include(p => p.IdDireccionNavigation)
-                .Include(p => p.Turnos) // Necesario para calcular FechaUltimaConsulta en el DTO
+                .Include(p => p.Turnos.OrderByDescending(t => t.FechaTurno).Take(1)) // Necesario para calcular FechaUltimaConsulta en el DTO
                 .FirstOrDefaultAsync(p => p.Dni == dni);
         }
 
@@ -63,7 +63,7 @@ namespace ClinicksApi.Data.Repositories
             return await _context.Pacientes
                 .Include(p => p.IdEstadoPacienteNavigation)
                 .Include(p => p.IdDireccionNavigation)
-                .Include(p => p.Turnos)
+                .Include(p => p.Turnos.OrderByDescending(t => t.FechaTurno).Take(1))
                 .Where(p => p.Turnos.Any(t => t.IdMedico == medicoId && t.IdEstadoTurno == idEstadoRealizado))
                 .ToListAsync();
         }

@@ -38,39 +38,25 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task AsegurarEstadoTurnoExiste(int idEstadoTurno, string nombreEstado)
+        public async Task<int> AsegurarEstadoTurnoExiste(string nombreEstado)
         {
-            // Si el estado ya existe por ID, no hacemos nada.
-            var existePorId = await _context.EstadoTurnos.AnyAsync(e => e.IdEstadoTurno == idEstadoTurno);
-            if (existePorId) return;
+            var estadoExistente = await _context.EstadoTurnos
+                .FirstOrDefaultAsync(e => e.Nombre.ToLower() == nombreEstado.ToLower());
+            
+            if (estadoExistente != null)
+            {
+                return estadoExistente.IdEstadoTurno;
+            }
 
-            // Intentamos insertar el estado forzando el ID. En PostgreSQL con columna IDENTITY, 
-            // esto puede fallar si la secuencia no lo permite, por eso capturamos el error.
             var nuevoEstado = new EstadoTurno
             {
-                IdEstadoTurno = idEstadoTurno,
-                Nombre        = nombreEstado
+                Nombre = nombreEstado
             };
 
-            try
-            {
-                _context.EstadoTurnos.Add(nuevoEstado);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                // Si falló el insert con ID forzado (ej: columna auto-incremental), 
-                // desvinculamos la entidad para no corromper el tracking de EF Core.
-                _context.Entry(nuevoEstado).State = EntityState.Detached;
+            _context.EstadoTurnos.Add(nuevoEstado);
+            await _context.SaveChangesAsync();
 
-                // Como fallback, verificamos si existe por nombre y si no, lo creamos sin forzar el ID.
-                var existePorNombre = await _context.EstadoTurnos.AnyAsync(e => e.Nombre == nombreEstado);
-                if (!existePorNombre)
-                {
-                    _context.EstadoTurnos.Add(new EstadoTurno { Nombre = nombreEstado });
-                    await _context.SaveChangesAsync();
-                }
-            }
+            return nuevoEstado.IdEstadoTurno;
         }
     }
 }

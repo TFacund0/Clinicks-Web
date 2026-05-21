@@ -48,17 +48,7 @@ namespace ClinicksApi.Controllers
             if (!int.TryParse(idMedicoStr, out int idMedico))
                 return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
 
-            var pacienteExiste = await _pacienteService.ExistePaciente(dto.dnipaciente);
-            if (!pacienteExiste.Success)
-            {
-                return BadRequest(new
-                {
-                    success = false,
-                    mensaje = "El paciente no existe en el sistema."
-                });
-            }
-
-            // Delega la validación completa y el guardado en base de datos al servicio de negocio.
+            // Delega la validación completa (incluyendo verificar si el paciente existe) y el guardado en base de datos al servicio de negocio.
             var resultado = await _consultaService.RegistrarConsulta(dto, idMedico);
 
             if (resultado.Success)

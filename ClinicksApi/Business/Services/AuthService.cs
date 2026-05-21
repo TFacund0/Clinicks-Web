@@ -36,6 +36,13 @@ namespace ClinicksApi.Business.Services
                 return null;
             }
 
+            // PASO 1.5: Verificar el estado del usuario (debe estar Activo)
+            if (usuario.IdEstadoUsuarioNavigation != null && usuario.IdEstadoUsuarioNavigation.Nombre.ToLower() != "activo")
+            {
+                Console.WriteLine($"[LOGIN DEBUG] ERROR: El usuario '{username}' no está ACTIVO. Estado actual: '{usuario.IdEstadoUsuarioNavigation.Nombre}'");
+                return null;
+            }
+
             Console.WriteLine($"[LOGIN DEBUG] 2. Usuario encontrado: ID {usuario.IdUsuario}. Verificando clave...");
 
             // PASO 2: Verificar contraseña (AQUÍ ESTABA EL MAYOR PROBLEMA)
@@ -68,13 +75,7 @@ namespace ClinicksApi.Business.Services
 
             if (medico == null)
             {
-                Console.WriteLine("[LOGIN DEBUG] ADVERTENCIA: El usuario no tiene médico vinculado (id_usuario nulo en tabla medico). Usando el primero...");
-                medico = await _authRepository.GetFirstMedicoAsync();
-            }
-
-            if (medico == null) 
-            {
-                Console.WriteLine("[LOGIN DEBUG] ERROR: La tabla de Médicos está completamente vacía.");
+                Console.WriteLine("[LOGIN DEBUG] ERROR: El usuario no tiene ningún médico vinculado.");
                 return null;
             }
 

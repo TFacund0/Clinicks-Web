@@ -24,12 +24,10 @@ namespace ClinicksApi.Data.Interfaces
         Task<Turno> CrearTurnoVinculado(Turno turno);
 
         /// <summary>
-        /// Verifica si un estado de turno con el ID indicado existe en la base de datos y, si no, lo crea.
-        /// Este método actúa como un mecanismo de inicialización para garantizar que los datos de referencia 
-        /// (como el estado "Realizado") siempre estén presentes incluso en entornos recién creados.
+        /// Garantiza que un estado de turno con el nombre indicado exista en la base de datos y retorna su ID.
         /// </summary>
-        /// <param name="idEstadoTurno">El ID del estado de turno a verificar o crear.</param>
         /// <param name="nombreEstado">El nombre descriptivo del estado (ej: "Realizado").</param>
-        Task AsegurarEstadoTurnoExiste(int idEstadoTurno, string nombreEstado);
+        /// <returns>El ID del estado de turno (existente o recién creado) administrado por PostgreSQL.</returns>
+        Task<int> AsegurarEstadoTurnoExiste(string nombreEstado);
     }
 }

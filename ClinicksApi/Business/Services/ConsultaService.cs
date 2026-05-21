@@ -62,7 +62,7 @@ namespace ClinicksApi.Business.Services
                 // 2. VERIFICACIÓN CRUZADA — Validamos que el DNI ingresado exista realmente en el sistema.
                 var paciente = await _pacienteRepo.GetByDniAsync(dto.dnipaciente);
                 if (paciente == null)
-                    return (false, "Paciente no encontrado.", null);
+                    return (false, "El paciente no existe en el sistema.", null);
 
                 // 3. MAPEO — Convertimos el DTO (JSON de React) en una Entidad que entiende Entity Framework.
                 var nuevaConsulta = new ConsultaMedica
@@ -81,6 +81,23 @@ namespace ClinicksApi.Business.Services
 
                 // 4. GUARDADO — El repositorio ejecuta el INSERT en PostgreSQL.
                 var resultado = await _consultaRepo.CrearConsulta(nuevaConsulta);
+
+                // 4.5. VINCULACIÓN CON UN TURNO AUTOMÁTICO
+                // Para mantener la consistencia histórica y que impacte en "FechaUltimaConsulta",
+                // creamos un Turno en estado "Atendido" vinculado a esta consulta.
+                int idEstadoAtendido = await _consultaRepo.AsegurarEstadoTurnoExiste("Atendido");
+                
+                var nuevoTurno = new Turno
+                {
+                    IdPaciente      = paciente.IdPaciente,
+                    IdMedico        = idMedicoLogueado,
+                    IdConsulta      = resultado.IdConsulta,
+                    IdEstadoTurno   = idEstadoAtendido,
+                    FechaTurno      = nuevaConsulta.FechaConsulta ?? DateTime.Now,
+                    Motivo          = $"Consulta Médica: {nuevaConsulta.Motivo}"
+                };
+
+                await _consultaRepo.CrearTurnoVinculado(nuevoTurno);
 
                 return (true, "Consulta registrada con éxito.", resultado);
             }

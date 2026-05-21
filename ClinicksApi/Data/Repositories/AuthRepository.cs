@@ -17,6 +17,7 @@ namespace ClinicksApi.Data.Repositories
         {
             var cleanUsername = username.Trim().ToLower();
             var usuario = await _context.Usuarios
+                .Include(u => u.IdEstadoUsuarioNavigation)
                 .FirstOrDefaultAsync(u => u.Username.ToLower() == cleanUsername);
 
             // Intento 2 (fallback)
@@ -28,6 +29,7 @@ namespace ClinicksApi.Data.Repositories
                 if (medico != null && medico.IdUsuario.HasValue)
                 {
                     usuario = await _context.Usuarios
+                        .Include(u => u.IdEstadoUsuarioNavigation)
                         .FirstOrDefaultAsync(u => u.IdUsuario == medico.IdUsuario.Value);
                 }
             }
@@ -39,11 +41,6 @@ namespace ClinicksApi.Data.Repositories
         {
             return await _context.Medicos
                 .FirstOrDefaultAsync(m => m.IdUsuario == usuarioId);
-        }
-
-        public async Task<Medico?> GetFirstMedicoAsync()
-        {
-            return await _context.Medicos.FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Usuario>> GetAllUsuariosAsync()

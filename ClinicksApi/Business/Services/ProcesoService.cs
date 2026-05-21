@@ -62,9 +62,8 @@ namespace ClinicksApi.Business.Services
                 var procGuardado = await _procesoRepo.CrearProcedimiento(nuevoProcedimiento);
 
                 // 5. PREPARACIÓN DEL TURNO VINCULADO
-                // Garantizamos que el estado "Realizado" (id=1) exista en la tabla estado_turno.
-                int idEstadoHecho = 1;
-                await _procesoRepo.AsegurarEstadoTurnoExiste(idEstadoHecho, "Realizado");
+                // Garantizamos que el estado "Realizado" exista en la tabla estado_turno y obtenemos su ID real.
+                int idEstadoHecho = await _procesoRepo.AsegurarEstadoTurnoExiste("Realizado");
 
                 // Construimos el Turno que une el procedimiento con el paciente y el médico.
                 var nuevoTurno = new Turno
