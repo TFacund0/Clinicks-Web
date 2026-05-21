@@ -27,9 +27,7 @@ export const usePatients = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   // 3. LÓGICA DE FILTRADO EN TIEMPO REAL
   const pacientesFiltrados = (pacientes || []).filter((p) => {

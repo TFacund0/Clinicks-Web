@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const clinicksApi = axios.create({
-  // Vite lee tu .env.local. Si no existe, usa el localhost por defecto.
+  // Vite lee .env.local si no existe usa el localhost por defecto.
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5056/api',
   timeout: 10000,
   headers: {
