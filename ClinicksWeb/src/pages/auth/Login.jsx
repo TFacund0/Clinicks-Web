@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Activity, Lock, User, AlertCircle } from 'lucide-react';
 import clinicksApi from '../../api/clinicksApi';
 
@@ -6,6 +7,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
@@ -28,7 +30,7 @@ const Login = () => {
       localStorage.setItem('medicoNombre', `${data.nombre} ${data.apellido}`);
       localStorage.setItem('medicoMatricula', data.matricula);
       
-      window.location.replace('/dashboard');
+      navigate('/dashboard', { replace: true });
 
     } catch (err) {
       if (err.code === 'ECONNABORTED') {

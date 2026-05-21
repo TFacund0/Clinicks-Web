@@ -51,6 +51,21 @@ namespace ClinicksApi.Business.Services
         }
 
         /// <summary>
+        /// Recupera un paciente por su DNI y lo devuelve como DTO seguro.
+        /// Este método centraliza las validaciones de negocio antes de devolver un paciente a otros servicios.
+        /// </summary>
+        public async Task<PacienteDto?> ObtenerPorDni(string dni)
+        {
+            var dato = await _repository.GetByDniAsync(dni);
+            if (dato == null) return null;
+
+            // Aquí se pueden agregar reglas de negocio (ej. retornar null si el paciente está inactivo)
+            // if (dato.IdEstadoPacienteNavigation?.Nombre?.ToLower() != "activo") return null;
+
+            return MapToDto(dato);
+        }
+
+        /// <summary>
         /// Método auxiliar (Privado) que realiza la conversión de Entidad a DTO.
         /// </summary>
         private PacienteDto MapToDto(Paciente dato)
@@ -66,10 +81,10 @@ namespace ClinicksApi.Business.Services
                 NombreCompleto  = $"{dato.Nombre} {dato.Apellido}",
                 Dni             = dato.Dni,
                 Edad            = edad,
-                FechaUltimaConsulta = dato.Turnos?.Any() == true
+                FechaUltimaConsulta = (dato.Turnos != null && dato.Turnos.Any())
                     ? dato.Turnos.OrderByDescending(t => t.FechaTurno).First().FechaTurno.ToShortDateString()
                     : "Sin consultas",
-                EstaActivo = dato.IdEstadoPacienteNavigation?.Nombre.ToLower() == "activo"
+                EstaActivo = dato.IdEstadoPacienteNavigation?.Nombre?.ToLower() == "activo"
             };
         }
 

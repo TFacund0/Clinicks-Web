@@ -16,34 +16,33 @@ namespace ClinicksApi.Data.Repositories
         public async Task<Usuario?> GetUsuarioByUsernameAsync(string username)
         {
             var cleanUsername = username.Trim().ToLower();
-            var usuario = await _context.Usuarios
+            return await _context.Usuarios
+                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Username.ToLower() == cleanUsername);
+        }
 
-            // Intento 2 (fallback)
-            if (usuario == null)
+        public async Task<Usuario?> GetUsuarioByMedicoMatriculaAsync(string matricula)
+        {
+            var cleanMatricula = matricula.Trim().ToLower();
+            var medico = await _context.Medicos
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Matricula.ToLower() == cleanMatricula);
+
+            if (medico != null && medico.IdUsuario.HasValue)
             {
-                var medico = await _context.Medicos
-                    .FirstOrDefaultAsync(m => m.Matricula.ToLower() == cleanUsername);
-                
-                if (medico != null && medico.IdUsuario.HasValue)
-                {
-                    usuario = await _context.Usuarios
-                        .FirstOrDefaultAsync(u => u.IdUsuario == medico.IdUsuario.Value);
-                }
+                return await _context.Usuarios
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.IdUsuario == medico.IdUsuario.Value);
             }
 
-            return usuario;
+            return null;
         }
 
         public async Task<Medico?> GetMedicoByUsuarioIdAsync(int usuarioId)
         {
             return await _context.Medicos
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.IdUsuario == usuarioId);
-        }
-
-        public async Task<Medico?> GetFirstMedicoAsync()
-        {
-            return await _context.Medicos.FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Usuario>> GetAllUsuariosAsync()

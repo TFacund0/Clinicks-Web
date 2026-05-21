@@ -58,6 +58,7 @@ builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddScoped<IProcesoRepository, ProcesoRepository>();
 
 // Capa de Negocio (Servicios)
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPacienteService, PacienteService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IConsultaService, ConsultaService>();
@@ -85,4 +86,14 @@ app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// ====================================================================
+// FASE 3: INICIALIZACIÓN DE DATOS MAESTROS (SEEDING)
+// ====================================================================
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ClinicksDbContext>();
+    await DbInitializer.SeedAsync(context);
+}
+
 app.Run();

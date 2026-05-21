@@ -1,4 +1,4 @@
-﻿using ClinicksApi.Data.Entities;
+using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,13 +24,14 @@ namespace ClinicksApi.Data.Repositories
         /// <inheritdoc/>
         public async Task<List<ConsultaMedica>> ListaConsultas()
         {
-            return await _context.ConsultaMedicas.ToListAsync();
+            return await _context.ConsultaMedicas.AsNoTracking().ToListAsync();
         }
 
         /// <inheritdoc/>
         public async Task<List<ConsultaMedica>> HistorialPaciente(int pacienteId)
         {
             return await _context.ConsultaMedicas
+                .AsNoTracking()
                 .Where(c => c.IdPaciente == pacienteId)
                 .Include(c => c.IdMedicoNavigation) // JOIN con la tabla medico para traer nombre y apellido
                 .OrderByDescending(c => c.FechaConsulta)
