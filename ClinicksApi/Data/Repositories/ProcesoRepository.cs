@@ -50,5 +50,17 @@ namespace ClinicksApi.Data.Repositories
                 throw;
             }
         }
+
+        /// <inheritdoc/>
+        public async Task<List<Procedimiento>> HistorialPaciente(int pacienteId)
+        {
+            return await _context.Procedimientos
+                .AsNoTracking()
+                .Where(p => p.Turnos.Any(t => t.IdPaciente == pacienteId))
+                .Include(p => p.Turnos) // Incluir turnos para acceder al médico
+                    .ThenInclude(t => t.IdMedicoNavigation)
+                .OrderByDescending(p => p.Fecha)
+                .ToListAsync();
+        }
     }
 }

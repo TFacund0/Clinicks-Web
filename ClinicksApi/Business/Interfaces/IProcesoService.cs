@@ -29,5 +29,12 @@ namespace ClinicksApi.Business.Interfaces
         /// </summary>
         /// <returns>Colección de tipos de procedimientos con su ID y Nombre descriptivo.</returns>
         IEnumerable<object> ObtenerTiposProceso();
+
+        /// <summary>
+        /// Obtiene el historial clínico completo de procedimientos de un paciente ordenado por fecha descendente.
+        /// </summary>
+        /// <param name="pacienteId">El ID numérico del paciente.</param>
+        /// <returns>Una lista de DTOs con el historial de procedimientos del paciente, o vacía si no tiene.</returns>
+        Task<IEnumerable<ProcesoHistorialDto>> ObtenerHistorialPaciente(int pacienteId);
     }
 }

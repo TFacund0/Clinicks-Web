@@ -11,6 +11,12 @@ const procesoService = {
     obtenerTiposProceso: async () => {
         const res = await clinicksApi.get('/procesos/tipos');
         return res.data;
+    },
+
+    // Recupera el historial clínico de procedimientos de un paciente específico.
+    obtenerHistorialPaciente: async (pacienteId) => {
+        const respuesta = await clinicksApi.get(`/procesos/historial/${pacienteId}`);
+        return respuesta.data;
     }
 };
 
