@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import procesoService from '../services/procesoService';
+import { extraerMensajeError } from '../utils/errorUtils';
 
 export const useNewProcess = (dniInicial = '') => {
     const navigate = useNavigate();
@@ -74,7 +75,7 @@ export const useNewProcess = (dniInicial = '') => {
             addTimer(() => setShowSuccess(false), 3000);
             addTimer(() => navigate('/dashboard'), 1500);
         } catch (error) {
-            setErrorMsg(error.response?.data?.message || error.response?.data?.mensaje || "Error al conectar con la base de datos.");
+            setErrorMsg(extraerMensajeError(error, "Error al conectar con la base de datos."));
             addTimer(() => setErrorMsg(null), 3000);
         } finally {
             setIsSubmitting(false);

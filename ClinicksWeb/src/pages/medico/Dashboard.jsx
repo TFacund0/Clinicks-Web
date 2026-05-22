@@ -1,7 +1,5 @@
-// src/pages/medico/Dashboard.jsx
-import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
+import PageLayout from '../../components/PageLayout';
 import { usePatients } from '../../hooks/usePatients';
 import { useAuth } from '../../context/AuthContext';
 import { ClipboardPlus, Activity, ExternalLink } from 'lucide-react';
@@ -21,16 +19,9 @@ const Dashboard = () => {
   const pacientesRecientes = pacientesFiltrados ? pacientesFiltrados.slice(0, 5) : [];
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
-      <Sidebar />
-
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header paginaActual='Dashboard'/>
-
-        <main className="p-8 overflow-y-auto">
-          
-          {/* Mensaje de bienvenida personalizado con el nombre del médico */}
-          <div className="flex justify-between items-end mb-8">
+    <PageLayout title="Dashboard">
+      {/* Mensaje de bienvenida personalizado con el nombre del médico */}
+      <div className="flex justify-between items-end mb-8">
             <div>
               <h1 className="text-4xl font-bold text-white">Buenos días, {medicoNombre}</h1>
               <p className="text-slate-500 mt-1">Aquí tienes un resumen de tu actividad de hoy.</p>
@@ -135,9 +126,7 @@ const Dashboard = () => {
             </div>
 
           </div>
-        </main>
-      </div>
-    </div>
+    </PageLayout>
   );
 };
 

@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import consultaService from '../services/consultaService';
 import { useNavigate } from 'react-router-dom';
+import { extraerMensajeError } from '../utils/errorUtils';
 
 export const useNewConsultation = (dniInicial = '') => {
     // 1. Estado del formulario
@@ -86,7 +87,7 @@ export const useNewConsultation = (dniInicial = '') => {
             addTimer(() => navigate('/dashboard'), 1500);
 
         } catch (error) {
-            setErrorMsg(error.response?.data?.message || error.response?.data?.mensaje || "Error al conectar con la base de datos.");
+            setErrorMsg(extraerMensajeError(error, "Error al conectar con la base de datos."));
             addTimer(() => setErrorMsg(null), 4000);
         } finally {
             setIsSubmitting(false);

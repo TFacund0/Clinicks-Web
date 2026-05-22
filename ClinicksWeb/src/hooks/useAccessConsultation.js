@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import pacienteService from '../services/pacienteService';
+import { extraerMensajeError } from '../utils/errorUtils';
 
 export const useAccessConsultation = (destino) => {
     const navigate = useNavigate();
@@ -61,7 +62,7 @@ export const useAccessConsultation = (destino) => {
             addTimer(() => setShowSuccess(false), 3000);
             addTimer(() => navigate(destino, { state: { dniIngresado: formData.dnipaciente } }), 1500);
         } catch (error) {
-            setErrorMsg(error.response?.data?.message || error.response?.data?.mensaje || "DNI no registrado en la base de datos.");
+            setErrorMsg(extraerMensajeError(error, "DNI no registrado en la base de datos."));
             addTimer(() => setErrorMsg(null), 4000);
         } finally {
             setIsSubmitting(false);
