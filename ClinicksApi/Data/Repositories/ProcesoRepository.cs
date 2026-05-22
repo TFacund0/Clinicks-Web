@@ -22,41 +22,45 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<Procedimiento> CrearProcedimiento(Procedimiento procedimiento)
+        public async Task<Procedimiento> CrearProcedimientoYTurnoVinculado(Procedimiento procedimiento, Turno turno)
         {
-            _context.Procedimientos.Add(procedimiento);
-            await _context.SaveChangesAsync();
-            return procedimiento;
-        }
-
-        /// <inheritdoc/>
-        public async Task<Turno> CrearTurnoVinculado(Turno turno)
-        {
-            _context.Turnos.Add(turno);
-            await _context.SaveChangesAsync();
-            return turno;
-        }
-
-        /// <inheritdoc/>
-        public async Task<int> AsegurarEstadoTurnoExiste(string nombreEstado)
-        {
-            var estadoExistente = await _context.EstadoTurnos
-                .FirstOrDefaultAsync(e => e.Nombre.ToLower() == nombreEstado.ToLower());
-            
-            if (estadoExistente != null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                return estadoExistente.IdEstadoTurno;
+                // 1. Guardar el procedimiento
+                _context.Procedimientos.Add(procedimiento);
+                await _context.SaveChangesAsync(); // Guarda y obtiene el ID autoincremental de procedimiento
+
+                // 2. Vincular el ID del procedimiento generado al Turno
+                turno.IdProcedimiento = procedimiento.IdProcedimiento;
+
+                // 3. Guardar el turno
+                _context.Turnos.Add(turno);
+                await _context.SaveChangesAsync();
+
+                // 4. Confirmar la transacción
+                await transaction.CommitAsync();
+
+                return procedimiento;
             }
-
-            var nuevoEstado = new EstadoTurno
+            catch (Exception)
             {
-                Nombre = nombreEstado
-            };
+                // Revertir cambios en caso de error
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
 
-            _context.EstadoTurnos.Add(nuevoEstado);
-            await _context.SaveChangesAsync();
-
-            return nuevoEstado.IdEstadoTurno;
+        /// <inheritdoc/>
+        public async Task<List<Procedimiento>> HistorialPaciente(int pacienteId)
+        {
+            return await _context.Procedimientos
+                .AsNoTracking()
+                .Where(p => p.Turnos.Any(t => t.IdPaciente == pacienteId))
+                .Include(p => p.Turnos) // Incluir turnos para acceder al médico
+                    .ThenInclude(t => t.IdMedicoNavigation)
+                .OrderByDescending(p => p.Fecha)
+                .ToListAsync();
         }
     }
 }

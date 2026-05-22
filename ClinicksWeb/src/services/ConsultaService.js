@@ -10,16 +10,10 @@ const consultaService = {
         return respuesta.data;
     },
 
-    // Recupera el listado completo de todas las consultas médicas registradas (GET).
-    obtenerConsultas: async () => {
-        const res = await clinicksApi.get('/consultas');
-        return res.data;
-    },
-
-    // Busca y devuelve los detalles de una consulta específica utilizando su ID (GET).
-    obtenerPorId: async (id) => {
-        const res = await clinicksApi.get(`/consultas/${id}`);
-        return res.data;
+    // Recupera el historial clínico (consultas) de un paciente específico.
+    obtenerHistorialPaciente: async (pacienteId) => {
+        const respuesta = await clinicksApi.get(`/consultas/historial/${pacienteId}`);
+        return respuesta.data;
     }
 };
 

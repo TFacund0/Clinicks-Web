@@ -1,53 +1,40 @@
 // src/pages/medico/Patients.jsx
 
 // 1. IMPORTACIÓN DE COMPONENTES Y HERRAMIENTAS
-import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
-import { useNavigate } from 'react-router-dom';
-import { usePatients } from '../../hooks/usePatients';
-import { Search, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; 
+import PageLayout from '../../components/PageLayout';
+import { usePatients } from '../../hooks/usePatients'; 
+import { Search, ExternalLink } from 'lucide-react'; 
 
 // Vista que muestra la tabla con todos los pacientes del médico, incluyendo un buscador en tiempo real.
 const Patients = () => {
   // Inicializa la herramienta para cambiar de página (ej. ir al historial).
   const navigate = useNavigate();
 
-  // 1. CONSUMO DEL CUSTOM HOOK 'usePatients'
+  // 2. GESTIÓN DE SESIÓN
+  // (El ID del médico ya no se requiere aquí, se maneja vía JWT en el backend)
+
+  // 3. CONSUMO DEL CUSTOM HOOK 'usePatients'
   // Extrae los datos procesados, estados de carga y controles de búsqueda desde nuestro "cerebro".
-  const {
-    pacientesFiltrados,
-    cargando,
-    error,
-    searchTerm,
-    setSearchTerm
+  const { 
+    pacientesFiltrados, 
+    cargando,           
+    error,              
+    searchTerm,         
+    setSearchTerm       
   } = usePatients();
 
-  // 2. RENDERIZADO DE LA INTERFAZ
+  // 4. RENDERIZADO DE LA INTERFAZ
   return (
-    <div className="flex h-screen w-full bg-slate-950 text-slate-200 overflow-hidden font-sans">
-      <Sidebar />
-
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header paginaActual='Listado de Pacientes' />
-
-        <main className="flex-1 p-8 overflow-y-auto w-full">
-          <div className="max-w-7xl mx-auto w-full">
-
-            {/* Encabezado principal de la pantalla */}
-            <div className="flex justify-between items-center mb-8">
-              <div>
-                <h1 className="text-3xl font-bold">Listado de Pacientes</h1>
-                <p className="text-slate-500 text-sm">Gestiona y consulta el historial de tus pacientes.</p>
-              </div>
-            </div>
+    <PageLayout title="Pacientes">
 
             {/* BARRA DE BÚSQUEDA */}
             <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 mb-6 flex flex-wrap gap-4 items-center justify-between">
               <div className="flex items-center gap-3 bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 w-full md:w-96">
                 <Search size={18} className="text-slate-500" />
-                <input
-                  type="text"
-                  placeholder="Buscar por Nombre o DNI..."
+                <input 
+                  type="text" 
+                  placeholder="Buscar por Nombre o DNI..." 
                   className="bg-transparent border-none outline-none text-sm text-slate-300 w-full"
                   value={searchTerm} // Conecta lo que se ve en el input con el estado del Hook
                   onChange={(e) => setSearchTerm(e.target.value)} // Actualiza la búsqueda con cada tecla presionada
@@ -68,7 +55,7 @@ const Patients = () => {
                     <th className="p-5 text-right">Acciones</th>
                   </tr>
                 </thead>
-
+                
                 <tbody className="divide-y divide-slate-800">
                   {/* Lógica condicional: Decide qué mostrar según el estado de los datos */}
                   {cargando ? (
@@ -97,16 +84,17 @@ const Patients = () => {
                           <td className="p-5 text-center text-sm text-slate-400">{paciente.edad}</td>
                           <td className="p-5 text-sm text-slate-400">{paciente.fechaUltimaConsulta}</td>
                           <td className="p-5">
-                            <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${paciente.estaActivo
-                                ? "bg-green-500/10 text-green-500"
-                                : "bg-red-500/10 text-red-500"
-                              }`}>
+                            <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                              paciente.estaActivo 
+                              ? "bg-green-500/10 text-green-500" 
+                              : "bg-red-500/10 text-red-500"
+                            }`}>
                               {paciente.estaActivo ? "Activo" : "Inactivo"}
                             </span>
                           </td>
                           <td className="p-5 text-right">
                             {/* Botón que navega a la URL específica del historial de este paciente */}
-                            <button
+                            <button 
                               onClick={() => navigate(`/pacientes/${paciente.id}/historial`)}
                               className="text-cyan-400 text-xs font-bold flex items-center gap-1 ml-auto hover:text-cyan-300 transition-colors"
                             >
@@ -119,9 +107,9 @@ const Patients = () => {
                       // ESTADO 4: La búsqueda no arrojó resultados o la base está vacía
                       <tr>
                         <td colSpan="6" className="p-10 text-center text-slate-500">
-                          {searchTerm === ""
-                            ? "No hay pacientes atendidos registrados"
-                            : `No se encontraron pacientes que coincidan con "${searchTerm}"`
+                          {searchTerm === "" 
+                            ? "No hay pacientes atendidos registrados" 
+                            : `No se encontraron pacientes que coincidan con "${searchTerm}"` 
                           }
                         </td>
                       </tr>
@@ -131,10 +119,7 @@ const Patients = () => {
 
               </table>
             </div>
-          </div>
-        </main>
-      </div>
-    </div>
+    </PageLayout>
   );
 };
 

@@ -17,17 +17,14 @@ namespace ClinicksApi.Controllers
     public class ConsultasController : ControllerBase
     {
         private readonly IConsultaService _consultaService;
-        private readonly IPacienteService _pacienteService;
 
         /// <summary>
         /// Constructor del controlador. Recibe los servicios inyectados por el contenedor de dependencias de .NET.
         /// </summary>
         /// <param name="consultaService">Servicio con la lógica de negocio de consultas médicas.</param>
-        /// <param name="pacienteService">Servicio para validar la existencia del paciente antes de registrar una consulta.</param>
-        public ConsultasController(IConsultaService consultaService, IPacienteService pacienteService)
+        public ConsultasController(IConsultaService consultaService)
         {
             _consultaService = consultaService;
-            _pacienteService = pacienteService;
         }
 
         /// <summary>
@@ -48,7 +45,7 @@ namespace ClinicksApi.Controllers
             if (!int.TryParse(idMedicoStr, out int idMedico))
                 return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
 
-            // Delega la validación completa (incluyendo verificar si el paciente existe) y el guardado en base de datos al servicio de negocio.
+            // Delega la validación completa y el guardado en base de datos al servicio de negocio.
             var resultado = await _consultaService.RegistrarConsulta(dto, idMedico);
 
             if (resultado.Success)

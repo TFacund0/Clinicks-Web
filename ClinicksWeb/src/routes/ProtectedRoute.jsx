@@ -1,15 +1,14 @@
+// src/routes/ProtectedRoute.jsx
+// Protege las rutas privadas consultando el AuthContext reactivo.
+// Si el usuario no tiene sesión activa, lo redirige al Login.
+
 import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-/**
- * Componente que protege las rutas de la aplicación.
- * Si el usuario no tiene un token de sesión válido, lo redirige al Login.
- * Si está autenticado, renderiza los componentes hijos (Outlet).
- */
 const ProtectedRoute = () => {
-    const estaAutenticado = !!localStorage.getItem('token');
+    const { isAuthenticated } = useAuth();
 
-    if (!estaAutenticado) {
-        // Guardamos la intención de navegación para poder volver después del login si fuera necesario
+    if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
     }
 

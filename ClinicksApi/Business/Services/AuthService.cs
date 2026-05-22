@@ -1,54 +1,54 @@
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.DTOs;
-using Microsoft.Extensions.Configuration;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
-
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ClinicksApi.Business.Services
 {
+    /// <summary>
+    /// Servicio de autenticación.
+    /// Contiene las reglas de negocio para validar credenciales de acceso, verificar roles y generar
+    /// las sesiones seguras del personal médico a través de tokens JWT mediante ITokenService.
+    /// </summary>
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;
-        private readonly IConfiguration _config;
+        private readonly ITokenService _tokenService;
 
-        public AuthService(IAuthRepository authRepository, IConfiguration config)
+        public AuthService(IAuthRepository authRepository, ITokenService tokenService)
         {
             _authRepository = authRepository;
-            _config = config;
+            _tokenService = tokenService;
         }
 
+        /// <inheritdoc/>
         public async Task<LoginResponseDto?> AuthenticateAsync(string username, string password)
         {
             Console.WriteLine($"\n[LOGIN DEBUG] 1. Intentando buscar usuario: '{username}'");
             
-            // PASO 1: Buscar el usuario
+            // PASO 1: Buscar el usuario por username o matrícula (fallback coordinado en la capa de servicios)
             var usuario = await _authRepository.GetUsuarioByUsernameAsync(username);
+
+            if (usuario == null)
+            {
+                Console.WriteLine("[LOGIN DEBUG] Fallback: Intentando buscar por matrícula del médico");
+                usuario = await _authRepository.GetUsuarioByMedicoMatriculaAsync(username);
+            }
 
             if (usuario == null) 
             {
-                Console.WriteLine("[LOGIN DEBUG] ERROR: El usuario retornó NULL. No existe en DB o falla EF Core.");
-                return null;
-            }
-
-            // PASO 1.5: Verificar el estado del usuario (debe estar Activo)
-            if (usuario.IdEstadoUsuarioNavigation != null && usuario.IdEstadoUsuarioNavigation.Nombre.ToLower() != "activo")
-            {
-                Console.WriteLine($"[LOGIN DEBUG] ERROR: El usuario '{username}' no está ACTIVO. Estado actual: '{usuario.IdEstadoUsuarioNavigation.Nombre}'");
+                Console.WriteLine("[LOGIN DEBUG] ERROR: El usuario no existe en DB por username ni por matrícula.");
                 return null;
             }
 
             Console.WriteLine($"[LOGIN DEBUG] 2. Usuario encontrado: ID {usuario.IdUsuario}. Verificando clave...");
 
-            // PASO 2: Verificar contraseña (AQUÍ ESTABA EL MAYOR PROBLEMA)
+            // PASO 2: Verificar contraseña
             bool isPasswordValid = false;
             
-            // Limpiamos los espacios en blanco que PostgreSQL pudo haber guardado por error
             string dbPassword = usuario.Password?.Trim() ?? "";
             string inputPassword = password?.Trim() ?? "";
 
@@ -73,34 +73,19 @@ namespace ClinicksApi.Business.Services
             Console.WriteLine($"[LOGIN DEBUG] 4. Clave correcta. Buscando Médico para id_usuario: {usuario.IdUsuario}");
             var medico = await _authRepository.GetMedicoByUsuarioIdAsync(usuario.IdUsuario);
 
+            // CORRECCIÓN DE SEGURIDAD CRÍTICA:
+            // Si el usuario no tiene médico vinculado, rechazamos el login de inmediato en lugar de usar un fallback
+            // que suplantaría la identidad de otro médico.
             if (medico == null)
             {
-                Console.WriteLine("[LOGIN DEBUG] ERROR: El usuario no tiene ningún médico vinculado.");
+                Console.WriteLine("[LOGIN DEBUG] ERROR CRÍTICO DE SEGURIDAD: El usuario no tiene médico vinculado en la base de datos.");
                 return null;
             }
 
             Console.WriteLine($"[LOGIN DEBUG] 5. ¡ÉXITO! Login autorizado para Dr/Dra. {medico.Apellido}");
 
-            // PASO 4: Generar el Token JWT
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Name, medico.Matricula),
-                    new Claim("idMedico", medico.IdMedico.ToString()),
-                    new Claim(ClaimTypes.Role, "Medico")
-                }),
-                Expires = DateTime.UtcNow.AddHours(8),
-                Issuer = _config["Jwt:Issuer"],
-                Audience = _config["Jwt:Audience"],
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            // PASO 4: Generar el Token JWT usando el servicio abstraído
+            var tokenString = _tokenService.GenerateToken(medico);
 
             return new LoginResponseDto
             {
@@ -108,10 +93,11 @@ namespace ClinicksApi.Business.Services
                 Nombre    = medico.Nombre,
                 Apellido  = medico.Apellido,
                 Matricula = medico.Matricula,
-                Token     = tokenHandler.WriteToken(token)
+                Token     = tokenString
             };
         }
 
+        /// <inheritdoc/>
         public async Task<int> HashExistingPasswordsAsync()
         {
             var usuarios = await _authRepository.GetAllUsuariosAsync();

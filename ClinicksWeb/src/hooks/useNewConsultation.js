@@ -1,8 +1,8 @@
 // src/hooks/useNewConsultation.js
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import consultaService from '../services/consultaService';
-
 import { useNavigate } from 'react-router-dom';
+import { extraerMensajeError } from '../utils/errorUtils';
 
 export const useNewConsultation = (dniInicial = '') => {
     // 1. Estado del formulario
@@ -20,18 +20,29 @@ export const useNewConsultation = (dniInicial = '') => {
     const [showSuccess, setShowSuccess] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isMounted = useRef(true);
+
+    // Ref para acumular todos los timers activos y cancelarlos al desmontar.
+    // Evita el error "Can't perform a React state update on an unmounted component".
+    const timersRef = useRef([]);
+    const addTimer = (fn, ms) => {
+        const id = setTimeout(fn, ms);
+        timersRef.current.push(id);
+        return id;
+    };
+
+    useEffect(() => {
+        isMounted.current = true;
+        return () => {
+            isMounted.current = false;
+            timersRef.current.forEach(clearTimeout);
+        };
+    }, []);
 
     // 3. MANEJADOR DE CAMBIOS EN LOS INPUTS
-    // Cada vez que el médico teclea algo, esta función se ejecuta.
     const handleChange = (e) => {
-        // Extraigo el 'name' (ej: 'motivo') y el 'value' (lo que escribió) del input que disparó el evento.
         const { name, value } = e.target;
-
-        // Actualizo mi objeto formData copiando lo que ya tenía y pisando solo el campo que cambió.
         setFormData({ ...formData, [name]: value });
-
-        // Un toque de experiencia de usuario (UX): si el campo tenía un error en rojo, 
-        // apenas el médico empieza a escribir para corregirlo, le borro el mensaje de error.
         if (errors[name]) {
             setErrors({ ...errors, [name]: null });
         }
@@ -42,13 +53,11 @@ export const useNewConsultation = (dniInicial = '') => {
         let erroresTemporales = {};
         const hoy = new Date().toISOString().split('T')[0];
 
-        // Validaciones de obligatoriedad
         if (!formData.dnipaciente.trim()) erroresTemporales.dnipaciente = "El DNI del paciente es obligatorio.";
         if (!formData.motivo.trim()) erroresTemporales.motivo = "El motivo de la consulta es obligatorio.";
         if (!formData.diagnostico.trim()) erroresTemporales.diagnostico = "El diagnóstico es obligatorio.";
         if (!formData.tratamiento.trim()) erroresTemporales.tratamiento = "El tratamiento indicado es obligatorio.";
-        
-        // Validación de fecha (no puede ser futura)
+
         if (formData.fechaconsulta && formData.fechaconsulta > hoy) {
             erroresTemporales.fechaconsulta = "La fecha no puede ser posterior a hoy.";
         }
@@ -58,14 +67,10 @@ export const useNewConsultation = (dniInicial = '') => {
     };
 
     // 5. ENVÍO DEL FORMULARIO A LA API
-    // Esta función se dispara cuando el médico hace clic en "Guardar Consulta".
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Evito que el navegador recargue la página por defecto.
-
-        // Corto la ejecución acá si la validación falla (si validarFormulario devuelve false).
+        e.preventDefault();
         if (!validarFormulario()) return;
 
-        // Prendo el estado de carga para cambiar el texto del botón a "Guardando..."
         setIsSubmitting(true);
         setErrorMsg(null);
 
@@ -77,25 +82,23 @@ export const useNewConsultation = (dniInicial = '') => {
 
             await consultaService.crearConsulta(dataLimpia);
 
-            setShowSuccess(true);
-            setTimeout(() => setShowSuccess(false), 3000);
-
-            setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '' });
-
-            setTimeout(() => {
-                navigate('/dashboard');
-            }, 1500);
+            if (isMounted.current) {
+                setShowSuccess(true);
+                addTimer(() => { if(isMounted.current) setShowSuccess(false); }, 3000);
+                setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '' });
+                addTimer(() => { if(isMounted.current) navigate('/dashboard'); }, 1500);
+            }
         } catch (error) {
-            setErrorMsg(error.response?.data?.message || error.response?.data?.mensaje || "Error al conectar con la base de datos.");
-            setTimeout(() => setErrorMsg(null), 4000);
+            if (isMounted.current) {
+                setErrorMsg(extraerMensajeError(error, "Error al conectar con la base de datos."));
+                addTimer(() => { if(isMounted.current) setErrorMsg(null); }, 4000);
+            }
         } finally {
-            setIsSubmitting(false);
+            if (isMounted.current) setIsSubmitting(false);
         }
     };
 
     // 6. CANCELAR Y LIMPIAR
-    // Esta función la conecto al botón "Cancelar". 
-    // Simplemente devuelve todo a su estado inicial.
     const handleCancel = () => {
         setFormData({
             dnipaciente: '',
@@ -106,12 +109,9 @@ export const useNewConsultation = (dniInicial = '') => {
             observaciones: '',
             recomendacion: '',
         });
-        setErrors({}); // También limpio los mensajes de error en rojo si los hubiera.
+        setErrors({});
     };
 
-    // 7. LO QUE DEVUELVE MI HOOK
-    // Exponemos hacia afuera (hacia la vista visual NewConsultation.jsx) 
-    // solo los datos y funciones que necesita para funcionar. Lo demás queda privado acá adentro.
     return {
         formData,
         errors,
