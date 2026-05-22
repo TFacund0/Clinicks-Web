@@ -18,6 +18,12 @@ export const pacienteService = {
     validarPacientePorDni: async (dni) => {
         const respuesta = await clinicksApi.get(`/pacientes/validar/${dni}`);
         return respuesta.data;
+    },
+
+    // Obtiene los datos detallados de un paciente específico por su ID.
+    obtenerPorId: async (id) => {
+        const respuesta = await clinicksApi.get(`/pacientes/${id}`);
+        return respuesta.data;
     }
 };
 export default pacienteService;

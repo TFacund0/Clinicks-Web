@@ -1,10 +1,10 @@
 // src/pages/medico/NewConsultation.jsx
 import React from 'react';
-import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
-import { ClipboardList, User, FileText, Save, X } from 'lucide-react';
-import { useNewConsultation } from '../../hooks/useNewConsultation'; 
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Calendar, User, AlignLeft, AlertCircle, Save, X, Activity, ClipboardList, FileText } from 'lucide-react';
+import { useNewConsultation } from '../../hooks/useNewConsultation';
+import PageLayout from '../../components/PageLayout';
+import Toast from '../../components/Toast';
 
 // Componente visual principal para registrar una nueva consulta médica.
 const NewConsultation = () => {
@@ -32,19 +32,13 @@ const NewConsultation = () => {
   }, [dniEntrante, navigate]);
 
   return (
-    // Contenedor principal que estructura la pantalla: Sidebar a la izquierda y contenido a la derecha.
-    <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Header paginaActual='Crear Consulta'/>
-        <main className="p-8 overflow-y-auto">
-          
-          <div className="flex justify-between items-end mb-8">
-            <div>
-              <h1 className="text-4xl font-bold text-white">Buenos días</h1>
-              <p className="text-slate-500 mt-1">Aquí tienes un resumen de tu actividad de hoy.</p>
-            </div> 
-          </div>
+        <PageLayout title="Nueva Consulta">
+            <div className="max-w-4xl mx-auto">
+                {/* SOC-2: Corregido el saludo copiado del Dashboard */}
+                <div className="mb-8">
+                    <h1 className="text-4xl font-bold text-white tracking-tight">Nueva Consulta Médica</h1>
+                    <p className="text-slate-500 mt-1">Complete el formulario para registrar la atención clínica del paciente.</p>
+                </div>
 
           {/* Formulario principal: el evento onSubmit está conectado a la función del Hook */}
           <form onSubmit={handleSubmit} className="w-full">
@@ -99,16 +93,13 @@ const NewConsultation = () => {
             {/* Fila Inferior: Campo extenso para notas privadas */}
             <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 mb-8">
     
-    {/* TÍTULO GENERAL (OPCIONAL) */}
     <h3 className="text-lg font-bold flex items-center gap-2 mb-6 border-b border-slate-800 pb-3">
         <FileText size={20} className="text-cyan-400" />
         Detalles Finales de la Consulta
     </h3>
 
-    {/* GRID PARA LAS DOS COLUMNAS */}
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        {/* COLUMNA IZQUIERDA: Observaciones */}
         <div className="space-y-3">
             <label className="block text-xs text-slate-500 uppercase font-bold">
                 Observaciones Adicionales
@@ -126,7 +117,6 @@ const NewConsultation = () => {
             )}
         </div>
 
-        {/* COLUMNA DERECHA: Recomendaciones */}
         <div className="space-y-3">
             <label className="block text-xs text-slate-500 uppercase font-bold">
                 tratamiento
@@ -149,7 +139,6 @@ const NewConsultation = () => {
             
             {/* Controles de Acción */}
             <div className="flex gap-4">
-                {/* El botón se deshabilita (disabled) si ya se está enviando para evitar doble carga */}
                 <button 
                   type="submit" 
                   disabled={isSubmitting} 
@@ -158,7 +147,6 @@ const NewConsultation = () => {
                     <Save size={20} /> 
                     {isSubmitting ? 'Guardando...' : 'Guardar Consulta'}
                 </button>
-                {/* Conecta el botón cancelar a la función que vacía el formulario */}
                 <button 
                   type="button" 
                   onClick={handleCancel} 
@@ -168,21 +156,14 @@ const NewConsultation = () => {
                 </button>
             </div>
           </form>
-        </main>
-      </div>
-      
-      {/* Alertas Flotantes (Toasts): Solo se renderizan si showSuccess o errorMsg tienen valor */}
-      {showSuccess && (
-        <div className="fixed bottom-6 right-6 bg-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in">
-            <span className="font-semibold">Consulta guardada con éxito</span>
-        </div>
-      )}
-      {errorMsg && (
-        <div className="fixed bottom-6 right-6 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in">
-            <span className="font-semibold">{errorMsg}</span>
-        </div>
-      )}
-    </div>
+            </div>
+
+            <Toast 
+                showSuccess={showSuccess} 
+                successMsg="Consulta registrada exitosamente"
+                errorMsg={errorMsg}
+            />
+        </PageLayout>
   );
 };
 

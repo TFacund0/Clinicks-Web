@@ -13,5 +13,6 @@ public interface IPacienteService
     Task<PacienteDto?> ObtenerPorId(int id);
     Task<IEnumerable<PacienteDto>> ObtenerAtendidosPorMedico(int medicoId);
 
+    Task<PacienteDto?> ObtenerPorDni(string dni);
     Task<(bool Success, string Message)> ExistePaciente(string dni);
 }

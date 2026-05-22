@@ -1,16 +1,15 @@
-// src/pages/medico/Dashboard.jsx
-import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom';
-import { usePatients } from '../../hooks/usePatients'; 
-import { ClipboardPlus, Activity, ExternalLink, User } from 'lucide-react';
+import PageLayout from '../../components/PageLayout';
+import { usePatients } from '../../hooks/usePatients';
+import { useAuth } from '../../context/AuthContext';
+import { ClipboardPlus, Activity, ExternalLink } from 'lucide-react';
 
 // Vista principal que muestra un resumen rápido de acciones, agenda y los últimos pacientes atendidos.
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // Recupera la información del médico logueado para personalizar el saludo.
-  const medicoNombre = localStorage.getItem('medicoNombre') || "Doctor/a";
+  // VUL-3 CORREGIDO: El nombre del médico proviene del AuthContext, no de localStorage.
+  const { medicoNombre } = useAuth();
 
   // Obtiene los pacientes atendidos por este médico manejando estados de carga y error.
   const { pacientesFiltrados, cargando, error } = usePatients();
@@ -20,16 +19,9 @@ const Dashboard = () => {
   const pacientesRecientes = pacientesFiltrados ? pacientesFiltrados.slice(0, 5) : [];
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
-      <Sidebar />
-
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header paginaActual='Dashboard'/>
-
-        <main className="p-8 overflow-y-auto">
-          
-          {/* Mensaje de bienvenida personalizado con el nombre del médico */}
-          <div className="flex justify-between items-end mb-8">
+    <PageLayout title="Dashboard">
+      {/* Mensaje de bienvenida personalizado con el nombre del médico */}
+      <div className="flex justify-between items-end mb-8">
             <div>
               <h1 className="text-4xl font-bold text-white">Buenos días, {medicoNombre}</h1>
               <p className="text-slate-500 mt-1">Aquí tienes un resumen de tu actividad de hoy.</p>
@@ -113,7 +105,7 @@ const Dashboard = () => {
                           <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
                             paciente.estaActivo ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
                           }`}>
-                            {paciente.estaActivo ? "Activo" : "OI"}
+                            {paciente.estaActivo ? "Activo" : "Inactivo"}
                           </span>
                         </td>
                         <td className="p-4 text-right">
@@ -134,9 +126,7 @@ const Dashboard = () => {
             </div>
 
           </div>
-        </main>
-      </div>
-    </div>
+    </PageLayout>
   );
 };
 

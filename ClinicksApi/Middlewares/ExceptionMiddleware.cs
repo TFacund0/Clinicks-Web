@@ -60,7 +60,12 @@ namespace ClinicksApi.Middlewares
                 Detail = _env.IsDevelopment() ? exception.StackTrace?.ToString() : null
             };
 
-            var json = JsonSerializer.Serialize(response);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var json = JsonSerializer.Serialize(response, options);
             return context.Response.WriteAsync(json);
         }
     }

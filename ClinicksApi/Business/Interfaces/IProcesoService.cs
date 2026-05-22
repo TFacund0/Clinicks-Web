@@ -22,5 +22,12 @@ namespace ClinicksApi.Business.Interfaces
         /// <c>Data</c> (<see cref="Procedimiento"/>?): la entidad guardada, o null si hubo un error.
         /// </returns>
         Task<(bool Success, string Message, Procedimiento? Data)> RegistrarProceso(ProcesoAltaDto dto, int idMedicoLogueado);
+
+        /// <summary>
+        /// Obtiene la lista estática o catálogo de tipos de procedimientos médicos permitidos en el sistema.
+        /// Este catálogo se almacena centralizadamente en la capa de negocio respetando SoC.
+        /// </summary>
+        /// <returns>Colección de tipos de procedimientos con su ID y Nombre descriptivo.</returns>
+        IEnumerable<object> ObtenerTiposProceso();
     }
 }

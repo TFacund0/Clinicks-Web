@@ -1,8 +1,9 @@
 import React from 'react';
 import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
-import { ClipboardList, User, FileText, Save, X } from 'lucide-react';
 import { useNewProcess } from '../../hooks/useNewProcess';
+import { Calendar, User, AlignLeft, AlertCircle, Save, X, Stethoscope, ClipboardList } from 'lucide-react';
+import PageLayout from '../../components/PageLayout';
+import Toast from '../../components/Toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const NewProcess = () => {
@@ -31,18 +32,13 @@ const NewProcess = () => {
 
 
     return (
-        <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
-            <Sidebar />
-            <div className="flex-1 flex flex-col">
-                <Header paginaActual='Crear Proceso' />
-                <main className="p-8 overflow-y-auto">
-
-                    <div className="flex justify-between items-end mb-8">
-                        <div>
-                            <h1 className="text-4xl font-bold text-white">Buenos días</h1>
-                            <p className="text-slate-500 mt-1">Aquí tienes un resumen de tu actividad de hoy.</p>
-                        </div>
-                    </div>
+        <PageLayout title="Nuevo Procedimiento">
+            <div className="max-w-4xl mx-auto">
+                {/* SOC-2: Corregido el saludo copiado del Dashboard */}
+                <div className="mb-8">
+                    <h1 className="text-4xl font-bold text-white tracking-tight">Nuevo Procedimiento</h1>
+                    <p className="text-slate-500 mt-1">Complete el formulario para registrar el procedimiento médico.</p>
+                </div>
 
                     <form onSubmit={handleSubmit} className="w-full">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -73,8 +69,8 @@ const NewProcess = () => {
 
                             <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
                                 <h3 className="text-lg font-bold flex items-center gap-2 border-b border-slate-800 pb-3">
-                                    <ClipboardList size={20} className="text-cyan-400" />
-                                    tipo de proceso
+                                    <Stethoscope size={20} className="text-cyan-400" />
+                                    Detalle Clínico
                                 </h3>
                                 <div>
                                     <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Tipo de Proceso</label>
@@ -95,7 +91,6 @@ const NewProcess = () => {
                             </div>
                         </div>
                         <div className="flex gap-4">
-                            {/* El botón se deshabilita (disabled) si ya se está enviando para evitar doble carga */}
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
@@ -104,7 +99,6 @@ const NewProcess = () => {
                                 <Save size={20} />
                                 {isSubmitting ? 'Guardando...' : 'Guardar Proceso'}
                             </button>
-                            {/* Conecta el botón cancelar a la función que vacía el formulario */}
                             <button
                                 type="button"
                                 onClick={handleCancel}
@@ -114,19 +108,14 @@ const NewProcess = () => {
                             </button>
                         </div>
                     </form>
-                </main>
             </div>
-            {showSuccess && (
-                <div className="fixed bottom-6 right-6 bg-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in">
-                    <span className="font-semibold">Proceso guardado con éxito</span>
-                </div>
-            )}
-            {errorMsg && (
-                <div className="fixed bottom-6 right-6 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in">
-                    <span className="font-semibold">{errorMsg}</span>
-                </div>
-            )}
-        </div>
+
+            <Toast 
+                showSuccess={showSuccess} 
+                successMsg="Proceso registrado exitosamente"
+                errorMsg={errorMsg}
+            />
+        </PageLayout>
     );
 };
 
