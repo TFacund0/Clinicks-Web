@@ -49,7 +49,7 @@ const PatientHistory = () => {
       </button>
 
       {/* CABECERA DEL PACIENTE (Premium Card) */}
-      <div className="bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800/50 rounded-3xl p-8 mb-10 flex flex-wrap gap-8 justify-between items-center shadow-2xl relative overflow-hidden">
+      <div className="bg-linear-to-r from-slate-900 to-slate-950 border border-slate-800/50 rounded-3xl p-8 mb-10 flex flex-wrap gap-8 justify-between items-center shadow-2xl relative overflow-hidden">
         {/* Glow de fondo para darle un toque premium */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
         
@@ -141,14 +141,14 @@ const PatientHistory = () => {
         </div>
       ) : (
         <div className="relative border-l-2 border-slate-800 ml-4 sm:ml-8 pl-8 sm:pl-12 pb-8 space-y-10">
-          {historial.map((item, index) => {
+          {historial.map((item) => {
             const isConsulta = item.tipoRegistro === 'consulta';
             const idUnico = isConsulta ? `C-${item.idConsulta}` : `P-${item.IdProcedimiento || item.idProcedimiento}`;
             
             return (
               <div key={idUnico} className="relative group">
                 {/* Timeline Dot */}
-                <div className={`absolute -left-[43px] sm:-left-[59px] top-6 w-5 h-5 rounded-full border-4 border-slate-950 transition-all duration-300 ${
+                <div className={`absolute -left-10.75 sm:-left-14.75 top-6 w-5 h-5 rounded-full border-4 border-slate-950 transition-all duration-300 ${
                     isConsulta 
                         ? 'bg-cyan-500 group-hover:bg-cyan-400 group-hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]' 
                         : 'bg-purple-500 group-hover:bg-purple-400 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]'
