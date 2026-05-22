@@ -38,7 +38,7 @@ const PatientHistory = () => {
   }
 
   return (
-    <PageLayout title={`Historial: ${paciente.nombre} ${paciente.apellido || ''}`}>
+    <PageLayout title={`Historial: ${paciente.nombreCompleto}`}>
       {/* Botón para volver al listado de pacientes */}
       <button 
         onClick={() => navigate('/pacientes')}
@@ -51,25 +51,29 @@ const PatientHistory = () => {
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 mb-8 flex justify-between items-center shadow-2xl">
         <div>
           <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-1">Nombre Completo</p>
-          <p className="font-bold text-lg">{paciente.nombre} {paciente.apellido}</p>
+          <p className="font-bold text-lg">{paciente.nombreCompleto}</p>
         </div>
         <div>
           <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-1">DNI</p>
           <p className="font-mono text-slate-300">{paciente.dni}</p>
         </div>
         <div>
-          <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-1">Fecha de Nacimiento</p>
+          <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-1">Edad</p>
           <p className="font-mono text-slate-300">
-            {paciente.fechaNacimiento ? new Date(paciente.fechaNacimiento).toLocaleDateString() : 'No registrada'}
+            {paciente.edad} años
           </p>
         </div>
         <div>
-          <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-1">Teléfono</p>
-          <p className="font-mono text-slate-300">{paciente.telefono || 'No registrado'}</p>
+          <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-1">Última Consulta</p>
+          <p className="font-mono text-slate-300 text-cyan-400">{paciente.fechaUltimaConsulta}</p>
         </div>
         <div>
-          <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-1">Email</p>
-          <p className="text-slate-300">{paciente.email || 'No registrado'}</p>
+          <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-1">Estado</p>
+          <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+             paciente.estaActivo ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
+          }`}>
+             {paciente.estaActivo ? "Activo" : "Inactivo"}
+          </span>
         </div>
       </div>
 
@@ -83,13 +87,17 @@ const PatientHistory = () => {
           <div className="p-12 text-center text-slate-500">No hay consultas registradas para este paciente.</div>
         ) : (
           historial.map((consulta) => (
-            <div key={consulta.id} className="p-6 border-b border-slate-800 last:border-0 hover:bg-slate-800/20 transition-colors">
+            <div key={consulta.idConsulta} className="p-6 border-b border-slate-800 last:border-0 hover:bg-slate-800/20 transition-colors">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <span className="text-cyan-500 font-mono text-sm border border-cyan-500/20 bg-cyan-500/10 px-2 py-1 rounded">
-                    {new Date(consulta.fechaconsulta).toLocaleDateString()}
+                    {consulta.fechaConsulta ? new Date(consulta.fechaConsulta).toLocaleDateString() : 'Sin fecha'}
                   </span>
                   <h4 className="text-lg font-bold text-white mt-2">{consulta.motivo}</h4>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-slate-500">Atendido por</p>
+                  <p className="text-sm font-bold text-cyan-400">{consulta.medicoAtencion}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm bg-slate-950/50 p-4 rounded-xl border border-slate-800/50">
@@ -101,10 +109,10 @@ const PatientHistory = () => {
                   <span className="text-slate-500 font-bold">Tratamiento: </span>
                   <span className="text-slate-300">{consulta.tratamiento}</span>
                 </div>
-                {consulta.observaciones && (
+                {consulta.observacion && (
                   <div className="col-span-2">
                     <span className="text-slate-500 font-bold">Observaciones: </span>
-                    <span className="text-slate-300">{consulta.observaciones}</span>
+                    <span className="text-slate-300">{consulta.observacion}</span>
                   </div>
                 )}
                 {consulta.recomendacion && (

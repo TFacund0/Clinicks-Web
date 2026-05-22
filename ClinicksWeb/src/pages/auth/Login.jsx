@@ -3,10 +3,11 @@
 // VUL-3 CORREGIDO: No escribe en localStorage. Delega todo al AuthContext que llama a authService.
 // Esta página solo maneja el estado del formulario y la UI.
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Activity, Lock, User, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { extraerMensajeError } from '../../utils/errorUtils';
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -14,6 +15,14 @@ const Login = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const navigate = useNavigate();
   const { login } = useAuth();
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
@@ -26,17 +35,15 @@ const Login = () => {
       // La lógica de qué endpoint llamar y qué guardar en localStorage
       // la maneja authService a través del contexto. La página solo pide "iniciar sesión".
       await login(credentials.username, credentials.password);
-      navigate('/dashboard', { replace: true });
-
+      if (isMounted.current) {
+        navigate('/dashboard', { replace: true });
+      }
     } catch (err) {
-      if (err.code === 'ECONNABORTED') {
-        setError("El servidor tarda demasiado en responder. Reintente en un momento.");
-      } else {
-        const mensajeError = err.response?.data?.message || err.response?.data?.mensaje || "Credenciales inválidas o servidor no disponible.";
-        setError(mensajeError);
+      if (isMounted.current) {
+        setError(extraerMensajeError(err, "Credenciales inválidas o servidor no disponible."));
       }
     } finally {
-      setLoading(false);
+      if (isMounted.current) setLoading(false);
     }
   };
 

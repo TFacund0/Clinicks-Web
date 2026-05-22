@@ -18,6 +18,7 @@ export const useNewProcess = (dniInicial = '') => {
     const [showSuccess, setShowSuccess] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isMounted = useRef(true);
 
     // Ref para acumular todos los timers activos y cancelarlos al desmontar.
     // Evita el error "Can't perform a React state update on an unmounted component".
@@ -29,9 +30,12 @@ export const useNewProcess = (dniInicial = '') => {
     };
 
     useEffect(() => {
+        isMounted.current = true;
         cargarTiposDisponibles();
-        // Cleanup: cancela cualquier timer pendiente al desmontar el componente.
-        return () => timersRef.current.forEach(clearTimeout);
+        return () => {
+            isMounted.current = false;
+            timersRef.current.forEach(clearTimeout);
+        };
     }, []);
 
     const handleChange = (e) => {
@@ -70,15 +74,18 @@ export const useNewProcess = (dniInicial = '') => {
                 fechaproceso: formData.fechaproceso || null
             };
             await procesoService.crearProceso(dataLimpia);
-            setShowSuccess(true);
-            // Timers registrados: se cancelan si el componente se desmonta antes de que disparen.
-            addTimer(() => setShowSuccess(false), 3000);
-            addTimer(() => navigate('/dashboard'), 1500);
+            if (isMounted.current) {
+                setShowSuccess(true);
+                addTimer(() => { if (isMounted.current) setShowSuccess(false); }, 3000);
+                addTimer(() => { if (isMounted.current) navigate('/dashboard'); }, 1500);
+            }
         } catch (error) {
-            setErrorMsg(extraerMensajeError(error, "Error al conectar con la base de datos."));
-            addTimer(() => setErrorMsg(null), 3000);
+            if (isMounted.current) {
+                setErrorMsg(extraerMensajeError(error, "Error al conectar con la base de datos."));
+                addTimer(() => { if (isMounted.current) setErrorMsg(null); }, 3000);
+            }
         } finally {
-            setIsSubmitting(false);
+            if (isMounted.current) setIsSubmitting(false);
         }
     };
 
@@ -96,7 +103,7 @@ export const useNewProcess = (dniInicial = '') => {
     const cargarTiposDisponibles = async () => {
         try {
             const res = await procesoService.obtenerTiposProceso();
-            setTiposDisponibles(res);
+            if (isMounted.current) setTiposDisponibles(res);
         } catch {
             // El select quedará vacío; el usuario verá el error al intentar enviar por validación.
         }

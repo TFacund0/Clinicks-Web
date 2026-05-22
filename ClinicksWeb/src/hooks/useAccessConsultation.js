@@ -12,6 +12,7 @@ export const useAccessConsultation = (destino) => {
     const [showSuccess, setShowSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
+    const isMounted = useRef(true);
 
     // Ref para acumular todos los timers activos y cancelarlos al desmontar.
     // Evita el error "Can't perform a React state update on an unmounted component".
@@ -23,8 +24,11 @@ export const useAccessConsultation = (destino) => {
     };
 
     useEffect(() => {
-        // Cleanup: cancela cualquier timer pendiente al desmontar el componente.
-        return () => timersRef.current.forEach(clearTimeout);
+        isMounted.current = true;
+        return () => {
+            isMounted.current = false;
+            timersRef.current.forEach(clearTimeout);
+        };
     }, []);
 
     // Manejador de cambios con filtro numérico
@@ -57,15 +61,18 @@ export const useAccessConsultation = (destino) => {
 
         try {
             await pacienteService.validarPacientePorDni(formData.dnipaciente);
-            setShowSuccess(true);
-            // Timers registrados: se cancelan si el componente se desmonta antes de que disparen.
-            addTimer(() => setShowSuccess(false), 3000);
-            addTimer(() => navigate(destino, { state: { dniIngresado: formData.dnipaciente } }), 1500);
+            if (isMounted.current) {
+                setShowSuccess(true);
+                addTimer(() => { if(isMounted.current) setShowSuccess(false); }, 3000);
+                addTimer(() => { if(isMounted.current) navigate(destino, { state: { dniIngresado: formData.dnipaciente } }); }, 1500);
+            }
         } catch (error) {
-            setErrorMsg(extraerMensajeError(error, "DNI no registrado en la base de datos."));
-            addTimer(() => setErrorMsg(null), 4000);
+            if (isMounted.current) {
+                setErrorMsg(extraerMensajeError(error, "DNI no registrado en la base de datos."));
+                addTimer(() => { if(isMounted.current) setErrorMsg(null); }, 4000);
+            }
         } finally {
-            setIsSubmitting(false);
+            if (isMounted.current) setIsSubmitting(false);
         }
     };
 

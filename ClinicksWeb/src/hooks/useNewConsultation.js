@@ -20,6 +20,7 @@ export const useNewConsultation = (dniInicial = '') => {
     const [showSuccess, setShowSuccess] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isMounted = useRef(true);
 
     // Ref para acumular todos los timers activos y cancelarlos al desmontar.
     // Evita el error "Can't perform a React state update on an unmounted component".
@@ -31,8 +32,11 @@ export const useNewConsultation = (dniInicial = '') => {
     };
 
     useEffect(() => {
-        // Cleanup: cancela cualquier timer pendiente al desmontar el componente.
-        return () => timersRef.current.forEach(clearTimeout);
+        isMounted.current = true;
+        return () => {
+            isMounted.current = false;
+            timersRef.current.forEach(clearTimeout);
+        };
     }, []);
 
     // 3. MANEJADOR DE CAMBIOS EN LOS INPUTS
@@ -78,19 +82,19 @@ export const useNewConsultation = (dniInicial = '') => {
 
             await consultaService.crearConsulta(dataLimpia);
 
-            setShowSuccess(true);
-            // Timer registrado: se cancela si el componente se desmonta antes de los 3s.
-            addTimer(() => setShowSuccess(false), 3000);
-
-            setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '' });
-
-            addTimer(() => navigate('/dashboard'), 1500);
-
+            if (isMounted.current) {
+                setShowSuccess(true);
+                addTimer(() => { if(isMounted.current) setShowSuccess(false); }, 3000);
+                setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '' });
+                addTimer(() => { if(isMounted.current) navigate('/dashboard'); }, 1500);
+            }
         } catch (error) {
-            setErrorMsg(extraerMensajeError(error, "Error al conectar con la base de datos."));
-            addTimer(() => setErrorMsg(null), 4000);
+            if (isMounted.current) {
+                setErrorMsg(extraerMensajeError(error, "Error al conectar con la base de datos."));
+                addTimer(() => { if(isMounted.current) setErrorMsg(null); }, 4000);
+            }
         } finally {
-            setIsSubmitting(false);
+            if (isMounted.current) setIsSubmitting(false);
         }
     };
 
