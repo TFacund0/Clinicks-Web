@@ -78,5 +78,29 @@ namespace ClinicksApi.Controllers
             var tipos = _procesoService.ObtenerTiposProceso();
             return Ok(tipos);
         }
+
+        /// <summary>
+        /// Obtiene el historial clínico completo de procedimientos de un paciente ordenado por fecha descendente.
+        /// </summary>
+        /// <param name="pacienteId">El ID numérico del paciente.</param>
+        /// <returns>
+        /// <see cref="OkResult"/> (200) con la lista de procedimientos del paciente.
+        /// <see cref="BadRequestResult"/> (400) si el ID es inválido.
+        /// </returns>
+        [HttpGet("historial/{pacienteId}")]
+        public async Task<IActionResult> GetHistorial(int pacienteId)
+        {
+            if (pacienteId <= 0)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    mensaje = "El Id del paciente debe ser mayor a cero."
+                });
+            }
+
+            var historial = await _procesoService.ObtenerHistorialPaciente(pacienteId);
+            return Ok(historial);
+        }
     }
 }

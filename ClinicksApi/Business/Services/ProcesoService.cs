@@ -95,5 +95,30 @@ namespace ClinicksApi.Business.Services
                 new { id = 9, nombre = "Otro" }
             };
         }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ProcesoHistorialDto>> ObtenerHistorialPaciente(int pacienteId)
+        {
+            var procesos = await _procesoRepo.HistorialPaciente(pacienteId);
+
+            return procesos.Select(p =>
+            {
+                // Extraer el nombre del médico desde el turno vinculado (si existe)
+                var turnoAsociado = p.Turnos?.FirstOrDefault();
+                var nombreMedico = turnoAsociado?.IdMedicoNavigation != null
+                    ? $"Dr/Dra. {turnoAsociado.IdMedicoNavigation.Nombre} {turnoAsociado.IdMedicoNavigation.Apellido}"
+                    : "No registrado";
+
+                return new ProcesoHistorialDto
+                {
+                    IdProcedimiento = p.IdProcedimiento,
+                    Tipo            = p.Tipo,
+                    Descripcion     = p.Descripcion ?? string.Empty,
+                    Resultado       = p.Resultado ?? string.Empty,
+                    Fecha           = p.Fecha,
+                    MedicoAtencion  = nombreMedico
+                };
+            });
+        }
     }
 }
