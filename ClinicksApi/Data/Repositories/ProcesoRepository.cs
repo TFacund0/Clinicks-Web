@@ -22,55 +22,45 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<Procedimiento> CrearProcedimiento(Procedimiento procedimiento)
+        public async Task<Procedimiento> CrearProcedimientoYTurnoVinculado(Procedimiento procedimiento, Turno turno)
         {
-            _context.Procedimientos.Add(procedimiento);
-            await _context.SaveChangesAsync();
-            return procedimiento;
-        }
-
-        /// <inheritdoc/>
-        public async Task<Turno> CrearTurnoVinculado(Turno turno)
-        {
-            _context.Turnos.Add(turno);
-            await _context.SaveChangesAsync();
-            return turno;
-        }
-
-        /// <inheritdoc/>
-        public async Task AsegurarEstadoTurnoExiste(int idEstadoTurno, string nombreEstado)
-        {
-            // Si el estado ya existe por ID, no hacemos nada.
-            var existePorId = await _context.EstadoTurnos.AnyAsync(e => e.IdEstadoTurno == idEstadoTurno);
-            if (existePorId) return;
-
-            // Intentamos insertar el estado forzando el ID. En PostgreSQL con columna IDENTITY, 
-            // esto puede fallar si la secuencia no lo permite, por eso capturamos el error.
-            var nuevoEstado = new EstadoTurno
-            {
-                IdEstadoTurno = idEstadoTurno,
-                Nombre        = nombreEstado
-            };
-
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                _context.EstadoTurnos.Add(nuevoEstado);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                // Si falló el insert con ID forzado (ej: columna auto-incremental), 
-                // desvinculamos la entidad para no corromper el tracking de EF Core.
-                _context.Entry(nuevoEstado).State = EntityState.Detached;
+                // 1. Guardar el procedimiento
+                _context.Procedimientos.Add(procedimiento);
+                await _context.SaveChangesAsync(); // Guarda y obtiene el ID autoincremental de procedimiento
 
-                // Como fallback, verificamos si existe por nombre y si no, lo creamos sin forzar el ID.
-                var existePorNombre = await _context.EstadoTurnos.AnyAsync(e => e.Nombre == nombreEstado);
-                if (!existePorNombre)
-                {
-                    _context.EstadoTurnos.Add(new EstadoTurno { Nombre = nombreEstado });
-                    await _context.SaveChangesAsync();
-                }
+                // 2. Vincular el ID del procedimiento generado al Turno
+                turno.IdProcedimiento = procedimiento.IdProcedimiento;
+
+                // 3. Guardar el turno
+                _context.Turnos.Add(turno);
+                await _context.SaveChangesAsync();
+
+                // 4. Confirmar la transacción
+                await transaction.CommitAsync();
+
+                return procedimiento;
             }
+            catch (Exception)
+            {
+                // Revertir cambios en caso de error
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<Procedimiento>> HistorialPaciente(int pacienteId)
+        {
+            return await _context.Procedimientos
+                .AsNoTracking()
+                .Where(p => p.Turnos.Any(t => t.IdPaciente == pacienteId))
+                .Include(p => p.Turnos) // Incluir turnos para acceder al médico
+                    .ThenInclude(t => t.IdMedicoNavigation)
+                .OrderByDescending(p => p.Fecha)
+                .ToListAsync();
         }
     }
 }

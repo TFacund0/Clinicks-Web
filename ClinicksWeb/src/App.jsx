@@ -1,16 +1,17 @@
-// src/App.jsx (o App.js)
+// src/App.jsx
 import { BrowserRouter as Router } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
+import { AuthProvider } from './context/AuthContext';
 
 // COMPONENTE RAÍZ
-// Este es el contenedor principal y punto de partida de toda tu aplicación en React.
+// El <AuthProvider> se coloca dentro del <Router> para que los componentes del contexto
+// (como Sidebar al hacer logout) puedan usar hooks de react-router como useNavigate.
 function App() {
   return (
-    // El <Router> envuelve toda la aplicación y es el "motor" que permite 
-    // cambiar de pantallas manipulando la URL sin recargar la página web.
     <Router>
-      {/* Adentro cargamos nuestro "mapa" que decide qué pantalla mostrar según la URL */}
-      <AppRoutes />
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </Router>
   );
 }

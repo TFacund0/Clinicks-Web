@@ -10,18 +10,19 @@ namespace ClinicksApi.Data.Interfaces
     {
         /// <summary>
         /// Busca un usuario en la tabla Usuarios coincidiendo el nombre de usuario de forma exacta.
-        /// También soporta búsqueda por matrícula de médico como fallback.
         /// </summary>
         Task<Usuario?> GetUsuarioByUsernameAsync(string username);
+
+        /// <summary>
+        /// Busca un usuario a través de la matrícula de un médico asociado.
+        /// </summary>
+        Task<Usuario?> GetUsuarioByMedicoMatriculaAsync(string matricula);
 
         /// <summary>
         /// Busca el médico asociado a un usuario dado su ID de usuario (FK id_usuario).
         /// Esta es la relación correcta entre las tablas 'usuario' y 'medico'.
         /// </summary>
         Task<Medico?> GetMedicoByUsuarioIdAsync(int usuarioId);
-
-        /// <summary>Método de fallback para obtener el primer médico disponible.</summary>
-        Task<Medico?> GetFirstMedicoAsync();
 
         /// <summary>Obtiene todos los usuarios (para el proceso de migración de contraseñas).</summary>
         Task<IEnumerable<Usuario>> GetAllUsuariosAsync();

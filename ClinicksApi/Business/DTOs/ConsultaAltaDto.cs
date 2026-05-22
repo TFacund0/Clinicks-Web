@@ -9,9 +9,11 @@ namespace ClinicksApi.Business.DTOs
     public class ConsultaAltaDto
     {
         /// <summary>Motivo principal por el que el paciente asiste a la consulta. Campo obligatorio.</summary>
+        [Required(ErrorMessage = "El Motivo es obligatorio.")]
         public string motivo { get; set; } = null!;
 
         /// <summary>Diagnóstico del médico al finalizar la consulta. Campo obligatorio.</summary>
+        [Required(ErrorMessage = "El Diagnóstico es obligatorio.")]
         public string diagnostico { get; set; } = null!;
 
         /// <summary>Plan de tratamiento indicado. Opcional; si se omite, se registra como "sin definir".</summary>
@@ -30,6 +32,7 @@ namespace ClinicksApi.Business.DTOs
         public DateTime? fechaconsulta { get; set; }
 
         /// <summary>DNI del paciente a registrar en la consulta. Se usa para buscarlo en la BD y obtener su ID real.</summary>
+        [Required(ErrorMessage = "El DNI del paciente es obligatorio.")]
         public required string dnipaciente { get; set; }
     }
 }

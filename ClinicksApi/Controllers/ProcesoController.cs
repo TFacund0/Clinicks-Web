@@ -69,27 +69,38 @@ namespace ClinicksApi.Controllers
 
         /// <summary>
         /// Devuelve el catálogo de tipos de procedimiento disponibles en el sistema.
-        /// La lista está definida en código ya que la base de datos no posee una tabla específica para este catálogo.
+        /// El catálogo es provisto por la capa de negocio centralizadamente.
         /// </summary>
         /// <returns><see cref="OkResult"/> (200) con la lista de tipos de procedimiento disponibles.</returns>
         [HttpGet("tipos")]
         public IActionResult GetTiposProceso()
         {
-            // Lista predefinida de categorías clínicas. A futuro podría moverse a la base de datos.
-            var tipos = new List<object>
-            {
-                new { id = 1, nombre = "Cirugía Menor" },
-                new { id = 2, nombre = "Estudio de Imagen (Rayos X, MRI)" },
-                new { id = 3, nombre = "Análisis de Laboratorio" },
-                new { id = 4, nombre = "Rehabilitación Física" },
-                new { id = 5, nombre = "Consulta Especializada" },
-                new { id = 6, nombre = "Procedimiento Odontológico" },
-                new { id = 7, nombre = "Curación de Heridas" },
-                new { id = 8, nombre = "Chequeo General" },
-                new { id = 9, nombre = "Otro" }
-            };
-
+            var tipos = _procesoService.ObtenerTiposProceso();
             return Ok(tipos);
+        }
+
+        /// <summary>
+        /// Obtiene el historial clínico completo de procedimientos de un paciente ordenado por fecha descendente.
+        /// </summary>
+        /// <param name="pacienteId">El ID numérico del paciente.</param>
+        /// <returns>
+        /// <see cref="OkResult"/> (200) con la lista de procedimientos del paciente.
+        /// <see cref="BadRequestResult"/> (400) si el ID es inválido.
+        /// </returns>
+        [HttpGet("historial/{pacienteId}")]
+        public async Task<IActionResult> GetHistorial(int pacienteId)
+        {
+            if (pacienteId <= 0)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    mensaje = "El Id del paciente debe ser mayor a cero."
+                });
+            }
+
+            var historial = await _procesoService.ObtenerHistorialPaciente(pacienteId);
+            return Ok(historial);
         }
     }
 }

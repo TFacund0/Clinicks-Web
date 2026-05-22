@@ -24,9 +24,10 @@ namespace ClinicksApi.Data.Repositories
         public async Task<IEnumerable<Paciente>> GetAllAsync()
         {
             return await _context.Pacientes
+                .AsNoTracking()
                 .Include(p => p.IdEstadoPacienteNavigation) // <--- CARGA LA TABLA DE ESTADOS
                 .Include(p => p.IdDireccionNavigation) // <--- CARGA LA TABLA DE DIRECCIONES
-                .Include(p => p.Turnos) // <--- CARGA LOS TURNOS PARA EL DTO
+                .Include(p => p.Turnos.OrderByDescending(t => t.FechaTurno).Take(1)) // <--- CARGA SOLO EL ÚLTIMO TURNO PARA EL DTO
                 .ToListAsync();
         }
 
@@ -34,9 +35,10 @@ namespace ClinicksApi.Data.Repositories
         public async Task<Paciente?> GetByIdAsync(int id)
         {
             return await _context.Pacientes
+                .AsNoTracking()
                 .Include(p => p.IdEstadoPacienteNavigation)
                 .Include(p => p.IdDireccionNavigation)
-                .Include(p => p.Turnos)
+                .Include(p => p.Turnos.OrderByDescending(t => t.FechaTurno).Take(1))
                 .FirstOrDefaultAsync(p => p.IdPaciente == id);
         }
 
@@ -44,9 +46,10 @@ namespace ClinicksApi.Data.Repositories
         public async Task<Paciente?> GetByDniAsync(string dni)
         {
             return await _context.Pacientes
+                .AsNoTracking()
                 .Include(p => p.IdEstadoPacienteNavigation)
                 .Include(p => p.IdDireccionNavigation)
-                .Include(p => p.Turnos) // Necesario para calcular FechaUltimaConsulta en el DTO
+                .Include(p => p.Turnos.OrderByDescending(t => t.FechaTurno).Take(1)) // Necesario para calcular FechaUltimaConsulta en el DTO
                 .FirstOrDefaultAsync(p => p.Dni == dni);
         }
 
@@ -57,13 +60,14 @@ namespace ClinicksApi.Data.Repositories
             // Si la tabla está vacía o el estado no existe aún, usamos -1 para que la query no devuelva nada.
             var idEstadoRealizado = await _context.EstadoTurnos
                 .Where(e => e.Nombre.ToLower() == "atendido")
-                .Select(e => e.IdEstadoTurno)
-                .FirstOrDefaultAsync();
+                .Select(e => (int?)e.IdEstadoTurno)
+                .FirstOrDefaultAsync() ?? -1;
 
             return await _context.Pacientes
+                .AsNoTracking()
                 .Include(p => p.IdEstadoPacienteNavigation)
                 .Include(p => p.IdDireccionNavigation)
-                .Include(p => p.Turnos)
+                .Include(p => p.Turnos.OrderByDescending(t => t.FechaTurno).Take(1))
                 .Where(p => p.Turnos.Any(t => t.IdMedico == medicoId && t.IdEstadoTurno == idEstadoRealizado))
                 .ToListAsync();
         }
