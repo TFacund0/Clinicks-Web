@@ -1,11 +1,10 @@
 // src/pages/medico/Patients.jsx
 
 // 1. IMPORTACIÓN DE COMPONENTES Y HERRAMIENTAS
-import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
 import { useNavigate } from 'react-router-dom'; 
+import PageLayout from '../../components/PageLayout';
 import { usePatients } from '../../hooks/usePatients'; 
-import { Search, Filter, ExternalLink } from 'lucide-react'; 
+import { Search, ExternalLink } from 'lucide-react'; 
 
 // Vista que muestra la tabla con todos los pacientes del médico, incluyendo un buscador en tiempo real.
 const Patients = () => {
@@ -27,22 +26,7 @@ const Patients = () => {
 
   // 4. RENDERIZADO DE LA INTERFAZ
   return (
-    <div className="flex h-screen w-full bg-slate-950 text-slate-200 overflow-hidden font-sans">
-      <Sidebar />
-
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header paginaActual='Listado de Pacientes'/>
-        
-        <main className="flex-1 p-8 overflow-y-auto w-full">
-            <div className="max-w-7xl mx-auto w-full">
-            
-            {/* Encabezado principal de la pantalla */}
-            <div className="flex justify-between items-center mb-8">
-              <div>
-                <h1 className="text-3xl font-bold">Listado de Pacientes</h1>
-                <p className="text-slate-500 text-sm">Gestiona y consulta el historial de tus pacientes.</p>
-              </div>
-            </div>
+    <PageLayout title="Pacientes">
 
             {/* BARRA DE BÚSQUEDA */}
             <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 mb-6 flex flex-wrap gap-4 items-center justify-between">
@@ -135,10 +119,7 @@ const Patients = () => {
 
               </table>
             </div>
-          </div>
-        </main>
-      </div>
-    </div>
+    </PageLayout>
   );
 };
 

@@ -1,6 +1,7 @@
 // src/hooks/usePatients.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { pacienteService } from '../services/pacienteService';
+import { extraerMensajeError } from '../utils/errorUtils';
 
 // Este Hook gestiona la carga y búsqueda de pacientes del médico logueado.
 // El ID del médico ya no es necesario aquí porque el backend lo extrae del Token JWT.
@@ -11,6 +12,14 @@ export const usePatients = () => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   // 2. FUNCIÓN DE CARGA (Conexión con la API)
   const fetchData = async () => {
@@ -18,18 +27,20 @@ export const usePatients = () => {
       setCargando(true);
       setError(null);
       const datos = await pacienteService.obtenerAtendidosPorMedico();
-      setPacientes(Array.isArray(datos) ? datos : []);
+      if (isMounted.current) {
+        setPacientes(Array.isArray(datos) ? datos : []);
+      }
     } catch (err) {
-      setError("No se pudo cargar tu listado de pacientes.");
-      setPacientes([]);
+      if (isMounted.current) {
+        setError(extraerMensajeError(err, "No se pudo cargar tu listado de pacientes."));
+        setPacientes([]);
+      }
     } finally {
-      setCargando(false);
+      if (isMounted.current) setCargando(false);
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   // 3. LÓGICA DE FILTRADO EN TIEMPO REAL
   const pacientesFiltrados = (pacientes || []).filter((p) => {

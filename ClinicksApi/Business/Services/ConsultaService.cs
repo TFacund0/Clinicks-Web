@@ -2,6 +2,7 @@ using ClinicksApi.Business.DTOs;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace ClinicksApi.Business.Services
 {
@@ -14,29 +15,49 @@ namespace ClinicksApi.Business.Services
     public class ConsultaService : IConsultaService
     {
         private readonly IConsultaRepository _consultaRepo;
-        private readonly IPacienteRepository _pacienteRepo;
-
-        /// <summary>
-        /// Constructor del servicio. Recibe los repositorios inyectados por el contenedor de dependencias de .NET.
-        /// </summary>
-        /// <param name="consultaRepo">Repositorio que ejecuta operaciones SQL sobre la tabla consulta_medica.</param>
-        /// <param name="pacienteRepo">Repositorio para verificar la existencia del paciente por DNI antes de registrar.</param>
-        public ConsultaService(IConsultaRepository consultaRepo, IPacienteRepository pacienteRepo)
+        private readonly IPacienteService _pacienteService;
+        private readonly ILogger<ConsultaService> _logger;
+        /// <param name="pacienteService">Servicio para verificar la existencia del paciente por DNI antes de registrar.</param>
+        /// <param name="logger">Logger de diagnóstico del servicio.</param>
+        public ConsultaService(IConsultaRepository consultaRepo, IPacienteService pacienteService, ILogger<ConsultaService> logger)
         {
             _consultaRepo = consultaRepo;
-            _pacienteRepo = pacienteRepo;
+            _pacienteService = pacienteService;
+            _logger = logger;
         }
 
         /// <inheritdoc/>
-        public async Task<List<ConsultaMedica>> ObtenerListaConsultas()
+        public async Task<List<ConsultaHistorialDto>> ObtenerListaConsultas()
         {
-            return await _consultaRepo.ListaConsultas();
+            var consultas = await _consultaRepo.ListaConsultas();
+            return consultas.Select(c => new ConsultaHistorialDto
+            {
+                IdConsulta = c.IdConsulta,
+                Motivo = c.Motivo,
+                Diagnostico = c.Diagnostico,
+                Tratamiento = c.Tratamiento ?? string.Empty,
+                Observacion = c.Observacion ?? string.Empty,
+                Recomendacion = c.Recomendacion ?? string.Empty,
+                FechaConsulta = c.FechaConsulta,
+                MedicoAtencion = c.IdMedicoNavigation != null ? $"{c.IdMedicoNavigation.Nombre} {c.IdMedicoNavigation.Apellido}" : "Médico Desconocido"
+            }).ToList();
         }
 
         /// <inheritdoc/>
-        public async Task<List<ConsultaMedica>> ObtenerHistorialPaciente(int pacienteId)
+        public async Task<List<ConsultaHistorialDto>> ObtenerHistorialPaciente(int pacienteId)
         {
-            return await _consultaRepo.HistorialPaciente(pacienteId);
+            var consultas = await _consultaRepo.HistorialPaciente(pacienteId);
+            return consultas.Select(c => new ConsultaHistorialDto
+            {
+                IdConsulta = c.IdConsulta,
+                Motivo = c.Motivo,
+                Diagnostico = c.Diagnostico,
+                Tratamiento = c.Tratamiento ?? string.Empty,
+                Observacion = c.Observacion ?? string.Empty,
+                Recomendacion = c.Recomendacion ?? string.Empty,
+                FechaConsulta = c.FechaConsulta,
+                MedicoAtencion = c.IdMedicoNavigation != null ? $"{c.IdMedicoNavigation.Nombre} {c.IdMedicoNavigation.Apellido}" : "Médico Desconocido"
+            }).ToList();
         }
 
         /// <inheritdoc/>
@@ -44,13 +65,7 @@ namespace ClinicksApi.Business.Services
         {
             try
             {
-                // 1. REGLAS DE NEGOCIO — Validaciones de campos obligatorios.
-                if (string.IsNullOrWhiteSpace(dto.motivo))
-                    return (false, "El Motivo es obligatorio.", null);
-
-                if (string.IsNullOrWhiteSpace(dto.diagnostico))
-                    return (false, "El Diagnóstico es obligatorio.", null);
-
+                // 1. REGLAS DE NEGOCIO — Validaciones de negocio (los campos obligatorios ya se validan en el DTO).
                 // Prevenimos viajes en el tiempo: la fecha no puede ser del futuro.
                 if (dto.fechaconsulta != null && dto.fechaconsulta > DateTime.Now)
                     return (false, "La fecha de consulta no puede ser futura.", null);
@@ -60,9 +75,10 @@ namespace ClinicksApi.Business.Services
                     return (false, "El Id del Médico logueado es obligatorio y debe ser mayor a cero.", null);
 
                 // 2. VERIFICACIÓN CRUZADA — Validamos que el DNI ingresado exista realmente en el sistema.
-                var paciente = await _pacienteRepo.GetByDniAsync(dto.dnipaciente);
-                if (paciente == null)
-                    return (false, "Paciente no encontrado.", null);
+                // Lo hacemos a través de IPacienteService para respetar SoC y aplicar sus reglas de negocio.
+                var pacienteDto = await _pacienteService.ObtenerPorDni(dto.dnipaciente);
+                if (pacienteDto == null)
+                    return (false, "Paciente no encontrado o no apto para consultas.", null);
 
                 // 3. MAPEO — Convertimos el DTO (JSON de React) en una Entidad que entiende Entity Framework.
                 var nuevaConsulta = new ConsultaMedica
@@ -75,8 +91,8 @@ namespace ClinicksApi.Business.Services
                     Recomendacion   = dto.recomendacion ?? "sin recomendaciones",
                     FechaConsulta   = dto.fechaconsulta ?? DateTime.Now,
                     IdMedico        = idMedicoLogueado,
-                    // Usamos el ID real de la BD; no confiamos en el DNI como identificador.
-                    IdPaciente      = paciente.IdPaciente
+                    // Usamos el ID real de la BD proveído por el DTO; no confiamos en el DNI como identificador.
+                    IdPaciente      = pacienteDto.Id
                 };
 
                 // 4. GUARDADO — El repositorio ejecuta el INSERT en PostgreSQL.
@@ -86,9 +102,9 @@ namespace ClinicksApi.Business.Services
             }
             catch (Exception ex)
             {
-                // Capturamos la causa raíz del error de base de datos (ej: violación de clave foránea).
-                var detalle = ex.InnerException != null ? $" Detalle: {ex.InnerException.Message}" : "";
-                return (false, $"Error interno: {ex.Message}{detalle}", null);
+                // Capturamos la causa raíz del error de base de datos en el log interno sin exponerla al cliente.
+                _logger.LogError(ex, "Error al registrar la consulta médica. Paciente DNI: {DniPaciente}", dto.dnipaciente);
+                return (false, "Error interno al registrar la consulta médica. Por favor, intente nuevamente más tarde.", null);
             }
         }
     }

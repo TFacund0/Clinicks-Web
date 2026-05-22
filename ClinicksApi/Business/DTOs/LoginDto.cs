@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace ClinicksApi.Business.DTOs
@@ -13,6 +14,7 @@ namespace ClinicksApi.Business.DTOs
         /// El atributo <see cref="JsonPropertyNameAttribute"/> permite que React envíe "username"
         /// en minúscula y C# lo mapee correctamente sin distinción de mayúsculas.
         /// </summary>
+        [Required(ErrorMessage = "El nombre de usuario es obligatorio.")]
         [JsonPropertyName("username")]
         public string Username { get; set; } = null!;
 
@@ -20,6 +22,7 @@ namespace ClinicksApi.Business.DTOs
         /// La contraseña en texto plano ingresada por el usuario.
         /// Se verifica contra el hash BCrypt almacenado en la base de datos; nunca se guarda en texto plano.
         /// </summary>
+        [Required(ErrorMessage = "La contraseña es obligatoria.")]
         [JsonPropertyName("password")]
         public string Password { get; set; } = null!;
     }

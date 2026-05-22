@@ -2,6 +2,7 @@ using ClinicksApi.Business.DTOs;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace ClinicksApi.Business.Services
 {
@@ -13,17 +14,15 @@ namespace ClinicksApi.Business.Services
     public class ProcesoService : IProcesoService
     {
         private readonly IProcesoRepository _procesoRepo;
-        private readonly IPacienteRepository _pacienteRepo;
-
-        /// <summary>
-        /// Constructor del servicio. Recibe los repositorios inyectados por el contenedor de dependencias de .NET.
-        /// </summary>
-        /// <param name="procesoRepo">Repositorio que ejecuta operaciones SQL sobre las tablas procedimiento y turno.</param>
-        /// <param name="pacienteRepo">Repositorio para verificar la existencia del paciente por DNI antes de registrar.</param>
-        public ProcesoService(IProcesoRepository procesoRepo, IPacienteRepository pacienteRepo)
+        private readonly IPacienteService _pacienteService;
+        private readonly ILogger<ProcesoService> _logger;
+        /// <param name="pacienteService">Servicio para verificar la existencia del paciente por DNI antes de registrar.</param>
+        /// <param name="logger">Logger de diagnóstico del servicio.</param>
+        public ProcesoService(IProcesoRepository procesoRepo, IPacienteService pacienteService, ILogger<ProcesoService> logger)
         {
             _procesoRepo = procesoRepo;
-            _pacienteRepo = pacienteRepo;
+            _pacienteService = pacienteService;
+            _logger = logger;
         }
 
         /// <inheritdoc/>
@@ -31,20 +30,15 @@ namespace ClinicksApi.Business.Services
         {
             try
             {
-                // 1. REGLAS DE NEGOCIO — Validaciones de campos obligatorios.
-                if (string.IsNullOrWhiteSpace(dto.tipoproceso))
-                    return (false, "El tipo de proceso es obligatorio.", null);
-
-                if (string.IsNullOrWhiteSpace(dto.descripcion))
-                    return (false, "La descripción es obligatoria.", null);
-
+                // 1. REGLAS DE NEGOCIO — Validaciones (los campos obligatorios ya se validan en el DTO).
                 if (idMedicoLogueado <= 0)
                     return (false, "El médico logueado es inválido.", null);
 
                 // 2. VERIFICACIÓN CRUZADA — Validamos que el DNI del paciente exista en el sistema.
-                var paciente = await _pacienteRepo.GetByDniAsync(dto.dnipaciente);
-                if (paciente == null)
-                    return (false, "Paciente no encontrado en la base de datos.", null);
+                // A través del IPacienteService para respetar la separación de incumbencias (SoC).
+                var pacienteDto = await _pacienteService.ObtenerPorDni(dto.dnipaciente);
+                if (pacienteDto == null)
+                    return (false, "Paciente no encontrado en la base de datos o no apto para procedimientos.", null);
 
                 // Si no se envió fecha, usamos la fecha y hora actual del servidor.
                 var fechaAUsar = dto.fechaproceso ?? DateTime.Now;
@@ -58,36 +52,73 @@ namespace ClinicksApi.Business.Services
                     Fecha       = fechaAUsar
                 };
 
-                // 4. GUARDADO DEL PROCEDIMIENTO — El repositorio ejecuta el INSERT en PostgreSQL.
-                var procGuardado = await _procesoRepo.CrearProcedimiento(nuevoProcedimiento);
-
-                // 5. PREPARACIÓN DEL TURNO VINCULADO
-                // Garantizamos que el estado "Realizado" (id=1) exista en la tabla estado_turno.
+                // 4. PREPARACIÓN DEL TURNO VINCULADO
+                // El estado "Realizado" tiene ID = 1 y ya está garantizado por el DbInitializer al iniciar la app.
                 int idEstadoHecho = 1;
-                await _procesoRepo.AsegurarEstadoTurnoExiste(idEstadoHecho, "Realizado");
 
                 // Construimos el Turno que une el procedimiento con el paciente y el médico.
                 var nuevoTurno = new Turno
                 {
-                    IdPaciente      = paciente.IdPaciente,
+                    IdPaciente      = pacienteDto.Id,
                     IdMedico        = idMedicoLogueado,
-                    IdProcedimiento = procGuardado.IdProcedimiento,
                     IdEstadoTurno   = idEstadoHecho,
                     FechaTurno      = fechaAUsar,
                     Motivo          = $"Procedimiento: {dto.tipoproceso}"
                 };
 
-                // 6. GUARDADO DEL TURNO — Persiste la relación entre las tres entidades.
-                await _procesoRepo.CrearTurnoVinculado(nuevoTurno);
+                // 5. GUARDADO ATÓMICO (TRANSACCIONAL) — Persistimos procedimiento y turno en una sola transacción
+                var procGuardado = await _procesoRepo.CrearProcedimientoYTurnoVinculado(nuevoProcedimiento, nuevoTurno);
 
                 return (true, "Procedimiento guardado y vinculado con éxito.", procGuardado);
             }
             catch (Exception ex)
             {
-                // Capturamos la causa raíz del error de base de datos para un diagnóstico más preciso.
-                var detalle = ex.InnerException != null ? $" Detalle: {ex.InnerException.Message}" : "";
-                return (false, $"Error interno al registrar proceso: {ex.Message}{detalle}", null);
+                // Capturamos la causa raíz del error de base de datos en el log interno sin exponerla al cliente.
+                _logger.LogError(ex, "Error al registrar proceso médico. Paciente DNI: {DniPaciente}", dto.dnipaciente);
+                return (false, "Error interno al registrar el proceso en el sistema. Por favor, intente nuevamente más tarde.", null);
             }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<object> ObtenerTiposProceso()
+        {
+            return new List<object>
+            {
+                new { id = 1, nombre = "Cirugía Menor" },
+                new { id = 2, nombre = "Estudio de Imagen (Rayos X, MRI)" },
+                new { id = 3, nombre = "Análisis de Laboratorio" },
+                new { id = 4, nombre = "Rehabilitación Física" },
+                new { id = 5, nombre = "Consulta Especializada" },
+                new { id = 6, nombre = "Procedimiento Odontológico" },
+                new { id = 7, nombre = "Curación de Heridas" },
+                new { id = 8, nombre = "Chequeo General" },
+                new { id = 9, nombre = "Otro" }
+            };
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ProcesoHistorialDto>> ObtenerHistorialPaciente(int pacienteId)
+        {
+            var procesos = await _procesoRepo.HistorialPaciente(pacienteId);
+
+            return procesos.Select(p =>
+            {
+                // Extraer el nombre del médico desde el turno vinculado (si existe)
+                var turnoAsociado = p.Turnos?.FirstOrDefault();
+                var nombreMedico = turnoAsociado?.IdMedicoNavigation != null
+                    ? $"Dr/Dra. {turnoAsociado.IdMedicoNavigation.Nombre} {turnoAsociado.IdMedicoNavigation.Apellido}"
+                    : "No registrado";
+
+                return new ProcesoHistorialDto
+                {
+                    IdProcedimiento = p.IdProcedimiento,
+                    Tipo            = p.Tipo,
+                    Descripcion     = p.Descripcion ?? string.Empty,
+                    Resultado       = p.Resultado ?? string.Empty,
+                    Fecha           = p.Fecha,
+                    MedicoAtencion  = nombreMedico
+                };
+            });
         }
     }
 }

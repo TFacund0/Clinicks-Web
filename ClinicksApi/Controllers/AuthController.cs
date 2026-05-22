@@ -37,9 +37,6 @@ namespace ClinicksApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            if (string.IsNullOrEmpty(request.Username))
-                return BadRequest(new { message = "El nombre de usuario es obligatorio." });
-
             var medico = await _authService.AuthenticateAsync(request.Username, request.Password);
 
             if (medico == null)
@@ -50,8 +47,10 @@ namespace ClinicksApi.Controllers
 
         /// <summary>
         /// Endpoint temporal de mantenimiento para encriptar claves en texto plano.
+        /// Se agregó autorización para evitar ataques DoS públicos.
         /// </summary>
         [HttpPost("encriptar-claves")]
+        [Authorize]
         public async Task<IActionResult> EncriptarClaves()
         {
             var cantidad = await _authService.HashExistingPasswordsAsync();

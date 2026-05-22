@@ -7,21 +7,16 @@ const procesoService = {
         return respuesta.data;
     },
 
-    // Recupera el listado completo de todos los procesos médicos registrados (GET).
-    obtenerProcesos: async () => {
-        const res = await clinicksApi.get('/procesos');
-        return res.data;
-    },
-
     // Recupera los tipos de procesos disponibles (GET).
     obtenerTiposProceso: async () => {
         const res = await clinicksApi.get('/procesos/tipos');
         return res.data;
     },
-    // Busca y devuelve los detalles de un proceso específico utilizando su ID (GET).
-    obtenerPorId: async (id) => {
-        const res = await clinicksApi.get(`/procesos/${id}`);
-        return res.data;
+
+    // Recupera el historial clínico de procedimientos de un paciente específico.
+    obtenerHistorialPaciente: async (pacienteId) => {
+        const respuesta = await clinicksApi.get(`/procesos/historial/${pacienteId}`);
+        return respuesta.data;
     }
 };
 

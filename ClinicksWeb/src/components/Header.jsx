@@ -1,11 +1,10 @@
 // src/components/Header.jsx
-
-// Este componente representa la barra superior de la interfaz. 
-// Su función principal es mostrar el contexto en el que se encuentra el médico (ej. en qué página está), 
-// la hora actual (que se actualiza en tiempo real), y la información básica de su sesión.
+// VUL-3 CORREGIDO: Ya no lee medicoNombre directamente de localStorage.
+// Ahora lo obtiene del AuthContext, que es la única fuente de verdad de la sesión.
 
 import { useState, useEffect } from 'react';
-import { Bell, Calendar as CalendarIcon, User, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 // Se define el componente Header. Recibe una "prop" llamada 'paginaActual'.
 // Si el componente padre (como Dashboard o Patients) no le pasa nada, por defecto dirá "Panel de Control".
@@ -24,8 +23,8 @@ const Header = ({ paginaActual = "Panel de Control" }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Obtenemos el nombre del médico logueado.
-  const medicoNombre = localStorage.getItem('medicoNombre') || "Médico";
+  // Obtenemos el nombre del médico logueado desde el contexto reactivo de autenticación.
+  const { medicoNombre } = useAuth();
 
   // Generamos las iniciales de forma segura para evitar errores si el nombre es corto o nulo.
   const iniciales = medicoNombre

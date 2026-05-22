@@ -1,4 +1,4 @@
-﻿using ClinicksApi.Data.Entities;
+using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,13 +24,14 @@ namespace ClinicksApi.Data.Repositories
         /// <inheritdoc/>
         public async Task<List<ConsultaMedica>> ListaConsultas()
         {
-            return await _context.ConsultaMedicas.ToListAsync();
+            return await _context.ConsultaMedicas.AsNoTracking().ToListAsync();
         }
 
         /// <inheritdoc/>
         public async Task<List<ConsultaMedica>> HistorialPaciente(int pacienteId)
         {
             return await _context.ConsultaMedicas
+                .AsNoTracking()
                 .Where(c => c.IdPaciente == pacienteId)
                 .Include(c => c.IdMedicoNavigation) // JOIN con la tabla medico para traer nombre y apellido
                 .OrderByDescending(c => c.FechaConsulta)
@@ -43,6 +44,35 @@ namespace ClinicksApi.Data.Repositories
             _context.ConsultaMedicas.Add(consulta);
             await _context.SaveChangesAsync();
             return consulta;
+        }
+
+        /// <inheritdoc/>
+        public async Task<int> AsegurarEstadoTurnoExiste(string nombreEstado)
+        {
+            var estadoExistente = await _context.EstadoTurnos
+                .FirstOrDefaultAsync(e => e.Nombre.ToLower() == nombreEstado.ToLower());
+            
+            if (estadoExistente != null)
+            {
+                return estadoExistente.IdEstadoTurno;
+            }
+
+            var nuevoEstado = new EstadoTurno
+            {
+                Nombre = nombreEstado
+            };
+
+            _context.EstadoTurnos.Add(nuevoEstado);
+            await _context.SaveChangesAsync();
+
+            return nuevoEstado.IdEstadoTurno;
+        }
+
+        /// <inheritdoc/>
+        public async Task CrearTurnoVinculado(Turno turno)
+        {
+            _context.Turnos.Add(turno);
+            await _context.SaveChangesAsync();
         }
     }
 }
