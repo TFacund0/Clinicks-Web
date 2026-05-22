@@ -8,18 +8,6 @@ const consultaService = {
     crearConsulta: async (consultaData) => {
         const respuesta = await clinicksApi.post('/consultas', consultaData);
         return respuesta.data;
-    },
-
-    // Recupera el listado completo de todas las consultas médicas registradas (GET).
-    obtenerConsultas: async () => {
-        const res = await clinicksApi.get('/consultas');
-        return res.data;
-    },
-
-    // Busca y devuelve los detalles de una consulta específica utilizando su ID (GET).
-    obtenerPorId: async (id) => {
-        const res = await clinicksApi.get(`/consultas/${id}`);
-        return res.data;
     }
 };
 

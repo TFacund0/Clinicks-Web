@@ -20,8 +20,7 @@ const Sidebar = () => {
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', path: '/dashboard' },
     { icon: <Users size={20} />, label: 'Pacientes', path: '/pacientes' },
     { icon: <ClipboardPlus size={20} />, label: 'Nueva Consulta', path: '/acceso-consulta' },
-    { icon: <Activity size={20} />, label: 'Nuevo Procedimiento', path: '/acceso-procedimiento' },
-    { icon: <Calendar size={20} />, label: 'Mi Agenda', path: '/agenda' }
+    { icon: <Activity size={20} />, label: 'Nuevo Procedimiento', path: '/acceso-procedimiento' }
   ];
 
   return (

@@ -4,8 +4,9 @@
 // por lo que cualquier cambio de login/logout actualiza automáticamente toda la UI
 // sin necesidad de recargar la página ni depender de localStorage directamente.
 
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import authService from '../services/authService';
+import { AUTH_EXPIRED_EVENT } from '../api/clinicksApi';
 
 const AuthContext = createContext(null);
 
@@ -37,6 +38,15 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
         setMedicoNombre('Médico');
     }, []);
+
+    // Escucha el evento que emite el interceptor de Axios cuando el backend devuelve 401.
+    // Esto garantiza que si el token expira mid-sesión, el estado de React se actualice
+    // y el usuario sea redirigido al login sin que la app quede en un estado inconsistente.
+    useEffect(() => {
+        const handleSessionExpired = () => logout();
+        window.addEventListener(AUTH_EXPIRED_EVENT, handleSessionExpired);
+        return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleSessionExpired);
+    }, [logout]);
 
     return (
         <AuthContext.Provider value={{ isAuthenticated, medicoNombre, login, logout }}>

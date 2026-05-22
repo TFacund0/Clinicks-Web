@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+// src/hooks/useNewProcess.js
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import procesoService from '../services/procesoService';
 
@@ -9,7 +10,7 @@ export const useNewProcess = (dniInicial = '') => {
         dnipaciente: dniInicial,
         tipoproceso: '',
         descripcion: '',
-        fechaproceso: new Date().toISOString().split('T')[0], // Fecha de hoy por defecto
+        fechaproceso: new Date().toISOString().split('T')[0],
         resultado: '',
     });
     const [errors, setErrors] = useState({});
@@ -17,12 +18,24 @@ export const useNewProcess = (dniInicial = '') => {
     const [errorMsg, setErrorMsg] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Ref para acumular todos los timers activos y cancelarlos al desmontar.
+    // Evita el error "Can't perform a React state update on an unmounted component".
+    const timersRef = useRef([]);
+    const addTimer = (fn, ms) => {
+        const id = setTimeout(fn, ms);
+        timersRef.current.push(id);
+        return id;
+    };
+
+    useEffect(() => {
+        cargarTiposDisponibles();
+        // Cleanup: cancela cualquier timer pendiente al desmontar el componente.
+        return () => timersRef.current.forEach(clearTimeout);
+    }, []);
+
     const handleChange = (e) => {
-
         const { name, value } = e.target;
-
         setFormData({ ...formData, [name]: value });
-        
         if (errors[name]) {
             setErrors({ ...errors, [name]: null });
         }
@@ -36,7 +49,6 @@ export const useNewProcess = (dniInicial = '') => {
         if (!formData.tipoproceso.trim()) erroresTemporales.tipoproceso = "El tipo de proceso es obligatorio.";
         if (!formData.descripcion.trim()) erroresTemporales.descripcion = "La descripción del proceso es obligatoria.";
 
-        // Validación de fecha (no puede ser futura)
         if (formData.fechaproceso && formData.fechaproceso > hoy) {
             erroresTemporales.fechaproceso = "La fecha no puede ser posterior a hoy.";
         }
@@ -47,7 +59,6 @@ export const useNewProcess = (dniInicial = '') => {
 
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
-
         if (!validarFormulario()) return;
 
         setIsSubmitting(true);
@@ -59,13 +70,12 @@ export const useNewProcess = (dniInicial = '') => {
             };
             await procesoService.crearProceso(dataLimpia);
             setShowSuccess(true);
-            setTimeout(() => setShowSuccess(false), 3000);
-            setTimeout(() => {
-                navigate('/dashboard');
-            }, 1500);
+            // Timers registrados: se cancelan si el componente se desmonta antes de que disparen.
+            addTimer(() => setShowSuccess(false), 3000);
+            addTimer(() => navigate('/dashboard'), 1500);
         } catch (error) {
             setErrorMsg(error.response?.data?.message || error.response?.data?.mensaje || "Error al conectar con la base de datos.");
-            setTimeout(() => setErrorMsg(null), 3000);
+            addTimer(() => setErrorMsg(null), 3000);
         } finally {
             setIsSubmitting(false);
         }
@@ -74,8 +84,8 @@ export const useNewProcess = (dniInicial = '') => {
     const handleCancel = () => {
         setFormData({
             ...formData,
-            tipoproceso: '', 
-            descripcion: '', 
+            tipoproceso: '',
+            descripcion: '',
             fechaproceso: new Date().toISOString().split('T')[0],
             resultado: ''
         });
@@ -86,13 +96,10 @@ export const useNewProcess = (dniInicial = '') => {
         try {
             const res = await procesoService.obtenerTiposProceso();
             setTiposDisponibles(res);
-        } catch (error) {
-            // Manejo de error silencioso o mediante estado de UI si fuera necesario
+        } catch {
+            // El select quedará vacío; el usuario verá el error al intentar enviar por validación.
         }
     };
-    useEffect(() => {
-        cargarTiposDisponibles();
-    }, []);
 
     return {
         formData,
@@ -105,4 +112,4 @@ export const useNewProcess = (dniInicial = '') => {
         handleCancel,
         tiposDisponibles,
     };
-}
+};

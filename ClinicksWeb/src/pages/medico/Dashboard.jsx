@@ -114,7 +114,7 @@ const Dashboard = () => {
                           <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
                             paciente.estaActivo ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
                           }`}>
-                            {paciente.estaActivo ? "Activo" : "OI"}
+                            {paciente.estaActivo ? "Activo" : "Inactivo"}
                           </span>
                         </td>
                         <td className="p-4 text-right">
