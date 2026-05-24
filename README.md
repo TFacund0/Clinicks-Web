@@ -1,4 +1,4 @@
-# Clinicks - Medical Management System
+# Clinicks - Sistema de Gestión Médica
 
 ## Descripción General
 Clinicks es un Sistema de Gestión Médica integral diseñado para digitalizar y optimizar las operaciones diarias de los centros de salud modernos. La plataforma ofrece un entorno robusto, escalable y seguro para que los profesionales médicos administren sus agendas, realicen consultas y mantengan expedientes clínicos electrónicos (EHR) de manera eficiente.
