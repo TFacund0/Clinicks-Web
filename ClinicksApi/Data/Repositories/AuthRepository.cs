@@ -4,15 +4,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClinicksApi.Data.Repositories
 {
+    /// <summary>
+    /// Implementación concreta del repositorio de autenticación, responsable de acceder a la tabla Usuarios y su relación con Medicos en PostgreSQL.
+    /// </summary>
     public class AuthRepository : IAuthRepository
     {
         private readonly ClinicksDbContext _context;
 
+        /// <summary>
+        /// Constructor del repositorio de autenticación. Recibe el contexto de base de datos inyectado por .NET, que representa la sesión activa con PostgreSQL.
+        /// </summary>
+        /// <param name="context"></param>
         public AuthRepository(ClinicksDbContext context)
         {
             _context = context;
         }
 
+        /// <inheritdoc/>
         public async Task<Usuario?> GetUsuarioByUsernameAsync(string username)
         {
             var cleanUsername = username.Trim().ToLower();
@@ -21,6 +29,7 @@ namespace ClinicksApi.Data.Repositories
                 .FirstOrDefaultAsync(u => u.Username.ToLower() == cleanUsername);
         }
 
+        /// <inheritdoc/>
         public async Task<Usuario?> GetUsuarioByMedicoMatriculaAsync(string matricula)
         {
             var cleanMatricula = matricula.Trim().ToLower();
@@ -38,6 +47,7 @@ namespace ClinicksApi.Data.Repositories
             return null;
         }
 
+        /// <inheritdoc/>
         public async Task<Medico?> GetMedicoByUsuarioIdAsync(int usuarioId)
         {
             return await _context.Medicos
@@ -45,11 +55,13 @@ namespace ClinicksApi.Data.Repositories
                 .FirstOrDefaultAsync(m => m.IdUsuario == usuarioId);
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Usuario>> GetAllUsuariosAsync()
         {
             return await _context.Usuarios.ToListAsync();
         }
 
+        /// <inheritdoc/>
         public async Task UpdateUsuarioAsync(Usuario usuario)
         {
             _context.Usuarios.Update(usuario);

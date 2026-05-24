@@ -24,9 +24,9 @@ namespace ClinicksApi.Business.Services
         /// <summary>
         /// Lógica de negocio para buscar a los pacientes asignados a un médico.
         /// </summary>
-        public async Task<IEnumerable<PacienteDto>> ObtenerAtendidosPorMedico(int medicoId)
+        public async Task<IEnumerable<PacienteDto>> ObtenerAtendidosPorMedico(int medicoId, string? searchTerm = null)
         {
-            var datos = await _repository.GetAtendidosByMedicoAsync(medicoId);
+            var datos = await _repository.GetAtendidosByMedicoAsync(medicoId, searchTerm);
             return datos.Select(MapToDto);
         }
 

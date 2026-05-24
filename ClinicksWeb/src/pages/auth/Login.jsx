@@ -1,8 +1,5 @@
 // src/pages/auth/Login.jsx
-// VUL-1 CORREGIDO: Ya no importa ni usa clinicksApi directamente.
-// VUL-3 CORREGIDO: No escribe en localStorage. Delega todo al AuthContext que llama a authService.
-// Esta página solo maneja el estado del formulario y la UI.
-
+// Esta página maneja el estado del formulario y la UI de inicio de sesión.
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Activity, Lock, User, AlertCircle } from 'lucide-react';
