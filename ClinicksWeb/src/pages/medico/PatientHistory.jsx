@@ -8,8 +8,7 @@ const PatientHistory = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // SOC-1: Usar API real
-  // SOC-2: Extraer la lógica de filtros del componente UI (ya vienen computados en 'historial')
+  // Obtenemos los datos y lógica de filtrado encapsulada en el hook
   const { paciente, historial, cargando, error, filtros, setFiltros } = usePatientHistory(id);
 
   if (cargando) {

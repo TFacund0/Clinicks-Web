@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { useAgenda } from '../../hooks/useAgenda';
+import { useAuth } from '../../context/AuthContext';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -32,14 +33,14 @@ const Agenda = () => {
   const {
     vistaActual, setVistaActual,
     fechaSeleccionada, setFechaSeleccionada,
-    turnos, pacientesDB,
+    turnos,
     turnoSeleccionado, setTurnoSeleccionado,
     cargandoTurnos, busquedaTurno, setBusquedaTurno,
     navegarTemporal, irAHoy, guardarTurnos
   } = useAgenda();
 
-  // Guardamos el nombre del médico para el encabezado/saludo
-  const medicoNombre = localStorage.getItem('medicoNombre') || "Doctor/a";
+  // Guardamos el nombre del médico para el encabezado/saludo desde el Contexto (No desde localStorage)
+  const { medicoNombre } = useAuth();
 
   // Formateadores de fecha para el título principal
   const tituloFecha = useMemo(() => {
@@ -121,7 +122,7 @@ const Agenda = () => {
     return {
       totales: turnosFiltrados.length,
       atendidos: turnosFiltrados.filter(t => t.estado === 'Atendido').length,
-      enEspera: turnosFiltrados.filter(t => t.estado === 'Confirmado' || t.estado === 'Pendiente').length,
+      enEspera: turnosFiltrados.filter(t => t.estado === 'Confirmado' || t.estado === 'Pendiente' || t.estado === 'En Curso').length,
       cancelados: turnosFiltrados.filter(t => t.estado === 'Cancelado' || t.estado === 'Rechazado').length
     };
   }, [turnosFiltrados]);
@@ -149,18 +150,8 @@ const Agenda = () => {
   };
 
   const verHistorialClinico = (turno) => {
-    // Si tenemos el ID del paciente, navegamos a su historial directo
-    if (turno.pacienteId) {
-      navigate(`/pacientes/${turno.pacienteId}/historial`);
-    } else {
-      // De respaldo si no hay ID, buscamos el paciente en nuestra DB por DNI
-      const pac = pacientesDB.find(p => p.dni === turno.pacienteDni);
-      if (pac) {
-        navigate(`/pacientes/${pac.id}/historial`);
-      } else {
-        alert("No se encontró un registro detallado en la base de datos para este paciente.");
-      }
-    }
+    // Como el backend ahora manda el pacienteId, redirigimos directo sin consultar bases de datos extrañas
+    navigate(`/pacientes/${turno.pacienteId}/historial`);
   };
 
   // Cambiar el estado del turno directamente desde la agenda (por ejemplo, check-in manual)
@@ -351,8 +342,8 @@ const Agenda = () => {
           const esHoy = new Date().toDateString() === dia.toDateString();
           const esSeleccionado = fechaSeleccionada.toDateString() === dia.toDateString();
 
-          // Filtrar turnos estrictamente para este día particular de la semana
-          const turnosDelDia = turnos.filter(t => 
+          // Filtrar turnos estrictamente para este día particular de la semana, respetando la búsqueda global
+          const turnosDelDia = turnosFiltrados.filter(t => 
             t.fecha.getDate() === dia.getDate() &&
             t.fecha.getMonth() === dia.getMonth() &&
             t.fecha.getFullYear() === dia.getFullYear()
@@ -489,8 +480,8 @@ const Agenda = () => {
             const esHoy = new Date().toDateString() === celda.fecha.toDateString();
             const esSeleccionado = fechaSeleccionada.toDateString() === celda.fecha.toDateString();
 
-            // Filtrar turnos programados en este día específico
-            const turnosDelDia = turnos.filter(t => 
+            // Filtrar turnos programados en este día específico, respetando la búsqueda global
+            const turnosDelDia = turnosFiltrados.filter(t => 
               t.fecha.getDate() === celda.fecha.getDate() &&
               t.fecha.getMonth() === celda.fecha.getMonth() &&
               t.fecha.getFullYear() === celda.fecha.getFullYear()

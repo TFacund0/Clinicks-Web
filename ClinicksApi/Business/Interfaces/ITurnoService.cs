@@ -11,7 +11,7 @@ namespace ClinicksApi.Business.Interfaces
         /// Obtiene la lista de turnos agendados, incluyendo información del paciente, motivo y estado del turno.
         /// </summary>
         /// <returns>Una lista de objetos TurnoAgendaDto con la información de los turnos agendados.</returns>
-        Task<IEnumerable<TurnoAgendaDto>> obtenerTurnosAgendadosAsync();
+        Task<IEnumerable<TurnoAgendaDto>> ObtenerTurnosAgendadosAsync();
 
         /// <summary>
         /// Obtiene la lista de turnos para un médico específico, con filtros opcionales por fechas.

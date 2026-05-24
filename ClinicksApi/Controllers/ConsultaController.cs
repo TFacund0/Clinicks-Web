@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.DTOs;
+using ClinicksApi.Extensions;
 
 namespace ClinicksApi.Controllers
 {
@@ -40,13 +41,13 @@ namespace ClinicksApi.Controllers
         [HttpPost]
         public async Task<IActionResult> RegistrarConsulta([FromBody] ConsultaAltaDto dto)
         {
-            // Lee el ID del médico directamente del Token JWT (claim "idMedico") para evitar suplantaciones.
-            var idMedicoStr = User.FindFirst("idMedico")?.Value;
-            if (!int.TryParse(idMedicoStr, out int idMedico))
+            // Lee el ID del médico directamente del Token JWT (claim "idMedico") usando el método de extensión para evitar suplantaciones.
+            var idMedico = User.GetMedicoId();
+            if (idMedico == null)
                 return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
 
             // Delega la validación completa y el guardado en base de datos al servicio de negocio.
-            var resultado = await _consultaService.RegistrarConsulta(dto, idMedico);
+            var resultado = await _consultaService.RegistrarConsulta(dto, idMedico.Value);
 
             if (resultado.Success)
             {

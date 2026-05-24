@@ -7,7 +7,6 @@ import { extraerMensajeError } from '../utils/errorUtils';
 
 /**
  * Hook para manejar la carga del paciente y su historial clínico.
- * SOC-1: Delega la obtención de datos a la API en lugar de usar datos estáticos en la vista.
  * 
  * @param {string|number} pacienteId - ID del paciente a consultar.
  */
@@ -17,7 +16,7 @@ export const usePatientHistory = (pacienteId) => {
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
 
-    // SOC-2: Estados de los filtros separados de la vista
+    // Estados de los filtros separados de la vista
     const [filtros, setFiltros] = useState({
         texto: '',
         mostrarConsultas: true,
@@ -82,7 +81,7 @@ export const usePatientHistory = (pacienteId) => {
         };
     }, [pacienteId]);
 
-    // SOC-2: Lógica de filtrado computada dinámicamente
+    // Lógica de filtrado computada dinámicamente
     const historialFiltrado = historial.filter(item => {
         // 1. Filtro por tipo
         if (item.tipoRegistro === 'consulta' && !filtros.mostrarConsultas) return false;

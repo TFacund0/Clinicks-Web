@@ -52,7 +52,9 @@ namespace ClinicksApi.Business.Services
             }
             catch (Exception)
             {
-                isPasswordValid = dbPassword == inputPassword;
+                // VULNERABILIDAD CRÍTICA PARCHEADA:
+                // Jamás hacer fallback a texto plano si falla la verificación del hash.
+                isPasswordValid = false;
             }
 
             if (!isPasswordValid) 

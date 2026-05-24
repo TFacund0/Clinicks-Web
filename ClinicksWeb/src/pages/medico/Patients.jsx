@@ -17,7 +17,7 @@ const Patients = () => {
   // 3. CONSUMO DEL CUSTOM HOOK 'usePatients'
   // Extrae los datos procesados, estados de carga y controles de búsqueda desde nuestro "cerebro".
   const { 
-    pacientesFiltrados, 
+    pacientes, // La lista ya viene filtrada del servidor
     cargando,           
     error,              
     searchTerm,         
@@ -66,8 +66,8 @@ const Patients = () => {
                     <tr><td colSpan="6" className="p-10 text-center text-red-400">{error}</td></tr>
                   ) : (
                     // ESTADO 3: Hay datos para mostrar
-                    pacientesFiltrados.length > 0 ? (
-                      pacientesFiltrados.map((paciente) => (
+                    pacientes.length > 0 ? (
+                      pacientes.map((paciente) => (
                         <tr key={paciente.id} className="hover:bg-slate-800/30 transition-colors group">
                           <td className="p-5 text-cyan-500 font-mono text-sm">#000{paciente.id}</td>
                           <td className="p-5">

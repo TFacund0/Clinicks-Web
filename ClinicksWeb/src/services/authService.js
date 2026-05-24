@@ -54,6 +54,9 @@ const authService = {
 
     // --- Getters de datos de sesión ---
 
+    /** @returns {string|null} Token JWT del médico logueado. */
+    getToken: () => localStorage.getItem(SESSION_KEYS.TOKEN),
+
     /** @returns {string} Nombre completo del médico logueado. */
     getMedicoNombre: () => localStorage.getItem(SESSION_KEYS.MEDICO_NOMBRE) || 'Médico',
 
