@@ -116,22 +116,15 @@ const Agenda = () => {
     }).sort((a, b) => a.fecha - b.fecha); // Siempre ordenados por hora cronológica
   }, [turnos, fechaSeleccionada, vistaActual, busquedaTurno]);
 
-  // Turnos de Hoy (para el resumen de estadísticas de la barra superior, no cambian con la navegación)
-  const estadisticasHoy = useMemo(() => {
-    const hoy = new Date();
-    const turnosDeHoy = turnos.filter(t => 
-      t.fecha.getDate() === hoy.getDate() &&
-      t.fecha.getMonth() === hoy.getMonth() &&
-      t.fecha.getFullYear() === hoy.getFullYear()
-    );
-
+  // Estadísticas dinámicas de la vista actual (Día, Semana o Mes)
+  const estadisticasVista = useMemo(() => {
     return {
-      totales: turnosDeHoy.length,
-      atendidos: turnosDeHoy.filter(t => t.estado === 'Atendido').length,
-      enEspera: turnosDeHoy.filter(t => t.estado === 'Confirmado').length,
-      cancelados: turnosDeHoy.filter(t => t.estado === 'Cancelado').length
+      totales: turnosFiltrados.length,
+      atendidos: turnosFiltrados.filter(t => t.estado === 'Atendido').length,
+      enEspera: turnosFiltrados.filter(t => t.estado === 'Confirmado' || t.estado === 'Pendiente').length,
+      cancelados: turnosFiltrados.filter(t => t.estado === 'Cancelado' || t.estado === 'Rechazado').length
     };
-  }, [turnos]);
+  }, [turnosFiltrados]);
 
   // ==========================================
   // CONTROLADORES DE ACCIONES MÉDICAS
@@ -213,6 +206,7 @@ const Agenda = () => {
           texto: 'text-white font-bold'
         };
       case 'Cancelado':
+      case 'Rechazado':
         return {
           badge: 'bg-red-500/10 text-red-400 border-red-500/20',
           card: 'border-slate-800 opacity-40 bg-slate-950',
@@ -610,12 +604,12 @@ const Agenda = () => {
               </div>
             </div>
 
-            {/* ESTADÍSTICAS RÁPIDAS DE HOY */}
+            {/* ESTADÍSTICAS RÁPIDAS DE LA VISTA */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Turnos de Hoy</p>
-                  <h3 className="text-2xl font-bold text-white mt-1 font-mono">{estadisticasHoy.totales}</h3>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Total en la Vista</p>
+                  <h3 className="text-2xl font-bold text-white mt-1 font-mono">{estadisticasVista.totales}</h3>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-slate-400">
                   <CalendarIcon size={18} />
@@ -624,8 +618,8 @@ const Agenda = () => {
 
               <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-emerald-500 uppercase tracking-widest font-black">Atendidos Hoy</p>
-                  <h3 className="text-2xl font-bold text-emerald-400 mt-1 font-mono">{estadisticasHoy.atendidos}</h3>
+                  <p className="text-[10px] text-emerald-500 uppercase tracking-widest font-black">Atendidos</p>
+                  <h3 className="text-2xl font-bold text-emerald-400 mt-1 font-mono">{estadisticasVista.atendidos}</h3>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                   <CheckCircle2 size={18} />
@@ -634,8 +628,8 @@ const Agenda = () => {
 
               <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-cyan-500 uppercase tracking-widest font-black">En Sala de Espera</p>
-                  <h3 className="text-2xl font-bold text-cyan-400 mt-1 font-mono">{estadisticasHoy.enEspera}</h3>
+                  <p className="text-[10px] text-cyan-500 uppercase tracking-widest font-black">En Espera / Pendiente</p>
+                  <h3 className="text-2xl font-bold text-cyan-400 mt-1 font-mono">{estadisticasVista.enEspera}</h3>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
                   <Clock size={18} />
@@ -645,7 +639,7 @@ const Agenda = () => {
               <div className="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 flex items-center justify-between">
                 <div>
                   <p className="text-[10px] text-red-500 uppercase tracking-widest font-black">Cancelados</p>
-                  <h3 className="text-2xl font-bold text-red-400 mt-1 font-mono">{estadisticasHoy.cancelados}</h3>
+                  <h3 className="text-2xl font-bold text-red-400 mt-1 font-mono">{estadisticasVista.cancelados}</h3>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
                   <AlertCircle size={18} />
