@@ -342,8 +342,8 @@ const Agenda = () => {
           const esHoy = new Date().toDateString() === dia.toDateString();
           const esSeleccionado = fechaSeleccionada.toDateString() === dia.toDateString();
 
-          // Filtrar turnos estrictamente para este día particular de la semana
-          const turnosDelDia = turnos.filter(t => 
+          // Filtrar turnos estrictamente para este día particular de la semana, respetando la búsqueda global
+          const turnosDelDia = turnosFiltrados.filter(t => 
             t.fecha.getDate() === dia.getDate() &&
             t.fecha.getMonth() === dia.getMonth() &&
             t.fecha.getFullYear() === dia.getFullYear()
@@ -480,8 +480,8 @@ const Agenda = () => {
             const esHoy = new Date().toDateString() === celda.fecha.toDateString();
             const esSeleccionado = fechaSeleccionada.toDateString() === celda.fecha.toDateString();
 
-            // Filtrar turnos programados en este día específico
-            const turnosDelDia = turnos.filter(t => 
+            // Filtrar turnos programados en este día específico, respetando la búsqueda global
+            const turnosDelDia = turnosFiltrados.filter(t => 
               t.fecha.getDate() === celda.fecha.getDate() &&
               t.fecha.getMonth() === celda.fecha.getMonth() &&
               t.fecha.getFullYear() === celda.fecha.getFullYear()
