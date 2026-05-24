@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.DTOs;
+using ClinicksApi.Extensions;
 
 namespace ClinicksApi.Controllers;
 
@@ -62,13 +63,12 @@ public class PacientesController : ControllerBase
     [HttpGet("atendidos")]
     public async Task<IActionResult> GetAtendidosByMedico()
     {
-        // Leemos el ID del médico directamente del Token JWT para prevenir que un médico
-        // consulte los pacientes de otro médico cambiando el ID en la URL.
-        var idMedicoStr = User.FindFirst("idMedico")?.Value;
-        if (!int.TryParse(idMedicoStr, out int medicoId))
+        // Leemos el ID del médico usando la extensión segura sobre ClaimsPrincipal
+        var idMedico = User.GetMedicoId();
+        if (idMedico == null)
             return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
 
-        var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(medicoId);
+        var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(idMedico.Value);
         return Ok(pacientes);
     }
 

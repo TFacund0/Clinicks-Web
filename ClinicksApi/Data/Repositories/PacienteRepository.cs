@@ -56,19 +56,15 @@ namespace ClinicksApi.Data.Repositories
         /// <inheritdoc/>
         public async Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId)
         {
-            // Obtenemos el ID del estado "Realizado" desde la BD para no depender de un número hardcodeado.
-            // Si la tabla está vacía o el estado no existe aún, usamos -1 para que la query no devuelva nada.
-            var idEstadoRealizado = await _context.EstadoTurnos
-                .Where(e => e.Nombre.ToLower() == "atendido")
-                .Select(e => (int?)e.IdEstadoTurno)
-                .FirstOrDefaultAsync() ?? -1;
-
             return await _context.Pacientes
                 .AsNoTracking()
                 .Include(p => p.IdEstadoPacienteNavigation)
                 .Include(p => p.IdDireccionNavigation)
                 .Include(p => p.Turnos.OrderByDescending(t => t.FechaTurno).Take(1))
-                .Where(p => p.Turnos.Any(t => t.IdMedico == medicoId && t.IdEstadoTurno == idEstadoRealizado))
+                .Where(p => 
+                    p.ConsultaMedicas.Any(c => c.IdMedico == medicoId) || 
+                    p.Turnos.Any(t => t.IdMedico == medicoId && t.IdProcedimiento != null)
+                )
                 .ToListAsync();
         }
 

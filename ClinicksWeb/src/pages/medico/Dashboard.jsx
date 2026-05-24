@@ -2,21 +2,34 @@ import { useNavigate } from 'react-router-dom';
 import PageLayout from '../../components/PageLayout';
 import { usePatients } from '../../hooks/usePatients';
 import { useAuth } from '../../context/AuthContext';
+import { useAgenda } from '../../hooks/useAgenda';
 import { ClipboardPlus, Activity, ExternalLink } from 'lucide-react';
 
 // Vista principal que muestra un resumen rápido de acciones, agenda y los últimos pacientes atendidos.
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // VUL-3 CORREGIDO: El nombre del médico proviene del AuthContext, no de localStorage.
+  // El nombre del médico proviene del AuthContext
   const { medicoNombre } = useAuth();
 
   // Obtiene los pacientes atendidos por este médico manejando estados de carga y error.
   const { pacientesFiltrados, cargando, error } = usePatients();
+  
+  // Obtiene los turnos para la agenda
+  const { turnos, cargandoTurnos: cargandoAgenda } = useAgenda();
 
   // Limita la lista a solo 5 pacientes para no sobrecargar la pantalla del panel de control.
-  // Aseguramos que pacientesFiltrados sea un array antes de hacer slice
   const pacientesRecientes = pacientesFiltrados ? pacientesFiltrados.slice(0, 5) : [];
+
+  // Filtra los turnos de hoy que estén pendientes/confirmados
+  const turnosHoy = turnos ? turnos.filter(t => {
+    const hoy = new Date();
+    const esHoy = t.fecha.getDate() === hoy.getDate() &&
+                  t.fecha.getMonth() === hoy.getMonth() &&
+                  t.fecha.getFullYear() === hoy.getFullYear();
+    const estadosActivos = ['Pendiente', 'Confirmado', 'En Curso'];
+    return esHoy && estadosActivos.includes(t.estado);
+  }).sort((a, b) => a.fecha - b.fecha) : [];
 
   return (
     <PageLayout title="Dashboard">
@@ -52,13 +65,39 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              {/* Sección reservada para mostrar los turnos del día */}
-              <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-sm">
-                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                  <div className="w-1 h-6 bg-cyan-500 rounded-full"></div> Mi Agenda
-                </h3>
-                <div className="space-y-4">
-                  <p className="text-xs text-slate-500 italic">No tienes turnos pendientes para la próxima hora.</p>
+              {/* Sección de Mi Agenda */}
+              <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-sm flex flex-col">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-bold flex items-center gap-2">
+                    <div className="w-1 h-6 bg-cyan-500 rounded-full"></div> Mi Agenda (Hoy)
+                  </h3>
+                  <button 
+                    onClick={() => navigate('/agenda')}
+                    className="text-xs text-cyan-500 hover:underline font-bold"
+                  >
+                    Ver completa
+                  </button>
+                </div>
+                
+                <div className="space-y-3 overflow-y-auto max-h-64 pr-1 scrollbar-thin">
+                  {cargandoAgenda ? (
+                    <p className="text-xs text-slate-500 italic mt-2">Cargando turnos...</p>
+                  ) : turnosHoy.length > 0 ? (
+                    turnosHoy.map((turno) => (
+                      <div key={turno.id} className="p-3 bg-slate-950 border border-slate-800 rounded-xl flex justify-between items-center group hover:border-cyan-500/30 transition-all cursor-pointer" onClick={() => navigate('/agenda')}>
+                        <div className="truncate pr-2">
+                          <p className="font-bold text-sm text-slate-200 truncate">{turno.pacienteNombre}</p>
+                          <p className="text-[10px] text-slate-500 font-mono mt-0.5 truncate">{turno.tipo} • {turno.motivo}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="font-bold text-cyan-400 font-mono text-sm">{turno.hora}</p>
+                          <span className="text-[8px] uppercase tracking-wider font-black text-slate-500 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 mt-1 inline-block">{turno.estado}</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-500 italic mt-2">No tienes turnos pendientes para hoy.</p>
+                  )}
                 </div>
               </div>
             </div>

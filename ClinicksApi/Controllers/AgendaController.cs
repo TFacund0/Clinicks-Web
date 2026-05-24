@@ -3,6 +3,7 @@ using ClinicksApi.Business.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using ClinicksApi.Extensions;
 
 namespace ClinicksApi.Controllers
 {
@@ -39,7 +40,7 @@ namespace ClinicksApi.Controllers
         [HttpGet("turnos-agendados")]
         public async Task<IActionResult> ObtenerTurnosAgendadosAsync()
         {
-            var miAgenda = await _turnoService.obtenerTurnosAgendadosAsync();
+            var miAgenda = await _turnoService.ObtenerTurnosAgendadosAsync();
 
             return Ok(miAgenda);
         }
@@ -57,14 +58,13 @@ namespace ClinicksApi.Controllers
         [HttpGet("mis-turnos")]
         public async Task<IActionResult> ObtenerMisTurnosAsync([FromQuery] DateTime? fechaInicio, [FromQuery] DateTime? fechaFin)
         {
-            var idMedicoClaim = User.FindFirst("idMedico")?.Value;
-
-            if (string.IsNullOrEmpty(idMedicoClaim) || !int.TryParse(idMedicoClaim, out int idMedico))
+            var idMedico = User.GetMedicoId();
+            if (idMedico == null)
             {
                 return Unauthorized("No se pudo identificar al médico autenticado.");
             }
 
-            var misTurnos = await _turnoService.ObtenerTurnosMedicoAsync(idMedico, fechaInicio, fechaFin);
+            var misTurnos = await _turnoService.ObtenerTurnosMedicoAsync(idMedico.Value, fechaInicio, fechaFin);
 
             if (!misTurnos.Any())
             {
