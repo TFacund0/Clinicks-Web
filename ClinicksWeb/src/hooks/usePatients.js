@@ -12,6 +12,8 @@ export const usePatients = () => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  // Estado interno para el debounce
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const isMounted = useRef(true);
 
   useEffect(() => {
@@ -21,12 +23,21 @@ export const usePatients = () => {
     };
   }, []);
 
-  // 2. FUNCIÓN DE CARGA (Conexión con la API)
-  const fetchData = async () => {
+  // 2. LÓGICA DE DEBOUNCE (Esperar antes de golpear la API)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // 3. FUNCIÓN DE CARGA (Conexión con la API)
+  const fetchData = async (searchParam = "") => {
     try {
       setCargando(true);
       setError(null);
-      const datos = await pacienteService.obtenerAtendidosPorMedico();
+      const datos = await pacienteService.obtenerAtendidosPorMedico(searchParam);
       if (isMounted.current) {
         setPacientes(Array.isArray(datos) ? datos : []);
       }
@@ -40,20 +51,11 @@ export const usePatients = () => {
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
-
-  // 3. LÓGICA DE FILTRADO EN TIEMPO REAL
-  const pacientesFiltrados = (pacientes || []).filter((p) => {
-    if (!p) return false;
-    const busqueda = searchTerm.toLowerCase();
-    const nombre = (p.nombreCompleto || "").toLowerCase();
-    const dni = (p.dni || "").toString();
-    return nombre.includes(busqueda) || dni.includes(busqueda);
-  });
+  useEffect(() => { fetchData(debouncedSearch); }, [debouncedSearch]);
 
   // 4. LO QUE DEVUELVE MI HOOK
   return {
-    pacientesFiltrados,
+    pacientes, // Renombrado a pacientes directamente (ya viene filtrado del servidor)
     cargando,
     error,
     searchTerm,

@@ -10,8 +10,10 @@ export const pacienteService = {
         return respuesta.data;
     },
 
-    obtenerAtendidosPorMedico: async () => {
-        const respuesta = await clinicksApi.get('/pacientes/atendidos');
+    obtenerAtendidosPorMedico: async (search = "") => {
+        const respuesta = await clinicksApi.get('/pacientes/atendidos', {
+            params: { search }
+        });
         return respuesta.data;
     },
 

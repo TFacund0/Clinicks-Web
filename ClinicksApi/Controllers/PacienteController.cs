@@ -57,18 +57,18 @@ public class PacientesController : ControllerBase
 
     /// <summary>
     /// Obtiene la lista de pacientes que han sido atendidos por el médico que está actualmente logueado.
-    /// El ID del médico se extrae del Token JWT para garantizar que cada médico solo pueda ver sus propios pacientes.
+    /// Soporta filtrado directo en la base de datos por nombre, apellido o DNI para escalar.
     /// </summary>
     /// <returns>Lista de pacientes del médico autenticado. Si no tiene, devuelve lista vacía (200 OK).</returns>
     [HttpGet("atendidos")]
-    public async Task<IActionResult> GetAtendidosByMedico()
+    public async Task<IActionResult> GetAtendidosByMedico([FromQuery] string? search)
     {
         // Leemos el ID del médico usando la extensión segura sobre ClaimsPrincipal
         var idMedico = User.GetMedicoId();
         if (idMedico == null)
             return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
 
-        var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(idMedico.Value);
+        var pacientes = await _pacienteService.ObtenerAtendidosPorMedico(idMedico.Value, search);
         return Ok(pacientes);
     }
 
