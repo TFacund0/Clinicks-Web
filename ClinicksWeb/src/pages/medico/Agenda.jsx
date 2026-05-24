@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
-import pacienteService from '../../services/pacienteService';
+import { useAgenda } from '../../hooks/useAgenda';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -27,175 +27,19 @@ const Agenda = () => {
   const navigate = useNavigate();
 
   // ==========================================
-  // ESTADOS PRINCIPALES
+  // ESTADOS Y LÓGICA (Extraídos en useAgenda)
   // ==========================================
-  const [vistaActual, setVistaActual] = useState('dia'); // 'dia', 'semana', 'mes'
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
-  const [turnos, setTurnos] = useState([]);
-  const [pacientesDB, setPacientesDB] = useState([]);
-  const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
-  const [cargandoPacientes, setCargandoPacientes] = useState(true);
-  const [busquedaTurno, setBusquedaTurno] = useState('');
-  
+  const {
+    vistaActual, setVistaActual,
+    fechaSeleccionada, setFechaSeleccionada,
+    turnos, pacientesDB,
+    turnoSeleccionado, setTurnoSeleccionado,
+    cargandoTurnos, busquedaTurno, setBusquedaTurno,
+    navegarTemporal, irAHoy, guardarTurnos
+  } = useAgenda();
+
   // Guardamos el nombre del médico para el encabezado/saludo
   const medicoNombre = localStorage.getItem('medicoNombre') || "Doctor/a";
-
-  // ==========================================
-  // CARGA DE DATOS Y PERSISTENCIA (localStorage)
-  // ==========================================
-  useEffect(() => {
-    const inicializarAgenda = async () => {
-      let listadoPacientes = [];
-      try {
-        setCargandoPacientes(true);
-        // Intentamos obtener los pacientes reales de la base de datos
-        const datos = await pacienteService.obtenerTodos();
-        listadoPacientes = Array.isArray(datos) ? datos : [];
-        setPacientesDB(listadoPacientes);
-      } catch (err) {
-        console.error("No se pudo conectar a la API de pacientes, se usarán mocks de respaldo", err);
-      } finally {
-        setCargandoPacientes(false);
-      }
-
-      // Revisamos si ya existen turnos guardados localmente
-      const turnosGuardados = localStorage.getItem('clinicks_agenda_turnos');
-      if (turnosGuardados) {
-        // Parseamos los turnos, pero convertimos los strings de fecha de vuelta a objetos Date
-        const parsed = JSON.parse(turnosGuardados).map(t => ({
-          ...t,
-          fecha: new Date(t.fecha)
-        }));
-        setTurnos(parsed);
-      } else {
-        // Si no hay turnos, generamos una base de turnos realista
-        const turnosIniciales = generarTurnosIniciales(listadoPacientes);
-        setTurnos(turnosIniciales);
-        localStorage.setItem('clinicks_agenda_turnos', JSON.stringify(turnosIniciales));
-      }
-    };
-
-    inicializarAgenda();
-  }, []);
-
-  // Función para guardar los cambios de turnos en localStorage
-  const guardarTurnos = (nuevosTurnos) => {
-    setTurnos(nuevosTurnos);
-    localStorage.setItem('clinicks_agenda_turnos', JSON.stringify(nuevosTurnos));
-  };
-
-  // Generador de turnos semilla
-  const generarTurnosIniciales = (pacientes) => {
-    const hoy = new Date();
-    const listaTurnos = [];
-
-    // Pacientes de respaldo si la base de datos está vacía
-    const pacientesBackup = [
-      { id: 101, nombreCompleto: "Emiliano Martínez", dni: "38920485", estaActivo: true },
-      { id: 102, nombreCompleto: "Lionel Messi", dni: "33010101", estaActivo: true },
-      { id: 103, nombreCompleto: "Antonela Roccuzzo", dni: "35492019", estaActivo: true },
-      { id: 104, nombreCompleto: "Julián Álvarez", dni: "42938102", estaActivo: true },
-      { id: 105, nombreCompleto: "Alexis Mac Allister", dni: "41029384", estaActivo: true },
-      { id: 106, nombreCompleto: "Rodrigo De Paul", dni: "39482910", estaActivo: true },
-      { id: 107, nombreCompleto: "Angel Di María", dni: "34928103", estaActivo: true }
-    ];
-
-    const poolPacientes = pacientes.length > 0 ? pacientes : pacientesBackup;
-
-    // Horarios para hoy
-    const horariosHoy = [
-      { hora: "08:30", tipo: "Consulta", status: "Atendido", motivo: "Control anual cardiológico" },
-      { hora: "10:00", tipo: "Consulta", status: "Atendido", motivo: "Lectura de análisis de sangre" },
-      { hora: "11:30", tipo: "Procedimiento", status: "En Curso", motivo: "Electrocardiograma de esfuerzo" },
-      { hora: "13:00", tipo: "Consulta", status: "Confirmado", motivo: "Dolor lumbar agudo tras actividad" },
-      { hora: "15:00", tipo: "Procedimiento", status: "Confirmado", motivo: "Infiltración articular hombro" },
-      { hora: "16:30", tipo: "Consulta", status: "Pendiente", motivo: "Chequeo pre-quirúrgico" },
-      { hora: "18:00", tipo: "Consulta", status: "Cancelado", motivo: "Consulta de rutina" }
-    ];
-
-    // Asignamos turnos para hoy
-    horariosHoy.forEach((h, index) => {
-      const pac = poolPacientes[index % poolPacientes.length];
-      const [hh, mm] = h.hora.split(":");
-      const fechaTurno = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), parseInt(hh), parseInt(mm));
-
-      listaTurnos.push({
-        id: `turno-hoy-${index}`,
-        pacienteId: pac.id,
-        pacienteNombre: pac.nombreCompleto || pac.nombre,
-        pacienteDni: pac.dni,
-        fecha: fechaTurno,
-        hora: h.hora,
-        duracion: h.tipo === "Procedimiento" ? 45 : 20,
-        tipo: h.tipo,
-        motivo: h.motivo,
-        estado: h.status // 'Pendiente', 'Confirmado', 'En Curso', 'Atendido', 'Cancelado'
-      });
-    });
-
-    // Añadimos algunos turnos para el resto de la semana
-    for (let i = -3; i <= 4; i++) {
-      if (i === 0) continue; // Saltamos hoy porque ya tiene sus turnos definidos arriba
-      
-      const fechaDia = new Date();
-      fechaDia.setDate(hoy.getDate() + i);
-      
-      // No agendamos los domingos (día 0)
-      if (fechaDia.getDay() === 0) continue;
-
-      const horariosExtra = ["09:00", "11:00", "14:30", "16:00"];
-      horariosExtra.forEach((horaStr, idx) => {
-        const pac = poolPacientes[(idx + Math.abs(i)) % poolPacientes.length];
-        const [hh, mm] = horaStr.split(":");
-        const fechaTurno = new Date(fechaDia.getFullYear(), fechaDia.getMonth(), fechaDia.getDate(), parseInt(hh), parseInt(mm));
-        
-        // Los días pasados están Atendidos, los futuros están Confirmados o Pendientes
-        let estado = "Confirmado";
-        if (i < 0) {
-          estado = idx === 3 ? "Cancelado" : "Atendido";
-        } else {
-          estado = idx === 0 ? "Pendiente" : "Confirmado";
-        }
-
-        listaTurnos.push({
-          id: `turno-dia-${i}-${idx}`,
-          pacienteId: pac.id,
-          pacienteNombre: pac.nombreCompleto || pac.nombre,
-          pacienteDni: pac.dni,
-          fecha: fechaTurno,
-          hora: horaStr,
-          duracion: idx % 3 === 0 ? 45 : 20,
-          tipo: idx % 3 === 0 ? "Procedimiento" : "Consulta",
-          motivo: idx % 3 === 0 ? "Prueba de esfuerzo funcional" : "Control de síntomas y medicación",
-          estado: estado
-        });
-      });
-    }
-
-    return listaTurnos;
-  };
-
-  // ==========================================
-  // LÓGICA DE NAVEGACIÓN TEMPORAL Y FILTROS
-  // ==========================================
-  const navegarTemporal = (direccion) => {
-    // direccion: -1 (anterior), 1 (siguiente)
-    const nueva = new Date(fechaSeleccionada);
-    if (vistaActual === 'dia') {
-      nueva.setDate(fechaSeleccionada.getDate() + direccion);
-    } else if (vistaActual === 'semana') {
-      nueva.setDate(fechaSeleccionada.getDate() + (direccion * 7));
-    } else if (vistaActual === 'mes') {
-      nueva.setMonth(fechaSeleccionada.getMonth() + direccion);
-    }
-    setFechaSeleccionada(nueva);
-    setTurnoSeleccionado(null); // Cerramos detalles al cambiar de fecha
-  };
-
-  const irAHoy = () => {
-    setFechaSeleccionada(new Date());
-    setTurnoSeleccionado(null);
-  };
 
   // Formateadores de fecha para el título principal
   const tituloFecha = useMemo(() => {
@@ -741,23 +585,28 @@ const Agenda = () => {
               </div>
               
               {/* Barra de Búsqueda rápida de turnos */}
-              <div className="relative w-full md:w-72">
-                <Search size={16} className="absolute left-4 top-3.5 text-slate-500" />
-                <input 
-                  type="text"
-                  placeholder="Buscar paciente o motivo..."
-                  value={busquedaTurno}
-                  onChange={(e) => setBusquedaTurno(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 focus:border-cyan-500/50 rounded-2xl pl-11 pr-4 py-3 text-sm text-slate-300 placeholder-slate-600 focus:outline-none transition-colors"
-                />
-                {busquedaTurno && (
-                  <button 
-                    onClick={() => setBusquedaTurno('')}
-                    className="absolute right-4 top-3.5 text-slate-500 hover:text-slate-300"
-                  >
-                    <X size={14} />
-                  </button>
+              <div className="relative w-full md:w-72 flex items-center gap-2">
+                {cargandoTurnos && (
+                  <RefreshCw size={18} className="animate-spin text-cyan-500" />
                 )}
+                <div className="relative flex-1">
+                  <Search size={16} className="absolute left-4 top-3.5 text-slate-500" />
+                  <input 
+                    type="text"
+                    placeholder="Buscar paciente o motivo..."
+                    value={busquedaTurno}
+                    onChange={(e) => setBusquedaTurno(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-800 focus:border-cyan-500/50 rounded-2xl pl-11 pr-4 py-3 text-sm text-slate-300 placeholder-slate-600 focus:outline-none transition-colors"
+                  />
+                  {busquedaTurno && (
+                    <button 
+                      onClick={() => setBusquedaTurno('')}
+                      className="absolute right-4 top-3.5 text-slate-500 hover:text-slate-300"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -857,11 +706,21 @@ const Agenda = () => {
 
             </div>
 
-            {/* RENDERIZADO DINÁMICO DE LA VISTA SELECCIONADA */}
-            <div className="transition-all duration-350">
-              {vistaActual === 'dia' && renderVistaDia()}
-              {vistaActual === 'semana' && renderVistaSemana()}
-              {vistaActual === 'mes' && renderVistaMes()}
+            {/* ÁREA DE CONTENIDO PRINCIPAL (CALENDARIOS Y LISTADOS) */}
+            <div className="relative">
+              {cargandoTurnos ? (
+                <div className="flex flex-col items-center justify-center p-24 bg-slate-900/20 border border-slate-800 rounded-3xl text-center">
+                  <RefreshCw size={40} className="animate-spin text-cyan-500 mb-4" />
+                  <h3 className="text-lg font-bold text-slate-400">Cargando tu agenda...</h3>
+                  <p className="text-sm text-slate-500 max-w-xs mt-2">Conectando con el sistema central para recuperar tus turnos.</p>
+                </div>
+              ) : (
+                <>
+                  {vistaActual === 'dia' && renderVistaDia()}
+                  {vistaActual === 'semana' && renderVistaSemana()}
+                  {vistaActual === 'mes' && renderVistaMes()}
+                </>
+              )}
             </div>
 
           </div>

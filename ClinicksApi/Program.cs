@@ -23,8 +23,10 @@ builder.Services.AddDbContext<ClinicksDbContext>(options =>
 // Configurar CORS para que React pueda conectarse usando configuración
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5173" };
 
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowReactApp", policy => {
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
         policy.WithOrigins(allowedOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader();
@@ -52,12 +54,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // ====================================================================
 
 // Capa de Datos (Repositorios)
+builder.Services.AddScoped<ITurnoRepository, TurnoRepository>();
 builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddScoped<IProcesoRepository, ProcesoRepository>();
 
 // Capa de Negocio (Servicios)
+builder.Services.AddScoped<ITurnoService, TurnoService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPacienteService, PacienteService>();
 builder.Services.AddScoped<IAuthService, AuthService>();

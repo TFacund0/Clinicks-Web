@@ -18,6 +18,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: 'Dashboard', path: '/dashboard' },
+    { icon: <Calendar size={20} />, label: 'Mi Agenda', path: '/agenda' },
     { icon: <Users size={20} />, label: 'Pacientes', path: '/pacientes' },
     { icon: <ClipboardPlus size={20} />, label: 'Nueva Consulta', path: '/acceso-consulta' },
     { icon: <Activity size={20} />, label: 'Nuevo Procedimiento', path: '/acceso-procedimiento' }
