@@ -25,6 +25,7 @@ namespace ClinicksApi.Business.Services
             return turnosDB.Select(t => new TurnoAgendaDto
             {
                 IdTurno = t.IdTurno,
+                IdPaciente = t.IdPaciente,
                 FechaTurno = t.FechaTurno,
                 PacienteNombreCompleto = t.IdPacienteNavigation != null ? $"{t.IdPacienteNavigation.Nombre} {t.IdPacienteNavigation.Apellido}".Trim() : "Paciente desconocido",
                 DniPaciente = t.IdPacienteNavigation?.Dni ?? string.Empty,
@@ -41,6 +42,7 @@ namespace ClinicksApi.Business.Services
             return turnosDB.Select(t => new TurnoAgendaDto
             {
                 IdTurno = t.IdTurno,
+                IdPaciente = t.IdPaciente,
                 FechaTurno = t.FechaTurno,
                 PacienteNombreCompleto = t.IdPacienteNavigation != null ? $"{t.IdPacienteNavigation.Nombre} {t.IdPacienteNavigation.Apellido}".Trim() : "Paciente desconocido",
                 DniPaciente = t.IdPacienteNavigation?.Dni ?? string.Empty,

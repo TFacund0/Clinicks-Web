@@ -6,7 +6,6 @@ export const useAgenda = () => {
   const [vistaActual, setVistaActual] = useState('dia'); // 'dia', 'semana', 'mes'
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
   const [turnos, setTurnos] = useState([]);
-  const [pacientesDB, setPacientesDB] = useState([]);
   const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
   const [cargandoTurnos, setCargandoTurnos] = useState(true);
   const [busquedaTurno, setBusquedaTurno] = useState('');
@@ -27,6 +26,7 @@ export const useAgenda = () => {
           const fechaObj = new Date(t.fechaTurno);
           return {
             id: t.idTurno,
+            pacienteId: t.idPaciente,
             pacienteNombre: t.pacienteNombreCompleto || "Paciente sin nombre",
             pacienteDni: t.dniPaciente || "Sin DNI",
             fecha: fechaObj,
@@ -39,10 +39,6 @@ export const useAgenda = () => {
         });
 
         setTurnos(turnosMapeados);
-
-        pacienteService.obtenerTodos()
-          .then(datos => setPacientesDB(Array.isArray(datos) ? datos : []))
-          .catch(() => console.error("No se pudieron cargar los pacientes"));
 
       } catch (err) {
         console.error("Error al inicializar la agenda", err);
@@ -85,7 +81,6 @@ export const useAgenda = () => {
     fechaSeleccionada,
     setFechaSeleccionada,
     turnos,
-    pacientesDB,
     turnoSeleccionado,
     setTurnoSeleccionado,
     cargandoTurnos,
