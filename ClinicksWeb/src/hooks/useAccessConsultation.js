@@ -25,9 +25,10 @@ export const useAccessConsultation = (destino) => {
 
     useEffect(() => {
         isMounted.current = true;
+        const currentTimers = timersRef.current;
         return () => {
             isMounted.current = false;
-            timersRef.current.forEach(clearTimeout);
+            currentTimers.forEach(clearTimeout);
         };
     }, []);
 

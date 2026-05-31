@@ -30,12 +30,24 @@ export const useNewProcess = (dniInicial = '', idTurnoInicial = null) => {
         return id;
     };
 
+    const cargarTiposDisponibles = async () => {
+        try {
+            const res = await procesoService.obtenerTiposProceso();
+            if (isMounted.current) setTiposDisponibles(res);
+        } catch {
+            // El select quedará vacío; el usuario verá el error al intentar enviar por validación.
+        }
+    };
+
     useEffect(() => {
         isMounted.current = true;
-        cargarTiposDisponibles();
+        Promise.resolve().then(() => {
+            cargarTiposDisponibles();
+        });
+        const currentTimers = timersRef.current;
         return () => {
             isMounted.current = false;
-            timersRef.current.forEach(clearTimeout);
+            currentTimers.forEach(clearTimeout);
         };
     }, []);
 
@@ -101,15 +113,6 @@ export const useNewProcess = (dniInicial = '', idTurnoInicial = null) => {
             idTurno: null
         });
         setErrors({});
-    };
-
-    const cargarTiposDisponibles = async () => {
-        try {
-            const res = await procesoService.obtenerTiposProceso();
-            if (isMounted.current) setTiposDisponibles(res);
-        } catch {
-            // El select quedará vacío; el usuario verá el error al intentar enviar por validación.
-        }
     };
 
     return {

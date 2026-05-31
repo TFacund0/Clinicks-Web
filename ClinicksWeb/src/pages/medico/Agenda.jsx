@@ -1,5 +1,5 @@
 // src/pages/medico/Agenda.jsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';

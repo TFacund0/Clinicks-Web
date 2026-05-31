@@ -25,19 +25,19 @@ const TurnAttentionDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [turno, setTurno] = useState(null);
-  const [cargandoTurno, setCargandoTurno] = useState(!location.state?.turno);
+  const [turno, setTurno] = useState(() => location.state?.turno || null);
+  const [cargandoTurno, setCargandoTurno] = useState(() => !location.state?.turno);
   const [errorTurno, setErrorTurno] = useState(null);
   const [showSelectionModal, setShowSelectionModal] = useState(false);
 
   // Intentamos obtener el turno del estado de navegación o consultando la API
   useEffect(() => {
-    if (location.state?.turno) {
-      setTurno(location.state.turno);
+    if (turno) {
       return;
     }
 
     const cargarTurno = async () => {
+      await Promise.resolve();
       try {
         setCargandoTurno(true);
         setErrorTurno(null);
@@ -67,7 +67,7 @@ const TurnAttentionDetail = () => {
     };
 
     cargarTurno();
-  }, [idTurno, location.state]);
+  }, [idTurno, turno]);
 
   // Usamos el hook de historial clínico, pasando el pacienteId una vez esté cargado el turno
   const pacienteId = turno?.pacienteId || null;

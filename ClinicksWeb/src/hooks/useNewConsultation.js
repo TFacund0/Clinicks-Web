@@ -34,9 +34,10 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
 
     useEffect(() => {
         isMounted.current = true;
+        const currentTimers = timersRef.current;
         return () => {
             isMounted.current = false;
-            timersRef.current.forEach(clearTimeout);
+            currentTimers.forEach(clearTimeout);
         };
     }, []);
 
