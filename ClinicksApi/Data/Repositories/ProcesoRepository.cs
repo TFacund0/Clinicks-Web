@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
+using ClinicksApi.Constants;
 
 namespace ClinicksApi.Data.Repositories
 {
@@ -52,18 +53,6 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<List<Procedimiento>> HistorialPaciente(int pacienteId)
-        {
-            return await _context.Procedimientos
-                .AsNoTracking()
-                .Where(p => p.Turnos.Any(t => t.IdPaciente == pacienteId))
-                .Include(p => p.Turnos) // Incluir turnos para acceder al médico
-                    .ThenInclude(t => t.IdMedicoNavigation)
-                .OrderByDescending(p => p.Fecha)
-                .ToListAsync();
-        }
-
-        /// <inheritdoc/>
         public async Task<Procedimiento> CrearProcedimientoYVincularATurnoExistente(Procedimiento procedimiento, int idTurno)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -80,10 +69,9 @@ namespace ClinicksApi.Data.Repositories
                     throw new Exception($"El turno con ID {idTurno} no existe.");
                 }
 
-                // 3. Vincular el procedimiento y actualizar el estado a "Atendido" (ID = 2)
+                // 3. Vincular el procedimiento y actualizar el estado a "Atendido" usando la constante
                 turnoExistente.IdProcedimiento = procedimiento.IdProcedimiento;
-                var estadoAtendido = await _context.EstadoTurnos.FirstOrDefaultAsync(e => e.Nombre.ToLower() == "atendido");
-                turnoExistente.IdEstadoTurno = estadoAtendido?.IdEstadoTurno ?? 2;
+                turnoExistente.IdEstadoTurno = ConstantesGenerales.EstadosTurno.AtendidoId;
 
                 _context.Turnos.Update(turnoExistente);
                 await _context.SaveChangesAsync();

@@ -2,6 +2,7 @@ using ClinicksApi.Business.DTOs;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
+using ClinicksApi.Constants;
 
 namespace ClinicksApi.Business.Services
 {
@@ -60,7 +61,7 @@ namespace ClinicksApi.Business.Services
             if (dato == null) return null;
 
             // Aquí se pueden agregar reglas de negocio (ej. retornar null si el paciente está inactivo)
-            // if (dato.IdEstadoPacienteNavigation?.Nombre?.ToLower() != "activo") return null;
+            // if (dato.IdEstadoPacienteNavigation?.Nombre?.ToLower() != ConstantesGenerales.EstadosPaciente.Activo) return null;
 
             return MapToDto(dato);
         }
@@ -84,7 +85,7 @@ namespace ClinicksApi.Business.Services
                 FechaUltimaConsulta = (dato.Turnos != null && dato.Turnos.Any())
                     ? dato.Turnos.OrderByDescending(t => t.FechaTurno).First().FechaTurno.ToShortDateString()
                     : "Sin consultas",
-                EstaActivo = dato.IdEstadoPacienteNavigation?.Nombre?.ToLower() == "activo"
+                EstaActivo = dato.IdEstadoPacienteNavigation?.Nombre?.ToLower() == ConstantesGenerales.EstadosPaciente.Activo
             };
         }
 
@@ -112,20 +113,20 @@ namespace ClinicksApi.Business.Services
             if (pacienteDto == null) return null;
 
             var turnos = await _repository.GetHistorialTurnosAsync(pacienteId);
+            var consultasDirectas = await _repository.GetHistorialConsultasAsync(pacienteId);
 
-            var consultas = turnos
-                .Where(t => t.IdConsultaNavigation != null)
-                .Select(t => new ConsultaHistorialDto
+            var consultas = consultasDirectas
+                .Select(c => new ConsultaHistorialDto
                 {
-                    IdConsulta = t.IdConsultaNavigation!.IdConsulta,
-                    Motivo = t.IdConsultaNavigation.Motivo,
-                    Diagnostico = t.IdConsultaNavigation.Diagnostico,
-                    Tratamiento = t.IdConsultaNavigation.Tratamiento ?? string.Empty,
-                    Observacion = t.IdConsultaNavigation.Observacion ?? string.Empty,
-                    Recomendacion = t.IdConsultaNavigation.Recomendacion ?? string.Empty,
-                    FechaConsulta = t.IdConsultaNavigation.FechaConsulta,
-                    MedicoAtencion = t.IdMedicoNavigation != null 
-                        ? $"{t.IdMedicoNavigation.Nombre} {t.IdMedicoNavigation.Apellido}" 
+                    IdConsulta = c.IdConsulta,
+                    Motivo = c.Motivo,
+                    Diagnostico = c.Diagnostico,
+                    Tratamiento = c.Tratamiento ?? string.Empty,
+                    Observacion = c.Observacion ?? string.Empty,
+                    Recomendacion = c.Recomendacion ?? string.Empty,
+                    FechaConsulta = c.FechaConsulta,
+                    MedicoAtencion = c.IdMedicoNavigation != null 
+                        ? $"{c.IdMedicoNavigation.Nombre} {c.IdMedicoNavigation.Apellido}" 
                         : "Médico Desconocido"
                 })
                 .ToList();

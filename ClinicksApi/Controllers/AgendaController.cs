@@ -4,19 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using ClinicksApi.Extensions;
+using ClinicksApi.Constants;
 
 namespace ClinicksApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
 
-    [Authorize] // Requiere autenticación para acceder a los endpoints de este controlador
-
     /// <summary>
     /// Controlador responsable de gestionar la agenda de turnos en la clínica.
     /// Proporciona endpoints para obtener la lista de turnos agendados, con detalles del paciente, motivo y estado del turno.
     /// Es el "Recepcionista" que muestra la agenda diaria al médico.
     /// </summary>
+    [Authorize] // Requiere autenticación para acceder a los endpoints de este controlador
     public class AgendaController : ControllerBase
     {
         private readonly ITurnoService _turnoService;
@@ -54,7 +54,7 @@ namespace ClinicksApi.Controllers
         /// <see cref="OkResult"/> (200) con la lista de turnos del médico.
         /// <see cref="UnauthorizedResult"/> (401) si no es un médico autenticado.
         /// </returns>
-        [Authorize(Roles = "Medico")]
+        [Authorize(Roles = ConstantesGenerales.Roles.Medico)]
         [HttpGet("mis-turnos")]
         public async Task<IActionResult> ObtenerMisTurnosAsync([FromQuery] DateTime? fechaInicio, [FromQuery] DateTime? fechaFin)
         {
@@ -86,7 +86,7 @@ namespace ClinicksApi.Controllers
         /// </summary>
         /// <param name="id">El ID del turno.</param>
         /// <returns>El turno si existe, de lo contrario NotFound.</returns>
-        [Authorize(Roles = "Medico")]
+        [Authorize(Roles = ConstantesGenerales.Roles.Medico)]
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerTurnoPorIdAsync(int id)
         {

@@ -1,6 +1,6 @@
 // src/hooks/useNewConsultation.js
 import { useState, useEffect, useRef } from 'react';
-import consultaService from '../services/ConsultaService';
+import consultaService from '../services/consultaService';
 import { useNavigate } from 'react-router-dom';
 import { extraerMensajeError } from '../utils/errorUtils';
 
@@ -103,17 +103,7 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
 
     // 6. CANCELAR Y LIMPIAR
     const handleCancel = () => {
-        setFormData({
-            dnipaciente: '',
-            motivo: '',
-            fechaconsulta: '',
-            diagnostico: '',
-            tratamiento: '',
-            observaciones: '',
-            recomendacion: '',
-            idTurno: null,
-        });
-        setErrors({});
+        navigate(-1);
     };
 
     return {

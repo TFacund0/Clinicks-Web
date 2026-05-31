@@ -17,13 +17,6 @@ namespace ClinicksApi.Business.Interfaces
         Task<List<ConsultaHistorialDto>> ObtenerListaConsultas();
 
         /// <summary>
-        /// Obtiene todas las consultas médicas realizadas a un paciente específico, ordenadas cronológicamente.
-        /// </summary>
-        /// <param name="pacienteId">El identificador único del paciente en la base de datos.</param>
-        /// <returns>Una lista de DTOs <see cref="ConsultaHistorialDto"/> del paciente, o una lista vacía si no tiene historial.</returns>
-        Task<List<ConsultaHistorialDto>> ObtenerHistorialPaciente(int pacienteId);
-
-        /// <summary>
         /// Aplica las reglas de negocio, valida los datos y persiste una nueva consulta médica en la base de datos.
         /// </summary>
         /// <param name="dto">DTO con los datos del formulario enviados desde el frontend.</param>

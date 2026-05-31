@@ -6,6 +6,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ClinicksApi.Constants;
 
 namespace ClinicksApi.Business.Services
 {
@@ -35,7 +36,7 @@ namespace ClinicksApi.Business.Services
                 {
                     new Claim(ClaimTypes.Name, medico.Matricula),
                     new Claim("idMedico", medico.IdMedico.ToString()),
-                    new Claim(ClaimTypes.Role, "Medico")
+                    new Claim(ClaimTypes.Role, ConstantesGenerales.Roles.Medico)
                 }),
                 Expires = DateTime.UtcNow.AddHours(8),
                 Issuer = _config["Jwt:Issuer"],

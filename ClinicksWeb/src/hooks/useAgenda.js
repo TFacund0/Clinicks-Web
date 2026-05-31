@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import agendaService from '../services/agendaService';
+import { ESTADOS_TURNO } from '../utils/constants';
 
 export const useAgenda = () => {
   const [vistaActual, setVistaActual] = useState('dia'); // 'dia', 'semana', 'mes'
@@ -35,7 +36,7 @@ export const useAgenda = () => {
             duracion: 20,
             tipo: "Consulta", 
             motivo: t.motivo || "Sin motivo especificado",
-            estado: t.estado || "Pendiente"
+            estado: t.estado || ESTADOS_TURNO.PENDIENTE
           };
         });
 
