@@ -2,6 +2,7 @@ using ClinicksApi.Business.DTOs;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
+using ClinicksApi.Constants;
 
 namespace ClinicksApi.Business.Services
 {
@@ -60,7 +61,7 @@ namespace ClinicksApi.Business.Services
             if (dato == null) return null;
 
             // Aquí se pueden agregar reglas de negocio (ej. retornar null si el paciente está inactivo)
-            // if (dato.IdEstadoPacienteNavigation?.Nombre?.ToLower() != "activo") return null;
+            // if (dato.IdEstadoPacienteNavigation?.Nombre?.ToLower() != ConstantesGenerales.EstadosPaciente.Activo) return null;
 
             return MapToDto(dato);
         }
@@ -84,7 +85,7 @@ namespace ClinicksApi.Business.Services
                 FechaUltimaConsulta = (dato.Turnos != null && dato.Turnos.Any())
                     ? dato.Turnos.OrderByDescending(t => t.FechaTurno).First().FechaTurno.ToShortDateString()
                     : "Sin consultas",
-                EstaActivo = dato.IdEstadoPacienteNavigation?.Nombre?.ToLower() == "activo"
+                EstaActivo = dato.IdEstadoPacienteNavigation?.Nombre?.ToLower() == ConstantesGenerales.EstadosPaciente.Activo
             };
         }
 

@@ -68,10 +68,6 @@ namespace ClinicksApi.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc/>
-        public async Task<Medico?> GetFirstMedicoAsync()
-        {
-            return await _context.Medicos.FirstOrDefaultAsync();
-        }
+
     }
 }
