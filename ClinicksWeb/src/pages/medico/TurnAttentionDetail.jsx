@@ -55,7 +55,7 @@ const TurnAttentionDetail = () => {
           duracion: 20,
           tipo: "Consulta", 
           motivo: data.motivo || "Sin motivo especificado",
-          estado: data.estado || "Pendiente"
+          estado: data.estado || ESTADOS_TURNO.PENDIENTE
         };
         setTurno(turnoMapeado);
       } catch (err) {
@@ -150,8 +150,8 @@ const TurnAttentionDetail = () => {
               <div className="flex items-center gap-3">
                 <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">Atención Activa</p>
                 <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border ${
-                  turno.estado === 'Confirmado' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
-                  turno.estado === 'En Curso' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' : 
+                  turno.estado === ESTADOS_TURNO.CONFIRMADO ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
+                  turno.estado === ESTADOS_TURNO.EN_CURSO ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' : 
                   'bg-slate-800 text-slate-400 border-slate-700/50'
                 }`}>
                   {turno.estado}
@@ -187,7 +187,7 @@ const TurnAttentionDetail = () => {
           </div>
 
           {/* Botón de Acción Principal para Iniciar */}
-          {turno.estado !== 'Atendido' && turno.estado !== 'Cancelado' ? (
+          {turno.estado !== ESTADOS_TURNO.ATENDIDO && turno.estado !== ESTADOS_TURNO.CANCELADO ? (
             <button
               onClick={alIniciarAtencion}
               className="px-6 py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all shadow-lg shadow-cyan-500/15 active:scale-95 z-20"

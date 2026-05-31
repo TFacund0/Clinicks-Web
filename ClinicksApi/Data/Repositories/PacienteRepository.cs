@@ -90,11 +90,21 @@ namespace ClinicksApi.Data.Repositories
         {
             return await _context.Turnos
                 .AsNoTracking()
-                .Include(t => t.IdConsultaNavigation)
                 .Include(t => t.IdProcedimientoNavigation)
                 .Include(t => t.IdMedicoNavigation)
-                .Where(t => t.IdPaciente == pacienteId && (t.IdConsulta != null || t.IdProcedimiento != null))
+                .Where(t => t.IdPaciente == pacienteId && t.IdProcedimiento != null)
                 .OrderByDescending(t => t.FechaTurno)
+                .ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<ConsultaMedica>> GetHistorialConsultasAsync(int pacienteId)
+        {
+            return await _context.ConsultaMedicas
+                .AsNoTracking()
+                .Include(c => c.IdMedicoNavigation)
+                .Where(c => c.IdPaciente == pacienteId)
+                .OrderByDescending(c => c.FechaConsulta)
                 .ToListAsync();
         }
     }

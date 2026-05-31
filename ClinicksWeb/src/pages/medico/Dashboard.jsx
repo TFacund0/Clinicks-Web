@@ -4,6 +4,7 @@ import { usePatients } from '../../hooks/usePatients';
 import { useAuth } from '../../context/AuthContext';
 import { useAgenda } from '../../hooks/useAgenda';
 import { ClipboardPlus, Activity, ExternalLink } from 'lucide-react';
+import { ESTADOS_TURNO } from '../../utils/constants';
 
 // Vista principal que muestra un resumen rápido de acciones, agenda y los últimos pacientes atendidos.
 const Dashboard = () => {
@@ -27,14 +28,14 @@ const Dashboard = () => {
     const esHoy = t.fecha.getDate() === hoy.getDate() &&
                   t.fecha.getMonth() === hoy.getMonth() &&
                   t.fecha.getFullYear() === hoy.getFullYear();
-    const estadosActivos = ['Pendiente', 'Confirmado', 'En Curso'];
+    const estadosActivos = [ESTADOS_TURNO.PENDIENTE, ESTADOS_TURNO.CONFIRMADO, ESTADOS_TURNO.EN_CURSO];
     return esHoy && estadosActivos.includes(t.estado);
   }).sort((a, b) => a.fecha - b.fecha) : [];
 
   // Calcula estadísticas generales para llenar el dashboard de forma útil
   const turnosMes = turnos ? turnos.length : 0;
   const totalPacientes = pacientes ? pacientes.length : 0;
-  const turnosAtendidosMes = turnos ? turnos.filter(t => t.estado === 'Atendido').length : 0;
+  const turnosAtendidosMes = turnos ? turnos.filter(t => t.estado === ESTADOS_TURNO.ATENDIDO).length : 0;
 
   return (
     <PageLayout title="Dashboard">

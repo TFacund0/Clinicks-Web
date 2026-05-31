@@ -113,20 +113,20 @@ namespace ClinicksApi.Business.Services
             if (pacienteDto == null) return null;
 
             var turnos = await _repository.GetHistorialTurnosAsync(pacienteId);
+            var consultasDirectas = await _repository.GetHistorialConsultasAsync(pacienteId);
 
-            var consultas = turnos
-                .Where(t => t.IdConsultaNavigation != null)
-                .Select(t => new ConsultaHistorialDto
+            var consultas = consultasDirectas
+                .Select(c => new ConsultaHistorialDto
                 {
-                    IdConsulta = t.IdConsultaNavigation!.IdConsulta,
-                    Motivo = t.IdConsultaNavigation.Motivo,
-                    Diagnostico = t.IdConsultaNavigation.Diagnostico,
-                    Tratamiento = t.IdConsultaNavigation.Tratamiento ?? string.Empty,
-                    Observacion = t.IdConsultaNavigation.Observacion ?? string.Empty,
-                    Recomendacion = t.IdConsultaNavigation.Recomendacion ?? string.Empty,
-                    FechaConsulta = t.IdConsultaNavigation.FechaConsulta,
-                    MedicoAtencion = t.IdMedicoNavigation != null 
-                        ? $"{t.IdMedicoNavigation.Nombre} {t.IdMedicoNavigation.Apellido}" 
+                    IdConsulta = c.IdConsulta,
+                    Motivo = c.Motivo,
+                    Diagnostico = c.Diagnostico,
+                    Tratamiento = c.Tratamiento ?? string.Empty,
+                    Observacion = c.Observacion ?? string.Empty,
+                    Recomendacion = c.Recomendacion ?? string.Empty,
+                    FechaConsulta = c.FechaConsulta,
+                    MedicoAtencion = c.IdMedicoNavigation != null 
+                        ? $"{c.IdMedicoNavigation.Nombre} {c.IdMedicoNavigation.Apellido}" 
                         : "Médico Desconocido"
                 })
                 .ToList();

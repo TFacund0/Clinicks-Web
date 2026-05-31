@@ -121,9 +121,9 @@ const Agenda = () => {
   const estadisticasVista = useMemo(() => {
     return {
       totales: turnosFiltrados.length,
-      atendidos: turnosFiltrados.filter(t => t.estado === 'Atendido').length,
-      enEspera: turnosFiltrados.filter(t => t.estado === 'Confirmado' || t.estado === 'Pendiente' || t.estado === 'En Curso').length,
-      cancelados: turnosFiltrados.filter(t => t.estado === 'Cancelado' || t.estado === 'Rechazado').length
+      atendidos: turnosFiltrados.filter(t => t.estado === ESTADOS_TURNO.ATENDIDO).length,
+      enEspera: turnosFiltrados.filter(t => t.estado === ESTADOS_TURNO.CONFIRMADO || t.estado === ESTADOS_TURNO.PENDIENTE || t.estado === ESTADOS_TURNO.EN_CURSO).length,
+      cancelados: turnosFiltrados.filter(t => t.estado === ESTADOS_TURNO.CANCELADO || t.estado === ESTADOS_TURNO.RECHAZADO).length
     };
   }, [turnosFiltrados]);
 
@@ -137,11 +137,11 @@ const Agenda = () => {
     // Cambiamos el estado del turno a "En Curso" localmente para reflejar que está siendo atendido
     const actualizados = turnos.map(t => {
       if (t.id === turno.id) {
-        return { ...t, estado: 'En Curso' };
+        return { ...t, estado: ESTADOS_TURNO.EN_CURSO };
       }
       // Si había otro "En Curso", lo dejamos como Confirmado para que no haya dos simultáneos
-      if (t.estado === 'En Curso' && t.id !== turno.id) {
-        return { ...t, estado: 'Confirmado' };
+      if (t.estado === ESTADOS_TURNO.EN_CURSO && t.id !== turno.id) {
+        return { ...t, estado: ESTADOS_TURNO.CONFIRMADO };
       }
       return t;
     });
@@ -190,36 +190,36 @@ const Agenda = () => {
   // ==========================================
   const obtenerEstiloEstado = (estado) => {
     switch (estado) {
-      case 'Atendido':
+      case ESTADOS_TURNO.ATENDIDO:
         return {
           badge: 'bg-slate-800 text-slate-400 border-slate-700/50',
           card: 'border-slate-800 opacity-60 hover:opacity-100 bg-slate-900/30',
           dot: 'bg-slate-600',
           texto: 'text-slate-500 line-through'
         };
-      case 'Confirmado':
+      case ESTADOS_TURNO.CONFIRMADO:
         return {
           badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
           card: 'border-slate-800 hover:border-emerald-500/40 bg-slate-900/80 shadow-md shadow-emerald-950/5',
           dot: 'bg-emerald-400 animate-pulse',
           texto: 'text-slate-200 font-semibold'
         };
-      case 'En Curso':
+      case ESTADOS_TURNO.EN_CURSO:
         return {
           badge: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30 animate-pulse',
           card: 'border-cyan-500 bg-slate-900 shadow-lg shadow-cyan-950/20 border-l-4 ring-1 ring-cyan-500/20',
           dot: 'bg-cyan-400 ring-4 ring-cyan-500/25 animate-ping',
           texto: 'text-white font-bold'
         };
-      case 'Cancelado':
-      case 'Rechazado':
+      case ESTADOS_TURNO.CANCELADO:
+      case ESTADOS_TURNO.RECHAZADO:
         return {
           badge: 'bg-red-500/10 text-red-400 border-red-500/20',
           card: 'border-slate-800 opacity-40 bg-slate-950',
           dot: 'bg-red-500',
           texto: 'text-slate-600 line-through'
         };
-      case 'Pendiente':
+      case ESTADOS_TURNO.PENDIENTE:
       default:
         return {
           badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
@@ -313,20 +313,20 @@ const Agenda = () => {
                       <FileText size={16} />
                     </button>
                     
-                    {turno.estado !== 'Atendido' && turno.estado !== 'Cancelado' && (
+                    {turno.estado !== ESTADOS_TURNO.ATENDIDO && turno.estado !== ESTADOS_TURNO.CANCELADO && (
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
                           iniciarAtencion(turno);
                         }}
                         className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-md active:scale-95 ${
-                          turno.estado === 'En Curso'
+                          turno.estado === ESTADOS_TURNO.EN_CURSO
                           ? 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-cyan-500/15'
                           : 'bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 hover:border-cyan-500/20'
                         }`}
                       >
                         <Play size={12} fill="currentColor" />
-                        {turno.estado === 'En Curso' ? 'Retomar' : 'Iniciar'}
+                        {turno.estado === ESTADOS_TURNO.EN_CURSO ? 'Retomar' : 'Iniciar'}
                       </button>
                     )}
                   </div>
@@ -840,9 +840,9 @@ const Agenda = () => {
                   </h4>
                   <div className="flex gap-2">
                     <button 
-                      onClick={() => cambiarEstadoTurno(turnoSeleccionado.id, 'Confirmado')}
+                      onClick={() => cambiarEstadoTurno(turnoSeleccionado.id, ESTADOS_TURNO.CONFIRMADO)}
                       className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all ${
-                        turnoSeleccionado.estado === 'Confirmado'
+                        turnoSeleccionado.estado === ESTADOS_TURNO.CONFIRMADO
                         ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                         : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
                       }`}
@@ -850,9 +850,9 @@ const Agenda = () => {
                       En Espera
                     </button>
                     <button 
-                      onClick={() => cambiarEstadoTurno(turnoSeleccionado.id, 'Atendido')}
+                      onClick={() => cambiarEstadoTurno(turnoSeleccionado.id, ESTADOS_TURNO.ATENDIDO)}
                       className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all ${
-                        turnoSeleccionado.estado === 'Atendido'
+                        turnoSeleccionado.estado === ESTADOS_TURNO.ATENDIDO
                         ? 'bg-slate-800 text-slate-400 border-slate-700'
                         : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
                       }`}
@@ -876,7 +876,7 @@ const Agenda = () => {
                   <FileText size={16} /> Ver Historial Clínico
                 </button>
 
-                {turnoSeleccionado.estado !== 'Atendido' && turnoSeleccionado.estado !== 'Cancelado' ? (
+                {turnoSeleccionado.estado !== ESTADOS_TURNO.ATENDIDO && turnoSeleccionado.estado !== ESTADOS_TURNO.CANCELADO ? (
                   <button
                     onClick={() => {
                       setTurnoSeleccionado(null);
