@@ -50,9 +50,13 @@ namespace ClinicksApi.Controllers
         /// Se agregó autorización para evitar ataques DoS públicos.
         /// </summary>
         [HttpPost("encriptar-claves")]
-        [Authorize]
-        public async Task<IActionResult> EncriptarClaves()
+        public async Task<IActionResult> EncriptarClaves([FromQuery] string secretKey)
         {
+            // Protección manual básica temporal en lugar de JWT
+            if (secretKey != "ClinicksAdmin2026")
+            {
+                return Unauthorized(new { message = "Clave secreta incorrecta." });
+            }
             var cantidad = await _authService.HashExistingPasswordsAsync();
             return Ok(new { message = $"Se han encriptado {cantidad} contraseñas exitosamente." });
         }

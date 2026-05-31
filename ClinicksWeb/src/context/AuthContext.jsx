@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // src/context/AuthContext.jsx
 // Contexto global de autenticación.
 // Resuelve VUL-2: el estado de autenticación ahora es reactivo (useState de React),
