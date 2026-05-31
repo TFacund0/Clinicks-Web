@@ -130,6 +130,9 @@ const Agenda = () => {
   // ==========================================
   // CONTROLADORES DE ACCIONES MÉDICAS
   // ==========================================
+  const [showSelectionModal, setShowSelectionModal] = useState(false);
+  const [turnoParaAtencion, setTurnoParaAtencion] = useState(null);
+
   const iniciarAtencion = (turno) => {
     // Cambiamos el estado del turno a "En Curso" localmente para reflejar que está siendo atendido
     const actualizados = turnos.map(t => {
@@ -144,9 +147,21 @@ const Agenda = () => {
     });
     guardarTurnos(actualizados);
 
-    // Redireccionamos a la pantalla correspondiente inyectando el DNI en el state de react-router
-    const rutaDestino = turno.tipo === 'Procedimiento' ? '/nuevo-procedimiento' : '/nueva-consulta';
-    navigate(rutaDestino, { state: { dniIngresado: turno.pacienteDni } });
+    setTurnoParaAtencion(turno);
+    setShowSelectionModal(true);
+  };
+
+  const seleccionarAtencion = (tipoAtencion) => {
+    setShowSelectionModal(false);
+    if (turnoParaAtencion) {
+      const rutaDestino = tipoAtencion === 'Procedimiento' ? '/nuevo-procedimiento' : '/nueva-consulta';
+      navigate(rutaDestino, { 
+        state: { 
+          idTurno: turnoParaAtencion.id, 
+          dniIngresado: turnoParaAtencion.pacienteDni 
+        } 
+      });
+    }
   };
 
   const verHistorialClinico = (turno) => {
@@ -247,6 +262,10 @@ const Agenda = () => {
                 {/* Tarjeta del Turno */}
                 <div 
                   onClick={() => setTurnoSeleccionado(turno)}
+                  onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/agenda/atencion/${turno.id}`, { state: { turno } });
+                  }}
                   className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${estilo.card}`}
                 >
                   <div className="space-y-1">
@@ -385,6 +404,10 @@ const Agenda = () => {
                       <div 
                         key={turno.id}
                         onClick={() => setTurnoSeleccionado(turno)}
+                        onDoubleClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/agenda/atencion/${turno.id}`, { state: { turno } });
+                        }}
                         className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all hover:scale-[1.02] ${estilo.card} text-xs`}
                       >
                         <div className="flex items-center justify-between mb-1.5">
@@ -861,15 +884,7 @@ const Agenda = () => {
                     }}
                     className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-lg shadow-cyan-500/15"
                   >
-                    {turnoSeleccionado.tipo === 'Procedimiento' ? (
-                      <>
-                        <Activity size={16} /> Iniciar Procedimiento
-                      </>
-                    ) : (
-                      <>
-                        <ClipboardPlus size={16} /> Iniciar Consulta Médica
-                      </>
-                    )}
+                    <Play size={16} fill="currentColor" /> Iniciar Atención
                   </button>
                 ) : (
                   <div className="bg-slate-950 border border-slate-800/80 p-4 rounded-2xl text-center text-xs text-slate-500 font-semibold italic">
@@ -882,6 +897,77 @@ const Agenda = () => {
           </div>
         );
       })()}
+
+      {/* ==========================================
+          MODAL DE SELECCIÓN DE TIPO DE ATENCIÓN (CONSULTA VS PROCEDIMIENTO)
+          ========================================== */}
+      {showSelectionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl relative">
+            
+            {/* Botón cerrar */}
+            <button 
+              onClick={() => setShowSelectionModal(false)}
+              className="absolute top-4 right-4 p-2 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-slate-200 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            {/* Encabezado */}
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center text-cyan-400 mx-auto mb-4 border border-cyan-500/20">
+                <Play size={20} fill="currentColor" />
+              </div>
+              <h3 className="text-xl font-bold text-white">Iniciar Atención</h3>
+              <p className="text-xs text-slate-400 mt-2">
+                Seleccione el tipo de registro que desea realizar para el paciente.
+              </p>
+            </div>
+
+            {/* Opciones */}
+            <div className="space-y-4">
+              
+              {/* Opción 1: Consulta Médica */}
+              <button
+                onClick={() => seleccionarAtencion('Consulta')}
+                className="w-full p-4 bg-slate-950 hover:bg-slate-800/50 border border-slate-800 hover:border-cyan-500/30 rounded-2xl flex items-center gap-4 text-left transition-all group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <ClipboardPlus size={20} />
+                </div>
+                <div>
+                  <p className="font-bold text-slate-200 group-hover:text-cyan-400 transition-colors text-sm">Registrar Consulta Médica</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">Control de rutina, diagnóstico y receta de fármacos.</p>
+                </div>
+              </button>
+
+              {/* Opción 2: Procedimiento Médico */}
+              <button
+                onClick={() => seleccionarAtencion('Procedimiento')}
+                className="w-full p-4 bg-slate-950 hover:bg-slate-800/50 border border-slate-800 hover:border-purple-500/30 rounded-2xl flex items-center gap-4 text-left transition-all group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Activity size={20} />
+                </div>
+                <div>
+                  <p className="font-bold text-slate-200 group-hover:text-purple-400 transition-colors text-sm">Registrar Procedimiento</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">Estudios, curaciones, cirugías menores u otros.</p>
+                </div>
+              </button>
+
+            </div>
+
+            {/* Cancelar */}
+            <button
+              onClick={() => setShowSelectionModal(false)}
+              className="w-full mt-6 py-3 bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-slate-300 font-bold rounded-xl text-xs transition-colors"
+            >
+              Cancelar
+            </button>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import procesoService from '../services/procesoService';
 import { extraerMensajeError } from '../utils/errorUtils';
 
-export const useNewProcess = (dniInicial = '') => {
+export const useNewProcess = (dniInicial = '', idTurnoInicial = null) => {
     const navigate = useNavigate();
     const [tiposDisponibles, setTiposDisponibles] = useState([]);
     const [formData, setFormData] = useState({
@@ -13,6 +13,7 @@ export const useNewProcess = (dniInicial = '') => {
         descripcion: '',
         fechaproceso: new Date().toISOString().split('T')[0],
         resultado: '',
+        idTurno: idTurnoInicial,
     });
     const [errors, setErrors] = useState({});
     const [showSuccess, setShowSuccess] = useState(false);
@@ -71,7 +72,8 @@ export const useNewProcess = (dniInicial = '') => {
         try {
             const dataLimpia = {
                 ...formData,
-                fechaproceso: formData.fechaproceso || null
+                fechaproceso: formData.fechaproceso || null,
+                idTurno: formData.idTurno || null
             };
             await procesoService.crearProceso(dataLimpia);
             if (isMounted.current) {
@@ -95,7 +97,8 @@ export const useNewProcess = (dniInicial = '') => {
             tipoproceso: '',
             descripcion: '',
             fechaproceso: new Date().toISOString().split('T')[0],
-            resultado: ''
+            resultado: '',
+            idTurno: null
         });
         setErrors({});
     };

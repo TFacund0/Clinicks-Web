@@ -12,6 +12,7 @@ const NewConsultation = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dniEntrante = location.state?.dniIngresado || '';
+  const idTurnoEntrante = location.state?.idTurno || null;
 
   const {
     formData,
@@ -22,7 +23,7 @@ const NewConsultation = () => {
     handleChange,
     handleSubmit,
     handleCancel
-  } = useNewConsultation(dniEntrante);
+  } = useNewConsultation(dniEntrante, idTurnoEntrante);
 
   // PROTECCIÓN DE RUTA: Si no hay DNI (acceso directo por URL), volvemos al buscador.
   React.useEffect(() => {

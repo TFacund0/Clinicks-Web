@@ -14,6 +14,7 @@ import PatientHistory from '../pages/medico/PatientHistory';
 import AccessConsultation from '../pages/medico/accessConsultation';
 import NewProcess from '../pages/medico/NewProcess';
 import Agenda from '../pages/medico/Agenda';
+import TurnAttentionDetail from '../pages/medico/TurnAttentionDetail';
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
@@ -33,6 +34,7 @@ const AppRoutes = () => {
         <Route path="/acceso-consulta"        element={<AccessConsultation key="consulta"  destino="/nueva-consulta" />} />
         <Route path="/acceso-procedimiento"   element={<AccessConsultation key="proceso"   destino="/nuevo-procedimiento" />} />
         <Route path="/agenda"                 element={<Agenda />} />
+        <Route path="/agenda/atencion/:idTurno" element={<TurnAttentionDetail />} />
       </Route>
 
       {/* Redirecciones por defecto */}
