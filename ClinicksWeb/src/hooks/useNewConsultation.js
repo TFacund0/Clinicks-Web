@@ -1,6 +1,6 @@
 // src/hooks/useNewConsultation.js
 import { useState, useEffect, useRef } from 'react';
-import consultaService from '../services/ConsultaService';
+import consultaService from '../services/consultaService';
 import { useNavigate } from 'react-router-dom';
 import { extraerMensajeError } from '../utils/errorUtils';
 
