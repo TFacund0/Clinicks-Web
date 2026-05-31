@@ -16,14 +16,20 @@ namespace ClinicksApi.Controllers;
 public class PacientesController : ControllerBase
 {
     private readonly IPacienteService _pacienteService;
+    private readonly IConsultaService _consultaService;
+    private readonly IProcesoService _procesoService;
 
     /// <summary>
-    /// Constructor del controlador. Recibe el servicio inyectado por .NET.
+    /// Constructor del controlador. Recibe los servicios inyectados por .NET.
     /// </summary>
-    /// <param name="pacienteService">Servicio que contiene las reglas de negocio para los pacientes.</param>
-    public PacientesController(IPacienteService pacienteService)
+    public PacientesController(
+        IPacienteService pacienteService,
+        IConsultaService consultaService,
+        IProcesoService procesoService)
     {
         _pacienteService = pacienteService;
+        _consultaService = consultaService;
+        _procesoService = procesoService;
     }
 
     /// <summary>
@@ -93,5 +99,29 @@ public class PacientesController : ControllerBase
             success = false, 
             mensaje = "El DNI ingresado no corresponde a un paciente registrado." 
         });
+    }
+
+    /// <summary>
+    /// Obtiene el historial clínico completo del paciente (datos, consultas y procesos) en una sola respuesta.
+    /// </summary>
+    /// <param name="id">El ID del paciente.</param>
+    [HttpGet("{id}/historial")]
+    public async Task<IActionResult> GetHistorialClinico(int id)
+    {
+        var paciente = await _pacienteService.ObtenerPorId(id);
+        if (paciente == null)
+            return NotFound(new { message = "Paciente no encontrado" });
+
+        var consultas = await _consultaService.ObtenerHistorialPaciente(id);
+        var procesos = await _procesoService.ObtenerHistorialPaciente(id);
+
+        var historial = new HistorialClinicoDto
+        {
+            Paciente = paciente,
+            Consultas = consultas,
+            Procedimientos = procesos.ToList()
+        };
+
+        return Ok(historial);
     }
 }
