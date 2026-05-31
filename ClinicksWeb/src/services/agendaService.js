@@ -38,6 +38,22 @@ const agendaService = {
       console.error('Error al obtener la agenda de turnos:', error);
       throw error;
     }
+  },
+
+  /**
+   * Obtiene un turno por su ID.
+   * 
+   * @param {number|string} idTurno - El ID del turno a obtener.
+   * @returns {Promise<Object>} El detalle del turno.
+   */
+  obtenerTurnoPorId: async (idTurno) => {
+    try {
+      const response = await clinicksApi.get(`/Agenda/${idTurno}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error al obtener el turno ${idTurno}:`, error);
+      throw error;
+    }
   }
 };
 

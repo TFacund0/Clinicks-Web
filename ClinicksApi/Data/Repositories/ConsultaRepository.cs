@@ -74,5 +74,71 @@ namespace ClinicksApi.Data.Repositories
             _context.Turnos.Add(turno);
             await _context.SaveChangesAsync();
         }
+
+        /// <inheritdoc/>
+        public async Task<ConsultaMedica> CrearConsultaYTurnoVinculado(ConsultaMedica consulta, Turno turno)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // 1. Guardar la consulta
+                _context.ConsultaMedicas.Add(consulta);
+                await _context.SaveChangesAsync(); // Guarda y obtiene el ID autoincremental de consulta
+
+                // 2. Vincular el ID de la consulta generada al Turno
+                turno.IdConsulta = consulta.IdConsulta;
+
+                // 3. Guardar el turno
+                _context.Turnos.Add(turno);
+                await _context.SaveChangesAsync();
+
+                // 4. Confirmar la transacción
+                await transaction.CommitAsync();
+
+                return consulta;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ConsultaMedica> CrearConsultaYVincularATurnoExistente(ConsultaMedica consulta, int idTurno)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // 1. Guardar la consulta
+                _context.ConsultaMedicas.Add(consulta);
+                await _context.SaveChangesAsync(); // Guarda y obtiene el ID autoincremental de consulta
+
+                // 2. Buscar el turno existente
+                var turnoExistente = await _context.Turnos.FirstOrDefaultAsync(t => t.IdTurno == idTurno);
+                if (turnoExistente == null)
+                {
+                    throw new Exception($"El turno con ID {idTurno} no existe.");
+                }
+
+                // 3. Vincular la consulta y actualizar el estado a "Atendido" (ID = 2)
+                turnoExistente.IdConsulta = consulta.IdConsulta;
+                var estadoAtendido = await _context.EstadoTurnos.FirstOrDefaultAsync(e => e.Nombre.ToLower() == "atendido");
+                turnoExistente.IdEstadoTurno = estadoAtendido?.IdEstadoTurno ?? 2;
+
+                _context.Turnos.Update(turnoExistente);
+                await _context.SaveChangesAsync();
+
+                // 4. Confirmar la transacción
+                await transaction.CommitAsync();
+
+                return consulta;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
     }
 }

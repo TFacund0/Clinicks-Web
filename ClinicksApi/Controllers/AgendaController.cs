@@ -80,5 +80,23 @@ namespace ClinicksApi.Controllers
                 turnos = misTurnos
             });
         }
+
+        /// <summary>
+        /// Endpoint para obtener un turno por su ID.
+        /// </summary>
+        /// <param name="id">El ID del turno.</param>
+        /// <returns>El turno si existe, de lo contrario NotFound.</returns>
+        [Authorize(Roles = "Medico")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> ObtenerTurnoPorIdAsync(int id)
+        {
+            var turno = await _turnoService.ObtenerTurnoPorIdAsync(id);
+            if (turno == null)
+            {
+                return NotFound($"No se encontró el turno con ID {id}.");
+            }
+
+            return Ok(turno);
+        }
     }
 }

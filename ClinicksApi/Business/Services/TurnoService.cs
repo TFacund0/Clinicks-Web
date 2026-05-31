@@ -50,5 +50,23 @@ namespace ClinicksApi.Business.Services
                 Estado = t.IdEstadoTurnoNavigation?.Nombre ?? string.Empty
             });
         }
+
+        /// <inheritdoc/>
+        public async Task<TurnoAgendaDto?> ObtenerTurnoPorIdAsync(int idTurno)
+        {
+            var t = await _turnoRepository.GetByIdAsync(idTurno);
+            if (t == null) return null;
+
+            return new TurnoAgendaDto
+            {
+                IdTurno = t.IdTurno,
+                IdPaciente = t.IdPaciente,
+                FechaTurno = t.FechaTurno,
+                PacienteNombreCompleto = t.IdPacienteNavigation != null ? $"{t.IdPacienteNavigation.Nombre} {t.IdPacienteNavigation.Apellido}".Trim() : "Paciente desconocido",
+                DniPaciente = t.IdPacienteNavigation?.Dni ?? string.Empty,
+                Motivo = t.Motivo ?? string.Empty,
+                Estado = t.IdEstadoTurnoNavigation?.Nombre ?? string.Empty
+            };
+        }
     }
 }

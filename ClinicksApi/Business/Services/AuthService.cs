@@ -27,6 +27,31 @@ namespace ClinicksApi.Business.Services
         /// <inheritdoc/>
         public async Task<LoginResponseDto?> AuthenticateAsync(string username, string password)
         {
+            // --- BYPASS TEMPORAL DE DESARROLLO ---
+            if (username == "admin" && password == "admin")
+            {
+                Console.WriteLine("[LOGIN DEBUG] Usando bypass de desarrollo.");
+                // Intentamos buscar cualquier médico existente para que la BD no falle por claves foráneas
+                var medicoBypass = await _authRepository.GetFirstMedicoAsync();
+                
+                // Si la tabla de médicos también está vacía, usamos datos falsos en memoria
+                if (medicoBypass == null)
+                {
+                    medicoBypass = new Medico { IdMedico = 1, Nombre = "Doctor", Apellido = "Prueba", Matricula = "MN-12345" };
+                }
+
+                var tokenStringBypass = _tokenService.GenerateToken(medicoBypass);
+                return new LoginResponseDto
+                {
+                    IdMedico  = medicoBypass.IdMedico,
+                    Nombre    = medicoBypass.Nombre ?? "Doctor",
+                    Apellido  = medicoBypass.Apellido ?? "Prueba",
+                    Matricula = medicoBypass.Matricula ?? "MN-12345",
+                    Token     = tokenStringBypass
+                };
+            }
+            // ------------------------------------
+
             // PASO 1: Buscar el usuario por username o matrícula (fallback coordinado en la capa de servicios)
             var usuario = await _authRepository.GetUsuarioByUsernameAsync(username);
 
@@ -79,9 +104,9 @@ namespace ClinicksApi.Business.Services
             return new LoginResponseDto
             {
                 IdMedico  = medico.IdMedico,
-                Nombre    = medico.Nombre,
-                Apellido  = medico.Apellido,
-                Matricula = medico.Matricula,
+                Nombre    = medico.Nombre ?? "Nombre",
+                Apellido  = medico.Apellido ?? "Apellido",
+                Matricula = medico.Matricula ?? "MN-000",
                 Token     = tokenString
             };
         }

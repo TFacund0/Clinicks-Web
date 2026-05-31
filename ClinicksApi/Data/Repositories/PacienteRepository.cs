@@ -84,5 +84,18 @@ namespace ClinicksApi.Data.Repositories
         {
             return await _context.Pacientes.AnyAsync(p => p.Dni == dni);
         }
+
+        /// <inheritdoc/>
+        public async Task<List<Turno>> GetHistorialTurnosAsync(int pacienteId)
+        {
+            return await _context.Turnos
+                .AsNoTracking()
+                .Include(t => t.IdConsultaNavigation)
+                .Include(t => t.IdProcedimientoNavigation)
+                .Include(t => t.IdMedicoNavigation)
+                .Where(t => t.IdPaciente == pacienteId && (t.IdConsulta != null || t.IdProcedimiento != null))
+                .OrderByDescending(t => t.FechaTurno)
+                .ToListAsync();
+        }
     }
 }

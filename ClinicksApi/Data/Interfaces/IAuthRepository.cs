@@ -37,5 +37,8 @@ namespace ClinicksApi.Data.Interfaces
         /// <summary>Actualiza los datos de un usuario (usada para guardar el hash de contraseña).</summary>
         /// <param name="usuario">La entidad Usuario con los datos actualizados que se desea guardar en la base de datos.</param>
         Task UpdateUsuarioAsync(Usuario usuario);
+
+        /// <summary>Obtiene el primer médico registrado (para bypass de desarrollo).</summary>
+        Task<Medico?> GetFirstMedicoAsync();
     }
 }

@@ -1,10 +1,10 @@
 // src/hooks/useNewConsultation.js
 import { useState, useEffect, useRef } from 'react';
-import consultaService from '../services/consultaService';
+import consultaService from '../services/ConsultaService';
 import { useNavigate } from 'react-router-dom';
 import { extraerMensajeError } from '../utils/errorUtils';
 
-export const useNewConsultation = (dniInicial = '') => {
+export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
     // 1. Estado del formulario
     const [formData, setFormData] = useState({
         dnipaciente: dniInicial,
@@ -14,6 +14,7 @@ export const useNewConsultation = (dniInicial = '') => {
         tratamiento: '',
         observaciones: '',
         recomendacion: '',
+        idTurno: idTurnoInicial,
     });
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
@@ -33,9 +34,10 @@ export const useNewConsultation = (dniInicial = '') => {
 
     useEffect(() => {
         isMounted.current = true;
+        const currentTimers = timersRef.current;
         return () => {
             isMounted.current = false;
-            timersRef.current.forEach(clearTimeout);
+            currentTimers.forEach(clearTimeout);
         };
     }, []);
 
@@ -77,7 +79,8 @@ export const useNewConsultation = (dniInicial = '') => {
         try {
             const dataLimpia = {
                 ...formData,
-                fechaconsulta: formData.fechaconsulta || null
+                fechaconsulta: formData.fechaconsulta || null,
+                idTurno: formData.idTurno || null
             };
 
             await consultaService.crearConsulta(dataLimpia);
@@ -85,7 +88,7 @@ export const useNewConsultation = (dniInicial = '') => {
             if (isMounted.current) {
                 setShowSuccess(true);
                 addTimer(() => { if(isMounted.current) setShowSuccess(false); }, 3000);
-                setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '' });
+                setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '', idTurno: null });
                 addTimer(() => { if(isMounted.current) navigate('/dashboard'); }, 1500);
             }
         } catch (error) {
@@ -108,6 +111,7 @@ export const useNewConsultation = (dniInicial = '') => {
             tratamiento: '',
             observaciones: '',
             recomendacion: '',
+            idTurno: null,
         });
         setErrors({});
     };
