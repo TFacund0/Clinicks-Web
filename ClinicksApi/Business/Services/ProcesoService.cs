@@ -52,22 +52,26 @@ namespace ClinicksApi.Business.Services
                     Fecha       = fechaAUsar
                 };
 
-                // 4. PREPARACIÓN DEL TURNO VINCULADO
-                // El estado "Realizado" tiene ID = 1 y ya está garantizado por el DbInitializer al iniciar la app.
-                int idEstadoHecho = 1;
+                // 4. GUARDADO ATÓMICO — Persiste el procedimiento y lo vincula al turno (existente o nuevo)
+                Procedimiento procGuardado;
 
-                // Construimos el Turno que une el procedimiento con el paciente y el médico.
-                var nuevoTurno = new Turno
+                if (dto.idTurno.HasValue && dto.idTurno.Value > 0)
                 {
-                    IdPaciente      = pacienteDto.Id,
-                    IdMedico        = idMedicoLogueado,
-                    IdEstadoTurno   = idEstadoHecho,
-                    FechaTurno      = fechaAUsar,
-                    Motivo          = $"Procedimiento: {dto.tipoproceso}"
-                };
-
-                // 5. GUARDADO ATÓMICO (TRANSACCIONAL) — Persistimos procedimiento y turno en una sola transacción
-                var procGuardado = await _procesoRepo.CrearProcedimientoYTurnoVinculado(nuevoProcedimiento, nuevoTurno);
+                    procGuardado = await _procesoRepo.CrearProcedimientoYVincularATurnoExistente(nuevoProcedimiento, dto.idTurno.Value);
+                }
+                else
+                {
+                    int idEstadoHecho = 1;
+                    var nuevoTurno = new Turno
+                    {
+                        IdPaciente      = pacienteDto.Id,
+                        IdMedico        = idMedicoLogueado,
+                        IdEstadoTurno   = idEstadoHecho,
+                        FechaTurno      = fechaAUsar,
+                        Motivo          = $"Procedimiento: {dto.tipoproceso}"
+                    };
+                    procGuardado = await _procesoRepo.CrearProcedimientoYTurnoVinculado(nuevoProcedimiento, nuevoTurno);
+                }
 
                 return (true, "Procedimiento guardado y vinculado con éxito.", procGuardado);
             }

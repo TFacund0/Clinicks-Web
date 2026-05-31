@@ -95,8 +95,26 @@ namespace ClinicksApi.Business.Services
                     IdPaciente      = pacienteDto.Id
                 };
 
-                // 4. GUARDADO — El repositorio ejecuta el INSERT en PostgreSQL.
-                var resultado = await _consultaRepo.CrearConsulta(nuevaConsulta);
+                // 4. GUARDADO — El repositorio ejecuta el INSERT en PostgreSQL vinculándolo a un turno.
+                ConsultaMedica resultado;
+
+                if (dto.idTurno.HasValue && dto.idTurno.Value > 0)
+                {
+                    resultado = await _consultaRepo.CrearConsultaYVincularATurnoExistente(nuevaConsulta, dto.idTurno.Value);
+                }
+                else
+                {
+                    int idEstadoHecho = 1;
+                    var nuevoTurno = new Turno
+                    {
+                        IdPaciente      = pacienteDto.Id,
+                        IdMedico        = idMedicoLogueado,
+                        IdEstadoTurno   = idEstadoHecho,
+                        FechaTurno      = nuevaConsulta.FechaConsulta ?? DateTime.Now,
+                        Motivo          = $"Consulta: {dto.motivo}"
+                    };
+                    resultado = await _consultaRepo.CrearConsultaYTurnoVinculado(nuevaConsulta, nuevoTurno);
+                }
 
                 return (true, "Consulta registrada con éxito.", resultado);
             }

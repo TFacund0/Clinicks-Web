@@ -24,5 +24,10 @@ namespace ClinicksApi.Data.Interfaces
         /// <param name="pacienteId">Identificador único del paciente.</param>
         /// <returns>Lista de procedimientos del paciente, incluyendo datos del médico asociado.</returns>
         Task<List<Procedimiento>> HistorialPaciente(int pacienteId);
+
+        /// <summary>
+        /// Persiste un nuevo Procedimiento y lo vincula a un Turno existente de forma atómica y transaccional.
+        /// </summary>
+        Task<Procedimiento> CrearProcedimientoYVincularATurnoExistente(Procedimiento procedimiento, int idTurno);
     }
 }

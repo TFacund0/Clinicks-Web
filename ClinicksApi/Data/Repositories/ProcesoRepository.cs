@@ -62,5 +62,41 @@ namespace ClinicksApi.Data.Repositories
                 .OrderByDescending(p => p.Fecha)
                 .ToListAsync();
         }
+
+        /// <inheritdoc/>
+        public async Task<Procedimiento> CrearProcedimientoYVincularATurnoExistente(Procedimiento procedimiento, int idTurno)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // 1. Guardar el procedimiento
+                _context.Procedimientos.Add(procedimiento);
+                await _context.SaveChangesAsync(); // Guarda y obtiene el ID autoincremental de procedimiento
+
+                // 2. Buscar el turno existente
+                var turnoExistente = await _context.Turnos.FirstOrDefaultAsync(t => t.IdTurno == idTurno);
+                if (turnoExistente == null)
+                {
+                    throw new Exception($"El turno con ID {idTurno} no existe.");
+                }
+
+                // 3. Vincular el procedimiento y actualizar el estado a "Realizado" (ID = 1)
+                turnoExistente.IdProcedimiento = procedimiento.IdProcedimiento;
+                turnoExistente.IdEstadoTurno = 1;
+
+                _context.Turnos.Update(turnoExistente);
+                await _context.SaveChangesAsync();
+
+                // 4. Confirmar la transacción
+                await transaction.CommitAsync();
+
+                return procedimiento;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
     }
 }

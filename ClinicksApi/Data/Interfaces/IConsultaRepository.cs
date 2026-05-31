@@ -42,5 +42,15 @@ namespace ClinicksApi.Data.Interfaces
         /// </summary>
         /// <param name="turno">El Turno a guardar.</param>
         Task CrearTurnoVinculado(Turno turno);
+
+        /// <summary>
+        /// Persiste una nueva consulta médica y crea su Turno vinculado de forma atómica y transaccional.
+        /// </summary>
+        Task<ConsultaMedica> CrearConsultaYTurnoVinculado(ConsultaMedica consulta, Turno turno);
+
+        /// <summary>
+        /// Persiste una nueva consulta médica y la vincula a un Turno existente de forma atómica y transaccional.
+        /// </summary>
+        Task<ConsultaMedica> CrearConsultaYVincularATurnoExistente(ConsultaMedica consulta, int idTurno);
     }
 }
