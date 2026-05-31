@@ -16,20 +16,14 @@ namespace ClinicksApi.Controllers;
 public class PacientesController : ControllerBase
 {
     private readonly IPacienteService _pacienteService;
-    private readonly IConsultaService _consultaService;
-    private readonly IProcesoService _procesoService;
 
     /// <summary>
-    /// Constructor del controlador. Recibe los servicios inyectados por .NET.
+    /// Constructor del controlador. Recibe el servicio inyectado por .NET.
     /// </summary>
-    public PacientesController(
-        IPacienteService pacienteService,
-        IConsultaService consultaService,
-        IProcesoService procesoService)
+    /// <param name="pacienteService">Servicio que contiene las reglas de negocio para los pacientes.</param>
+    public PacientesController(IPacienteService pacienteService)
     {
         _pacienteService = pacienteService;
-        _consultaService = consultaService;
-        _procesoService = procesoService;
     }
 
     /// <summary>
@@ -108,19 +102,9 @@ public class PacientesController : ControllerBase
     [HttpGet("{id}/historial")]
     public async Task<IActionResult> GetHistorialClinico(int id)
     {
-        var paciente = await _pacienteService.ObtenerPorId(id);
-        if (paciente == null)
+        var historial = await _pacienteService.ObtenerHistorialClinico(id);
+        if (historial == null)
             return NotFound(new { message = "Paciente no encontrado" });
-
-        var consultas = await _consultaService.ObtenerHistorialPaciente(id);
-        var procesos = await _procesoService.ObtenerHistorialPaciente(id);
-
-        var historial = new HistorialClinicoDto
-        {
-            Paciente = paciente,
-            Consultas = consultas,
-            Procedimientos = procesos.ToList()
-        };
 
         return Ok(historial);
     }

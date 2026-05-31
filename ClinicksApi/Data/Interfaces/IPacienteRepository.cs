@@ -26,5 +26,8 @@ namespace ClinicksApi.Data.Interfaces
 
         /// <summary>Verifica si existe un paciente registrado con el DNI proporcionado.</summary>
         Task<bool> ExistePacientePorDniAsync(string dni);
+
+        /// <summary>Obtiene los turnos históricos del paciente con carga previa de consultas y procedimientos.</summary>
+        Task<List<Turno>> GetHistorialTurnosAsync(int pacienteId);
     }
 }

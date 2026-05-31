@@ -102,5 +102,55 @@ namespace ClinicksApi.Business.Services
 
             return (false, "Paciente no encontrado");
         }
+
+        /// <summary>
+        /// Obtiene y consolida el expediente clínico del paciente consultando los turnos asociados.
+        /// </summary>
+        public async Task<HistorialClinicoDto?> ObtenerHistorialClinico(int pacienteId)
+        {
+            var pacienteDto = await ObtenerPorId(pacienteId);
+            if (pacienteDto == null) return null;
+
+            var turnos = await _repository.GetHistorialTurnosAsync(pacienteId);
+
+            var consultas = turnos
+                .Where(t => t.IdConsultaNavigation != null)
+                .Select(t => new ConsultaHistorialDto
+                {
+                    IdConsulta = t.IdConsultaNavigation!.IdConsulta,
+                    Motivo = t.IdConsultaNavigation.Motivo,
+                    Diagnostico = t.IdConsultaNavigation.Diagnostico,
+                    Tratamiento = t.IdConsultaNavigation.Tratamiento ?? string.Empty,
+                    Observacion = t.IdConsultaNavigation.Observacion ?? string.Empty,
+                    Recomendacion = t.IdConsultaNavigation.Recomendacion ?? string.Empty,
+                    FechaConsulta = t.IdConsultaNavigation.FechaConsulta,
+                    MedicoAtencion = t.IdMedicoNavigation != null 
+                        ? $"{t.IdMedicoNavigation.Nombre} {t.IdMedicoNavigation.Apellido}" 
+                        : "Médico Desconocido"
+                })
+                .ToList();
+
+            var procedimientos = turnos
+                .Where(t => t.IdProcedimientoNavigation != null)
+                .Select(t => new ProcesoHistorialDto
+                {
+                    IdProcedimiento = t.IdProcedimientoNavigation!.IdProcedimiento,
+                    Tipo = t.IdProcedimientoNavigation.Tipo,
+                    Descripcion = t.IdProcedimientoNavigation.Descripcion ?? string.Empty,
+                    Resultado = t.IdProcedimientoNavigation.Resultado ?? string.Empty,
+                    Fecha = t.IdProcedimientoNavigation.Fecha,
+                    MedicoAtencion = t.IdMedicoNavigation != null 
+                        ? $"Dr/Dra. {t.IdMedicoNavigation.Nombre} {t.IdMedicoNavigation.Apellido}" 
+                        : "No registrado"
+                })
+                .ToList();
+
+            return new HistorialClinicoDto
+            {
+                Paciente = pacienteDto,
+                Consultas = consultas,
+                Procedimientos = procedimientos
+            };
+        }
     }
 }
