@@ -1,10 +1,9 @@
 import { ClipboardPlus, Activity, AlertCircle, ArrowRight } from 'lucide-react';
-import { useAccessConsultation } from '../../hooks/useAccessConsultation';
+import { usePatientVerification } from '../../hooks/usePatientVerification';
 import PageLayout from '../../components/PageLayout';
 import Toast from '../../components/Toast';
 
-const AccessConsultation = ({ destino }) => {
-    // Usamos EXACTAMENTE lo que devuelve tu nuevo useAccessConsultation
+const PatientVerification = ({ destino }) => {
     const { 
         formData, 
         errors, 
@@ -13,7 +12,7 @@ const AccessConsultation = ({ destino }) => {
         handleChange, 
         errorMsg,
         handleSubmit 
-    } = useAccessConsultation(destino);
+    } = usePatientVerification(destino);
 
     return (
         <PageLayout title="Acceso">
@@ -84,4 +83,4 @@ const AccessConsultation = ({ destino }) => {
     );
 };
 
-export default AccessConsultation;
+export default PatientVerification;

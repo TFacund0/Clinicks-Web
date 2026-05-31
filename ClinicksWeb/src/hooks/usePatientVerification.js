@@ -1,10 +1,10 @@
-// src/hooks/useAccessConsultation.js
+// src/hooks/usePatientVerification.js
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import pacienteService from '../services/pacienteService';
 import { extraerMensajeError } from '../utils/errorUtils';
 
-export const useAccessConsultation = (destino) => {
+export const usePatientVerification = (destino) => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({ dnipaciente: '' });
