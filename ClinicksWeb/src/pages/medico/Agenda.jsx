@@ -5,6 +5,7 @@ import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { useAgenda } from '../../hooks/useAgenda';
 import { useAuth } from '../../context/AuthContext';
+import { ESTADOS_TURNO } from '../../utils/constants';
 import { 
   ChevronLeft, 
   ChevronRight, 

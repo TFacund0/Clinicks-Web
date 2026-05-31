@@ -103,17 +103,7 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
 
     // 6. CANCELAR Y LIMPIAR
     const handleCancel = () => {
-        setFormData({
-            dnipaciente: '',
-            motivo: '',
-            fechaconsulta: '',
-            diagnostico: '',
-            tratamiento: '',
-            observaciones: '',
-            recomendacion: '',
-            idTurno: null,
-        });
-        setErrors({});
+        navigate(-1);
     };
 
     return {

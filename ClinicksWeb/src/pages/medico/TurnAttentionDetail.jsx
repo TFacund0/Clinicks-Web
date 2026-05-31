@@ -19,6 +19,7 @@ import {
 import PageLayout from '../../components/PageLayout';
 import { usePatientHistory } from '../../hooks/usePatientHistory';
 import agendaService from '../../services/agendaService';
+import { ESTADOS_TURNO } from '../../utils/constants';
 
 const TurnAttentionDetail = () => {
   const { idTurno } = useParams();

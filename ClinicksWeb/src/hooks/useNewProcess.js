@@ -104,15 +104,7 @@ export const useNewProcess = (dniInicial = '', idTurnoInicial = null) => {
     };
 
     const handleCancel = () => {
-        setFormData({
-            ...formData,
-            tipoproceso: '',
-            descripcion: '',
-            fechaproceso: new Date().toISOString().split('T')[0],
-            resultado: '',
-            idTurno: null
-        });
-        setErrors({});
+        navigate(-1);
     };
 
     return {
