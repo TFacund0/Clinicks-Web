@@ -265,7 +265,7 @@ const Agenda = () => {
                   onClick={() => setTurnoSeleccionado(turno)}
                   onDoubleClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/agenda/atencion/${turno.id}`, { state: { turno } });
+                    iniciarAtencion(turno);
                   }}
                   className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${estilo.card}`}
                 >
@@ -407,7 +407,7 @@ const Agenda = () => {
                         onClick={() => setTurnoSeleccionado(turno)}
                         onDoubleClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/agenda/atencion/${turno.id}`, { state: { turno } });
+                          iniciarAtencion(turno);
                         }}
                         className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all hover:scale-[1.02] ${estilo.card} text-xs`}
                       >
