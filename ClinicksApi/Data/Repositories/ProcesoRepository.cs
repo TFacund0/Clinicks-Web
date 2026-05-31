@@ -80,9 +80,10 @@ namespace ClinicksApi.Data.Repositories
                     throw new Exception($"El turno con ID {idTurno} no existe.");
                 }
 
-                // 3. Vincular el procedimiento y actualizar el estado a "Realizado" (ID = 1)
+                // 3. Vincular el procedimiento y actualizar el estado a "Atendido" (ID = 2)
                 turnoExistente.IdProcedimiento = procedimiento.IdProcedimiento;
-                turnoExistente.IdEstadoTurno = 1;
+                var estadoAtendido = await _context.EstadoTurnos.FirstOrDefaultAsync(e => e.Nombre.ToLower() == "atendido");
+                turnoExistente.IdEstadoTurno = estadoAtendido?.IdEstadoTurno ?? 2;
 
                 _context.Turnos.Update(turnoExistente);
                 await _context.SaveChangesAsync();
