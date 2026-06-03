@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
+using ClinicksApi.Constants;
 
 namespace ClinicksApi.Data.Repositories
 {
@@ -52,15 +53,39 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<List<Procedimiento>> HistorialPaciente(int pacienteId)
+        public async Task<Procedimiento> CrearProcedimientoYVincularATurnoExistente(Procedimiento procedimiento, int idTurno)
         {
-            return await _context.Procedimientos
-                .AsNoTracking()
-                .Where(p => p.Turnos.Any(t => t.IdPaciente == pacienteId))
-                .Include(p => p.Turnos) // Incluir turnos para acceder al médico
-                    .ThenInclude(t => t.IdMedicoNavigation)
-                .OrderByDescending(p => p.Fecha)
-                .ToListAsync();
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // 1. Guardar el procedimiento
+                _context.Procedimientos.Add(procedimiento);
+                await _context.SaveChangesAsync(); // Guarda y obtiene el ID autoincremental de procedimiento
+
+                // 2. Buscar el turno existente
+                var turnoExistente = await _context.Turnos.FirstOrDefaultAsync(t => t.IdTurno == idTurno);
+                if (turnoExistente == null)
+                {
+                    throw new Exception($"El turno con ID {idTurno} no existe.");
+                }
+
+                // 3. Vincular el procedimiento y actualizar el estado a "Atendido" usando la constante
+                turnoExistente.IdProcedimiento = procedimiento.IdProcedimiento;
+                turnoExistente.IdEstadoTurno = ConstantesGenerales.EstadosTurno.AtendidoId;
+
+                _context.Turnos.Update(turnoExistente);
+                await _context.SaveChangesAsync();
+
+                // 4. Confirmar la transacción
+                await transaction.CommitAsync();
+
+                return procedimiento;
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
     }
 }

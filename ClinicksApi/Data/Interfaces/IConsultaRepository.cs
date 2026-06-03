@@ -16,14 +16,6 @@ namespace ClinicksApi.Data.Interfaces
         Task<List<ConsultaMedica>> ListaConsultas();
 
         /// <summary>
-        /// Recupera todas las consultas médicas realizadas a un paciente, ordenadas de la más reciente a la más antigua.
-        /// Incluye los datos del médico que atendió cada consulta (JOIN con tabla medico).
-        /// </summary>
-        /// <param name="pacienteId">El identificador único del paciente en la base de datos.</param>
-        /// <returns>Lista de consultas del paciente con datos del médico incluidos.</returns>
-        Task<List<ConsultaMedica>> HistorialPaciente(int pacienteId);
-
-        /// <summary>
         /// Persiste una nueva consulta médica en la base de datos ejecutando un INSERT.
         /// </summary>
         /// <param name="consulta">La entidad <see cref="ConsultaMedica"/> ya construida y validada por el Servicio.</param>
@@ -31,16 +23,19 @@ namespace ClinicksApi.Data.Interfaces
         Task<ConsultaMedica> CrearConsulta(ConsultaMedica consulta);
 
         /// <summary>
-        /// Garantiza que un estado de turno con el nombre indicado exista en la base de datos y retorna su ID.
-        /// </summary>
-        /// <param name="nombreEstado">El nombre descriptivo del estado (ej: "Atendido").</param>
-        /// <returns>El ID del estado de turno (existente o recién creado).</returns>
-        Task<int> AsegurarEstadoTurnoExiste(string nombreEstado);
-
-        /// <summary>
         /// Persiste un Turno en la base de datos.
         /// </summary>
         /// <param name="turno">El Turno a guardar.</param>
         Task CrearTurnoVinculado(Turno turno);
+
+        /// <summary>
+        /// Persiste una nueva consulta médica y crea su Turno vinculado de forma atómica y transaccional.
+        /// </summary>
+        Task<ConsultaMedica> CrearConsultaYTurnoVinculado(ConsultaMedica consulta, Turno turno);
+
+        /// <summary>
+        /// Persiste una nueva consulta médica y la vincula a un Turno existente de forma atómica y transaccional.
+        /// </summary>
+        Task<ConsultaMedica> CrearConsultaYVincularATurnoExistente(ConsultaMedica consulta, int idTurno);
     }
 }

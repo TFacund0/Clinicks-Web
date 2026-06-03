@@ -21,5 +21,8 @@ namespace ClinicksApi.Business.Interfaces
         /// <param name="fechaFin">Filtro opcional para la fecha de fin del período.</param>
         /// <returns>Una lista de objetos TurnoAgendaDto con la información de los turnos del médico.</returns>
         Task<IEnumerable<TurnoAgendaDto>> ObtenerTurnosMedicoAsync(int idMedico, DateTime? fechaInicio, DateTime? fechaFin);
+
+        /// <summary>Obtiene un turno mapeado a DTO por su ID.</summary>
+        Task<TurnoAgendaDto?> ObtenerTurnoPorIdAsync(int idTurno);
     }
 }

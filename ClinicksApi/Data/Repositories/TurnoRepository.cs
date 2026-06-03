@@ -54,5 +54,15 @@ namespace ClinicksApi.Data.Repositories
 
             return await query.OrderBy(t => t.FechaTurno).ToListAsync();
         }
+
+        /// <inheritdoc/>
+        public async Task<Turno?> GetByIdAsync(int idTurno)
+        {
+            return await _context.Turnos
+                .Include(t => t.IdPacienteNavigation)
+                .Include(t => t.IdMedicoNavigation)
+                .Include(t => t.IdEstadoTurnoNavigation)
+                .FirstOrDefaultAsync(t => t.IdTurno == idTurno);
+        }
     }
 }

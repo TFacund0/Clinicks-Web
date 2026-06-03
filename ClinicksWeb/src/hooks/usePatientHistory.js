@@ -1,8 +1,6 @@
 // src/hooks/usePatientHistory.js
 import { useState, useEffect } from 'react';
 import pacienteService from '../services/pacienteService';
-import consultaService from '../services/consultaService';
-import procesoService from '../services/procesoService';
 import { extraerMensajeError } from '../utils/errorUtils';
 
 /**
@@ -33,25 +31,21 @@ export const usePatientHistory = (pacienteId) => {
             setError(null);
             
             try {
-                // Obtenemos los datos básicos del paciente y su historial (consultas y procesos) en paralelo
-                const [pacienteData, consultasData, procesosData] = await Promise.all([
-                    pacienteService.obtenerPorId(pacienteId),
-                    consultaService.obtenerHistorialPaciente(pacienteId),
-                    procesoService.obtenerHistorialPaciente(pacienteId)
-                ]);
+                // Obtenemos el historial clínico consolidado directamente desde el backend en una sola petición
+                const data = await pacienteService.obtenerHistorial(pacienteId);
 
                 if (isMounted) {
-                    setPaciente(pacienteData);
+                    setPaciente(data.paciente);
 
                     // Etiquetar cada array para diferenciarlos en la UI
-                    const consultasMapeadas = consultasData.map(c => ({
+                    const consultasMapeadas = data.consultas.map(c => ({
                         ...c,
                         tipoRegistro: 'consulta',
                         // Unificamos la propiedad de fecha para ordenar fácilmente
                         fechaOrden: new Date(c.fechaConsulta).getTime()
                     }));
 
-                    const procesosMapeados = procesosData.map(p => ({
+                    const procesosMapeados = data.procedimientos.map(p => ({
                         ...p,
                         tipoRegistro: 'procedimiento',
                         fechaOrden: new Date(p.fecha).getTime()

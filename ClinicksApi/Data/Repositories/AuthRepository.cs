@@ -67,5 +67,7 @@ namespace ClinicksApi.Data.Repositories
             _context.Usuarios.Update(usuario);
             await _context.SaveChangesAsync();
         }
+
+
     }
 }
