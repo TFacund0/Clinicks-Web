@@ -10,6 +10,7 @@ const NewProcess = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const dniEntrante = location.state?.dniIngresado || '';
+    const idTurnoEntrante = location.state?.idTurno || null;
 
     const {
         formData,
@@ -21,7 +22,7 @@ const NewProcess = () => {
         handleSubmit,
         handleCancel,
         tiposDisponibles,
-    } = useNewProcess(dniEntrante);
+    } = useNewProcess(dniEntrante, idTurnoEntrante);
 
     // PROTECCIÓN DE RUTA: Si no hay DNI (acceso directo por URL), volvemos al buscador.
     React.useEffect(() => {
@@ -112,7 +113,7 @@ const NewProcess = () => {
 
             <Toast 
                 showSuccess={showSuccess} 
-                successMsg="Proceso registrado exitosamente"
+                successMsg="Procedimiento registrado exitosamente"
                 errorMsg={errorMsg}
             />
         </PageLayout>

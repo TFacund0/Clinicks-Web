@@ -61,7 +61,7 @@ public class PacientesController : ControllerBase
     /// </summary>
     /// <returns>Lista de pacientes del médico autenticado. Si no tiene, devuelve lista vacía (200 OK).</returns>
     [HttpGet("atendidos")]
-    public async Task<IActionResult> GetAtendidosByMedico([FromQuery] string? search)
+    public async Task<IActionResult> ObtenerAtendidosPorMedico([FromQuery] string? search)
     {
         // Leemos el ID del médico usando la extensión segura sobre ClaimsPrincipal
         var idMedico = User.GetMedicoId();
@@ -79,16 +79,16 @@ public class PacientesController : ControllerBase
     [HttpGet("validar/{dni}")]
     public async Task<IActionResult> ValidarPaciente(string dni)
     {
-        var resultado = await _pacienteService.ExistePaciente(dni);
-
-        if (resultado.Success)
+        var paciente = await _pacienteService.ValidarPaciente(dni);
+ 
+        if (paciente != null)
         {
             return Ok(new { 
                 success = true, 
                 mensaje = "Paciente verificado correctamente." 
             });
         }
-
+ 
         return NotFound(new { 
             success = false, 
             mensaje = "El DNI ingresado no corresponde a un paciente registrado." 

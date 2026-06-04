@@ -17,7 +17,7 @@ export const pacienteService = {
         return respuesta.data;
     },
 
-    validarPacientePorDni: async (dni) => {
+    validarPaciente: async (dni) => {
         const respuesta = await clinicksApi.get(`/pacientes/validar/${dni}`);
         return respuesta.data;
     },

@@ -54,7 +54,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId, string? searchTerm = null)
+        public async Task<IEnumerable<Paciente>> ObtenerAtendidosPorMedico(int medicoId, string? search = null)
         {
             var query = _context.Pacientes
                 .AsNoTracking()
@@ -66,13 +66,13 @@ namespace ClinicksApi.Data.Repositories
                     p.Turnos.Any(t => t.IdMedico == medicoId && t.IdProcedimiento != null)
                 );
 
-            if (!string.IsNullOrWhiteSpace(searchTerm))
+            if (!string.IsNullOrWhiteSpace(search))
             {
-                var search = searchTerm.ToLower();
+                var searchLower = search.ToLower();
                 query = query.Where(p => 
-                    p.Nombre.ToLower().Contains(search) || 
-                    p.Apellido.ToLower().Contains(search) || 
-                    p.Dni.Contains(search)
+                    p.Nombre.ToLower().Contains(searchLower) || 
+                    p.Apellido.ToLower().Contains(searchLower) || 
+                    p.Dni.Contains(searchLower)
                 );
             }
 
@@ -80,7 +80,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<bool> ExistePacientePorDniAsync(string dni)
+        public async Task<bool> ValidarPaciente(string dni)
         {
             return await _context.Pacientes.AnyAsync(p => p.Dni == dni);
         }

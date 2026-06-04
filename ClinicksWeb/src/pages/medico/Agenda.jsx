@@ -144,9 +144,9 @@ const Agenda = () => {
     });
     guardarTurnos(actualizados);
 
-    // Redireccionamos a la pantalla correspondiente inyectando el DNI en el state de react-router
+    // Redireccionamos a la pantalla correspondiente inyectando el DNI y el ID del turno en el state de react-router
     const rutaDestino = turno.tipo === 'Procedimiento' ? '/nuevo-procedimiento' : '/nueva-consulta';
-    navigate(rutaDestino, { state: { dniIngresado: turno.pacienteDni } });
+    navigate(rutaDestino, { state: { dniIngresado: turno.pacienteDni, idTurno: turno.id } });
   };
 
   const verHistorialClinico = (turno) => {

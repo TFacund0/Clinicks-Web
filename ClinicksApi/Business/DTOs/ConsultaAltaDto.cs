@@ -34,5 +34,8 @@ namespace ClinicksApi.Business.DTOs
         /// <summary>DNI del paciente a registrar en la consulta. Se usa para buscarlo en la BD y obtener su ID real.</summary>
         [Required(ErrorMessage = "El DNI del paciente es obligatorio.")]
         public required string dnipaciente { get; set; }
+
+        /// <summary>ID opcional del turno que se está atendiendo para vincularlo a esta consulta.</summary>
+        public int? idturno { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 using Moq; // Funciona joya
 using ClinicksApi.Business.Services;
 using ClinicksApi.Business.DTOs;
@@ -79,21 +79,20 @@ namespace ClinicksApi.Tests
         }
 
         [Fact]
-        public async Task ExistePaciente_DeberiaDevolverFalse_CuandoDniNoEstaRegistrado()
+        public async Task ValidarPaciente_DeberiaDevolverNull_CuandoDniNoEstaRegistrado()
         {
             // ARRANGE
             string dniInexistente = "11222333";
 
             // MOQ simulando que la base de datos no encontró el DNI
-            _pacienteRepoMock.Setup(repo => repo.ExistePacientePorDniAsync(dniInexistente))
-                             .ReturnsAsync(false);
+            _pacienteRepoMock.Setup(repo => repo.GetByDniAsync(dniInexistente))
+                             .ReturnsAsync((Paciente?)null);
 
             // ACT
-            var resultado = await _pacienteService.ExistePaciente(dniInexistente);
+            var resultado = await _pacienteService.ValidarPaciente(dniInexistente);
 
             // ASSERT
-            Assert.False(resultado.Success);
-            Assert.Equal("Paciente no encontrado", resultado.Message);
+            Assert.Null(resultado);
         }
     }
 }

@@ -60,7 +60,7 @@ export const useAccessConsultation = (destino) => {
         setIsSubmitting(true);
 
         try {
-            await pacienteService.validarPacientePorDni(formData.dnipaciente);
+            await pacienteService.validarPaciente(formData.dnipaciente);
             if (isMounted.current) {
                 setShowSuccess(true);
                 addTimer(() => { if(isMounted.current) setShowSuccess(false); }, 3000);

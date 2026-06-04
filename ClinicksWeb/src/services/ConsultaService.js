@@ -5,8 +5,8 @@ import clinicksApi from '../api/clinicksApi';
 const consultaService = {
 
     // Envía los datos del formulario al backend para guardar una nueva consulta en la base de datos (POST).
-    crearConsulta: async (consultaData) => {
-        const respuesta = await clinicksApi.post('/consultas', consultaData);
+    registrarConsulta: async (consulta) => {
+        const respuesta = await clinicksApi.post('/consultas', consulta);
         return respuesta.data;
     },
 

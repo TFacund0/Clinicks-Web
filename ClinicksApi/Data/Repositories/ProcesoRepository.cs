@@ -22,32 +22,29 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<Procedimiento> CrearProcedimientoYTurnoVinculado(Procedimiento procedimiento, Turno turno)
+        public async Task<Procedimiento> RegistrarProcedimiento(Procedimiento procedimiento)
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            _context.Procedimientos.Add(procedimiento);
+            await _context.SaveChangesAsync();
+            return procedimiento;
+        }
+
+        /// <inheritdoc/>
+        public async Task CrearTurnoVinculado(Turno turno)
+        {
+            _context.Turnos.Add(turno);
+            await _context.SaveChangesAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task ActualizarTurnoVinculado(int idTurno, int idProcedimiento)
+        {
+            var turno = await _context.Turnos.FirstOrDefaultAsync(t => t.IdTurno == idTurno);
+            if (turno != null)
             {
-                // 1. Guardar el procedimiento
-                _context.Procedimientos.Add(procedimiento);
-                await _context.SaveChangesAsync(); // Guarda y obtiene el ID autoincremental de procedimiento
-
-                // 2. Vincular el ID del procedimiento generado al Turno
-                turno.IdProcedimiento = procedimiento.IdProcedimiento;
-
-                // 3. Guardar el turno
-                _context.Turnos.Add(turno);
+                turno.IdProcedimiento = idProcedimiento;
+                turno.IdEstadoTurno = 1; // Realizado
                 await _context.SaveChangesAsync();
-
-                // 4. Confirmar la transacción
-                await transaction.CommitAsync();
-
-                return procedimiento;
-            }
-            catch (Exception)
-            {
-                // Revertir cambios en caso de error
-                await transaction.RollbackAsync();
-                throw;
             }
         }
 

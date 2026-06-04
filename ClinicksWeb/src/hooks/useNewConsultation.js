@@ -4,16 +4,17 @@ import consultaService from '../services/consultaService';
 import { useNavigate } from 'react-router-dom';
 import { extraerMensajeError } from '../utils/errorUtils';
 
-export const useNewConsultation = (dniInicial = '') => {
+export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
     // 1. Estado del formulario
     const [formData, setFormData] = useState({
         dnipaciente: dniInicial,
         motivo: '',
-        fechaconsulta: '',
+        fechaconsulta: new Date().toISOString().split('T')[0],
         diagnostico: '',
         tratamiento: '',
         observaciones: '',
         recomendacion: '',
+        idturno: idTurnoInicial,
     });
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
@@ -80,12 +81,12 @@ export const useNewConsultation = (dniInicial = '') => {
                 fechaconsulta: formData.fechaconsulta || null
             };
 
-            await consultaService.crearConsulta(dataLimpia);
+            await consultaService.registrarConsulta(dataLimpia);
 
             if (isMounted.current) {
                 setShowSuccess(true);
                 addTimer(() => { if(isMounted.current) setShowSuccess(false); }, 3000);
-                setFormData({ dnipaciente: '', motivo: '', fechaconsulta: '', diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '' });
+                setFormData({ dnipaciente: '', motivo: '', fechaconsulta: new Date().toISOString().split('T')[0], diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '', idturno: null });
                 addTimer(() => { if(isMounted.current) navigate('/dashboard'); }, 1500);
             }
         } catch (error) {
@@ -103,13 +104,15 @@ export const useNewConsultation = (dniInicial = '') => {
         setFormData({
             dnipaciente: '',
             motivo: '',
-            fechaconsulta: '',
+            fechaconsulta: new Date().toISOString().split('T')[0],
             diagnostico: '',
             tratamiento: '',
             observaciones: '',
             recomendacion: '',
+            idturno: null,
         });
         setErrors({});
+        navigate('/acceso-consulta');
     };
 
     return {

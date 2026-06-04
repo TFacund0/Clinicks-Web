@@ -34,6 +34,6 @@ namespace ClinicksApi.Business.Interfaces
         /// <c>Message</c> (string): mensaje descriptivo del resultado.
         /// <c>Data</c> (<see cref="ConsultaMedica"/>?): la entidad guardada, o null si hubo un error.
         /// </returns>
-        Task<(bool Success, string Message, ConsultaMedica? Data)> RegistrarConsulta(ConsultaAltaDto dto, int idMedicoLogueado);
+        Task<(bool Success, string Message, ConsultaMedica? Data)> RegistrarConsulta(ConsultaAltaDto consulta, int idMedicoLogueado);
     }
 }

@@ -24,9 +24,9 @@ namespace ClinicksApi.Business.Services
         /// <summary>
         /// Lógica de negocio para buscar a los pacientes asignados a un médico.
         /// </summary>
-        public async Task<IEnumerable<PacienteDto>> ObtenerAtendidosPorMedico(int medicoId, string? searchTerm = null)
+        public async Task<IEnumerable<PacienteDto>> ObtenerAtendidosPorMedico(int medicoId, string? search = null)
         {
-            var datos = await _repository.GetAtendidosByMedicoAsync(medicoId, searchTerm);
+            var datos = await _repository.ObtenerAtendidosPorMedico(medicoId, search);
             return datos.Select(MapToDto);
         }
 
@@ -91,16 +91,9 @@ namespace ClinicksApi.Business.Services
         /// <summary>
         /// Verifica la existencia de un paciente por su DNI.
         /// </summary>
-        public async Task<(bool Success, string Message)> ExistePaciente(string dni)
+        public async Task<PacienteDto?> ValidarPaciente(string dni)
         { 
-            var existe = await _repository.ExistePacientePorDniAsync(dni);
-
-            if (existe)
-            {
-                return (true, "Paciente encontrado");
-            }
-
-            return (false, "Paciente no encontrado");
+            return await ObtenerPorDni(dni);
         }
     }
 }

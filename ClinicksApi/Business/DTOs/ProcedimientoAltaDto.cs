@@ -7,7 +7,7 @@ namespace ClinicksApi.Business.DTOs
     /// Las propiedades marcadas con <see cref="RequiredAttribute"/> son validadas automáticamente por ASP.NET
     /// antes de llegar al Controlador, gracias al check de <c>ModelState.IsValid</c>.
     /// </summary>
-    public class ProcesoAltaDto
+    public class ProcedimientoAltaDto
     {
         /// <summary>DNI del paciente al que se le realiza el procedimiento. Campo obligatorio.</summary>
         [Required(ErrorMessage = "El DNI del paciente es obligatorio")]
@@ -31,5 +31,8 @@ namespace ClinicksApi.Business.DTOs
 
         /// <summary>Resultado o conclusión del procedimiento. Opcional; si se omite, se registra como "Sin resultado ingresado".</summary>
         public string? resultado { get; set; }
+
+        /// <summary>ID opcional del turno que se está atendiendo para vincularlo a este procedimiento.</summary>
+        public int? idturno { get; set; }
     }
 }

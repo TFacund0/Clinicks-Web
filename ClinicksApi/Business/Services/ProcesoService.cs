@@ -16,6 +16,7 @@ namespace ClinicksApi.Business.Services
         private readonly IProcesoRepository _procesoRepo;
         private readonly IPacienteService _pacienteService;
         private readonly ILogger<ProcesoService> _logger;
+        
         /// <param name="pacienteService">Servicio para verificar la existencia del paciente por DNI antes de registrar.</param>
         /// <param name="logger">Logger de diagnóstico del servicio.</param>
         public ProcesoService(IProcesoRepository procesoRepo, IPacienteService pacienteService, ILogger<ProcesoService> logger)
@@ -25,57 +26,59 @@ namespace ClinicksApi.Business.Services
             _logger = logger;
         }
 
-        /// <inheritdoc/>
-        public async Task<(bool Success, string Message, Procedimiento? Data)> RegistrarProceso(ProcesoAltaDto dto, int idMedicoLogueado)
+        public async Task<(bool Success, string Message, Procedimiento? Data)> RegistrarProcedimiento(ProcedimientoAltaDto procedimiento, int idMedicoLogueado)
         {
             try
             {
                 // 1. REGLAS DE NEGOCIO — Validaciones (los campos obligatorios ya se validan en el DTO).
                 if (idMedicoLogueado <= 0)
                     return (false, "El médico logueado es inválido.", null);
-
-                // 2. VERIFICACIÓN CRUZADA — Validamos que el DNI del paciente exista en el sistema.
-                // A través del IPacienteService para respetar la separación de incumbencias (SoC).
-                var pacienteDto = await _pacienteService.ObtenerPorDni(dto.dnipaciente);
+ 
+                var pacienteDto = await _pacienteService.ValidarPaciente(procedimiento.dnipaciente);
                 if (pacienteDto == null)
                     return (false, "Paciente no encontrado en la base de datos o no apto para procedimientos.", null);
-
+ 
                 // Si no se envió fecha, usamos la fecha y hora actual del servidor.
-                var fechaAUsar = dto.fechaproceso ?? DateTime.Now;
-
+                var fechaAUsar = procedimiento.fechaproceso ?? DateTime.Now;
+  
                 // 3. MAPEO — Construimos la entidad Procedimiento a partir del DTO del frontend.
                 var nuevoProcedimiento = new Procedimiento
                 {
-                    Tipo        = dto.tipoproceso,
-                    Descripcion = dto.descripcion,
-                    Resultado   = dto.resultado ?? "Sin resultado ingresado",
+                    Tipo        = procedimiento.tipoproceso,
+                    Descripcion = procedimiento.descripcion,
+                    Resultado   = procedimiento.resultado ?? "Sin resultado ingresado",
                     Fecha       = fechaAUsar
                 };
 
-                // 4. PREPARACIÓN DEL TURNO VINCULADO
-                // El estado "Realizado" tiene ID = 1 y ya está garantizado por el DbInitializer al iniciar la app.
-                int idEstadoHecho = 1;
+                var procGuardado = await _procesoRepo.RegistrarProcedimiento(nuevoProcedimiento);
 
-                // Construimos el Turno que une el procedimiento con el paciente y el médico.
-                var nuevoTurno = new Turno
+                if (procedimiento.idturno.HasValue && procedimiento.idturno.Value > 0)
                 {
-                    IdPaciente      = pacienteDto.Id,
-                    IdMedico        = idMedicoLogueado,
-                    IdEstadoTurno   = idEstadoHecho,
-                    FechaTurno      = fechaAUsar,
-                    Motivo          = $"Procedimiento: {dto.tipoproceso}"
-                };
+                    await _procesoRepo.ActualizarTurnoVinculado(procedimiento.idturno.Value, procGuardado.IdProcedimiento);
+                }
+                else
+                {
+                    int idEstadoHecho = 1; // ID 1 representa el estado "Realizado"
+                    var nuevoTurno = new Turno
+                    {
+                        IdPaciente      = pacienteDto.Id,
+                        IdMedico        = idMedicoLogueado,
+                        IdEstadoTurno   = idEstadoHecho,
+                        FechaTurno      = fechaAUsar,
+                        Motivo          = $"Procedimiento: {procedimiento.tipoproceso}",
+                        IdProcedimiento = procGuardado.IdProcedimiento
+                    };
 
-                // 5. GUARDADO ATÓMICO (TRANSACCIONAL) — Persistimos procedimiento y turno en una sola transacción
-                var procGuardado = await _procesoRepo.CrearProcedimientoYTurnoVinculado(nuevoProcedimiento, nuevoTurno);
-
-                return (true, "Procedimiento guardado y vinculado con éxito.", procGuardado);
+                    await _procesoRepo.CrearTurnoVinculado(nuevoTurno);
+                }
+  
+                return (true, "Procedimiento registrado exitosamente", procGuardado);
             }
             catch (Exception ex)
             {
                 // Capturamos la causa raíz del error de base de datos en el log interno sin exponerla al cliente.
-                _logger.LogError(ex, "Error al registrar proceso médico. Paciente DNI: {DniPaciente}", dto.dnipaciente);
-                return (false, "Error interno al registrar el proceso en el sistema. Por favor, intente nuevamente más tarde.", null);
+                _logger.LogError(ex, "Error al registrar el procedimiento médico. Paciente DNI: {DniPaciente}", procedimiento.dnipaciente);
+                return (false, "Error interno al registrar el procedimiento médico. Por favor, intente nuevamente más tarde.", null);
             }
         }
 

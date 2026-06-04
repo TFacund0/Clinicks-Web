@@ -39,7 +39,7 @@ namespace ClinicksApi.Controllers
         /// <see cref="UnauthorizedResult"/> (401) si el token JWT no es válido o no se proporcionó.
         /// </returns>
         [HttpPost]
-        public async Task<IActionResult> RegistrarConsulta([FromBody] ConsultaAltaDto dto)
+        public async Task<IActionResult> RegistrarConsulta([FromBody] ConsultaAltaDto consulta)
         {
             // Lee el ID del médico directamente del Token JWT (claim "idMedico") usando el método de extensión para evitar suplantaciones.
             var idMedico = User.GetMedicoId();
@@ -47,7 +47,7 @@ namespace ClinicksApi.Controllers
                 return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
 
             // Delega la validación completa y el guardado en base de datos al servicio de negocio.
-            var resultado = await _consultaService.RegistrarConsulta(dto, idMedico.Value);
+            var resultado = await _consultaService.RegistrarConsulta(consulta, idMedico.Value);
 
             if (resultado.Success)
             {

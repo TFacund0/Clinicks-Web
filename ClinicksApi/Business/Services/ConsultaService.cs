@@ -17,6 +17,7 @@ namespace ClinicksApi.Business.Services
         private readonly IConsultaRepository _consultaRepo;
         private readonly IPacienteService _pacienteService;
         private readonly ILogger<ConsultaService> _logger;
+        
         /// <param name="pacienteService">Servicio para verificar la existencia del paciente por DNI antes de registrar.</param>
         /// <param name="logger">Logger de diagnóstico del servicio.</param>
         public ConsultaService(IConsultaRepository consultaRepo, IPacienteService pacienteService, ILogger<ConsultaService> logger)
@@ -60,50 +61,59 @@ namespace ClinicksApi.Business.Services
             }).ToList();
         }
 
-        /// <inheritdoc/>
-        public async Task<(bool Success, string Message, ConsultaMedica? Data)> RegistrarConsulta(ConsultaAltaDto dto, int idMedicoLogueado)
+        public async Task<(bool Success, string Message, ConsultaMedica? Data)> RegistrarConsulta(ConsultaAltaDto consulta, int idMedicoLogueado)
         {
             try
             {
-                // 1. REGLAS DE NEGOCIO — Validaciones de negocio (los campos obligatorios ya se validan en el DTO).
-                // Prevenimos viajes en el tiempo: la fecha no puede ser del futuro.
-                if (dto.fechaconsulta != null && dto.fechaconsulta > DateTime.Now)
+                if (consulta.fechaconsulta != null && consulta.fechaconsulta > DateTime.Now)
                     return (false, "La fecha de consulta no puede ser futura.", null);
-
-                // El médico debe ser válido y provenir del Token JWT.
+ 
                 if (idMedicoLogueado <= 0)
                     return (false, "El Id del Médico logueado es obligatorio y debe ser mayor a cero.", null);
 
-                // 2. VERIFICACIÓN CRUZADA — Validamos que el DNI ingresado exista realmente en el sistema.
-                // Lo hacemos a través de IPacienteService para respetar SoC y aplicar sus reglas de negocio.
-                var pacienteDto = await _pacienteService.ObtenerPorDni(dto.dnipaciente);
+                var pacienteDto = await _pacienteService.ObtenerPorDni(consulta.dnipaciente);
                 if (pacienteDto == null)
                     return (false, "Paciente no encontrado o no apto para consultas.", null);
-
-                // 3. MAPEO — Convertimos el DTO (JSON de React) en una Entidad que entiende Entity Framework.
+ 
                 var nuevaConsulta = new ConsultaMedica
                 {
-                    Motivo          = dto.motivo,
-                    Diagnostico     = dto.diagnostico,
-                    // Si el frontend no mandó estos campos, usamos valores por defecto con el operador "??".
-                    Tratamiento     = dto.tratamiento   ?? "sin definir",
-                    Observacion     = dto.observaciones ?? "sin observaciones relevantes",
-                    Recomendacion   = dto.recomendacion ?? "sin recomendaciones",
-                    FechaConsulta   = dto.fechaconsulta ?? DateTime.Now,
+                    Motivo          = consulta.motivo,
+                    Diagnostico     = consulta.diagnostico,
+                    Tratamiento     = consulta.tratamiento   ?? "sin definir",
+                    Observacion     = consulta.observaciones ?? "sin observaciones relevantes",
+                    Recomendacion   = consulta.recomendacion ?? "sin recomendaciones",
+                    FechaConsulta   = consulta.fechaconsulta ?? DateTime.Now,
                     IdMedico        = idMedicoLogueado,
-                    // Usamos el ID real de la BD proveído por el DTO; no confiamos en el DNI como identificador.
                     IdPaciente      = pacienteDto.Id
                 };
 
-                // 4. GUARDADO — El repositorio ejecuta el INSERT en PostgreSQL.
-                var resultado = await _consultaRepo.CrearConsulta(nuevaConsulta);
+                var resultado = await _consultaRepo.RegistrarConsulta(nuevaConsulta);
 
-                return (true, "Consulta registrada con éxito.", resultado);
+                if (consulta.idturno.HasValue && consulta.idturno.Value > 0)
+                {
+                    await _consultaRepo.ActualizarTurnoVinculado(consulta.idturno.Value, resultado.IdConsulta);
+                }
+                else
+                {
+                    int idEstadoHecho = 1; // ID 1 representa el estado "Realizado"
+                    var nuevoTurno = new Turno
+                    {
+                        IdPaciente      = pacienteDto.Id,
+                        IdMedico        = idMedicoLogueado,
+                        IdEstadoTurno   = idEstadoHecho,
+                        FechaTurno      = nuevaConsulta.FechaConsulta ?? DateTime.Now,
+                        Motivo          = $"Consulta: {consulta.motivo}",
+                        IdConsulta      = resultado.IdConsulta
+                    };
+
+                    await _consultaRepo.CrearTurnoVinculado(nuevoTurno);
+                }
+
+                return (true, "Consulta registrada exitosamente", resultado);
             }
             catch (Exception ex)
             {
-                // Capturamos la causa raíz del error de base de datos en el log interno sin exponerla al cliente.
-                _logger.LogError(ex, "Error al registrar la consulta médica. Paciente DNI: {DniPaciente}", dto.dnipaciente);
+                _logger.LogError(ex, "Error al registrar la consulta médica. Paciente DNI: {DniPaciente}", consulta.dnipaciente);
                 return (false, "Error interno al registrar la consulta médica. Por favor, intente nuevamente más tarde.", null);
             }
         }

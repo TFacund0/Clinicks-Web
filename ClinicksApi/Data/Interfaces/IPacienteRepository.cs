@@ -21,10 +21,10 @@ namespace ClinicksApi.Data.Interfaces
         /// atendidos por un médico específico y que su turno tenga un estado en particular.
         /// </summary>
         /// <param name="medicoId">Primary key del médico a filtrar.</param>
-        /// <param name="searchTerm">Texto opcional para buscar por nombre, apellido o DNI.</param>
-        Task<IEnumerable<Paciente>> GetAtendidosByMedicoAsync(int medicoId, string? searchTerm = null);
+        /// <param name="search">Texto opcional para buscar por nombre, apellido o DNI.</param>
+        Task<IEnumerable<Paciente>> ObtenerAtendidosPorMedico(int medicoId, string? search = null);
 
         /// <summary>Verifica si existe un paciente registrado con el DNI proporcionado.</summary>
-        Task<bool> ExistePacientePorDniAsync(string dni);
+        Task<bool> ValidarPaciente(string dni);
     }
 }

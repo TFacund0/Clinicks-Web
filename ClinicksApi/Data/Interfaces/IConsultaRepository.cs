@@ -28,7 +28,7 @@ namespace ClinicksApi.Data.Interfaces
         /// </summary>
         /// <param name="consulta">La entidad <see cref="ConsultaMedica"/> ya construida y validada por el Servicio.</param>
         /// <returns>La entidad guardada con el ID asignado por la base de datos.</returns>
-        Task<ConsultaMedica> CrearConsulta(ConsultaMedica consulta);
+        Task<ConsultaMedica> RegistrarConsulta(ConsultaMedica consulta);
 
         /// <summary>
         /// Garantiza que un estado de turno con el nombre indicado exista en la base de datos y retorna su ID.
@@ -42,5 +42,12 @@ namespace ClinicksApi.Data.Interfaces
         /// </summary>
         /// <param name="turno">El Turno a guardar.</param>
         Task CrearTurnoVinculado(Turno turno);
+
+        /// <summary>
+        /// Asocia una consulta a un Turno existente y lo marca como Realizado.
+        /// </summary>
+        /// <param name="idTurno">El identificador del turno a actualizar.</param>
+        /// <param name="idConsulta">El identificador de la consulta a asociar.</param>
+        Task ActualizarTurnoVinculado(int idTurno, int idConsulta);
     }
 }

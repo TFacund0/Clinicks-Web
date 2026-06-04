@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import procesoService from '../services/procesoService';
 import { extraerMensajeError } from '../utils/errorUtils';
 
-export const useNewProcess = (dniInicial = '') => {
+export const useNewProcess = (dniInicial = '', idTurnoInicial = null) => {
     const navigate = useNavigate();
     const [tiposDisponibles, setTiposDisponibles] = useState([]);
     const [formData, setFormData] = useState({
@@ -13,6 +13,7 @@ export const useNewProcess = (dniInicial = '') => {
         descripcion: '',
         fechaproceso: new Date().toISOString().split('T')[0],
         resultado: '',
+        idturno: idTurnoInicial,
     });
     const [errors, setErrors] = useState({});
     const [showSuccess, setShowSuccess] = useState(false);
@@ -73,7 +74,7 @@ export const useNewProcess = (dniInicial = '') => {
                 ...formData,
                 fechaproceso: formData.fechaproceso || null
             };
-            await procesoService.crearProceso(dataLimpia);
+            await procesoService.registrarProcedimiento(dataLimpia);
             if (isMounted.current) {
                 setShowSuccess(true);
                 addTimer(() => { if (isMounted.current) setShowSuccess(false); }, 3000);
@@ -91,13 +92,15 @@ export const useNewProcess = (dniInicial = '') => {
 
     const handleCancel = () => {
         setFormData({
-            ...formData,
+            dnipaciente: '',
             tipoproceso: '',
             descripcion: '',
             fechaproceso: new Date().toISOString().split('T')[0],
-            resultado: ''
+            resultado: '',
+            idturno: null
         });
         setErrors({});
+        navigate('/acceso-procedimiento');
     };
 
     const cargarTiposDisponibles = async () => {

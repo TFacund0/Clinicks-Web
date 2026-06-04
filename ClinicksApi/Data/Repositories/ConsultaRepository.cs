@@ -39,7 +39,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<ConsultaMedica> CrearConsulta(ConsultaMedica consulta)
+        public async Task<ConsultaMedica> RegistrarConsulta(ConsultaMedica consulta)
         {
             _context.ConsultaMedicas.Add(consulta);
             await _context.SaveChangesAsync();
@@ -73,6 +73,18 @@ namespace ClinicksApi.Data.Repositories
         {
             _context.Turnos.Add(turno);
             await _context.SaveChangesAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task ActualizarTurnoVinculado(int idTurno, int idConsulta)
+        {
+            var turno = await _context.Turnos.FirstOrDefaultAsync(t => t.IdTurno == idTurno);
+            if (turno != null)
+            {
+                turno.IdConsulta = idConsulta;
+                turno.IdEstadoTurno = 1; // Realizado
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }
