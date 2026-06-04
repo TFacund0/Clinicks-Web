@@ -19,7 +19,7 @@ namespace ClinicksApi.Data
                 // Asegurar que la base de datos esté creada (y aplicar migraciones si corresponde)
                 // context.Database.Migrate(); // Opcional, pero útil si se ejecuta en entornos nuevos.
                 
-                // 1. Garantizar que el estado de turno 'Realizado' exista.
+                // 1. Garantizar que el estado de turno 'Realizado' (ID = RealizadoId) exista.
                 var existeRealizado = await context.EstadoTurnos.AnyAsync(e => e.IdEstadoTurno == ConstantesGenerales.EstadosTurno.RealizadoId);
                 if (!existeRealizado)
                 {
