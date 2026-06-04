@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ClinicksApi.Data.Entities;
+using ClinicksApi.Constants;
 
 namespace ClinicksApi.Data
 {
@@ -18,20 +19,20 @@ namespace ClinicksApi.Data
                 // Asegurar que la base de datos esté creada (y aplicar migraciones si corresponde)
                 // context.Database.Migrate(); // Opcional, pero útil si se ejecuta en entornos nuevos.
                 
-                // 1. Garantizar que el estado de turno 'Realizado' (ID = 1) exista.
-                var existeRealizado = await context.EstadoTurnos.AnyAsync(e => e.IdEstadoTurno == 1);
+                // 1. Garantizar que el estado de turno 'Realizado' exista.
+                var existeRealizado = await context.EstadoTurnos.AnyAsync(e => e.IdEstadoTurno == ConstantesGenerales.EstadosTurno.RealizadoId);
                 if (!existeRealizado)
                 {
-                    var realizado = new EstadoTurno { IdEstadoTurno = 1, Nombre = "Realizado" };
+                    var realizado = new EstadoTurno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.RealizadoId, Nombre = "Realizado" };
                     context.EstadoTurnos.Add(realizado);
-                    Console.WriteLine("[DB INITIALIZER] Seed de Estado de Turno 'Realizado' (ID = 1) agregado.");
+                    Console.WriteLine($"[DB INITIALIZER] Seed de Estado de Turno 'Realizado' (ID = {ConstantesGenerales.EstadosTurno.RealizadoId}) agregado.");
                 }
 
                 // 2. Garantizar que el estado de turno 'Atendido' (buscado por PacienteRepository) exista.
-                var existeAtendido = await context.EstadoTurnos.AnyAsync(e => e.Nombre.ToLower() == "atendido");
+                var existeAtendido = await context.EstadoTurnos.AnyAsync(e => e.IdEstadoTurno == ConstantesGenerales.EstadosTurno.AtendidoId);
                 if (!existeAtendido)
                 {
-                    var atendido = new EstadoTurno { Nombre = "Atendido" };
+                    var atendido = new EstadoTurno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.AtendidoId, Nombre = "Atendido" };
                     context.EstadoTurnos.Add(atendido);
                     Console.WriteLine("[DB INITIALIZER] Seed de Estado de Turno 'Atendido' agregado.");
                 }

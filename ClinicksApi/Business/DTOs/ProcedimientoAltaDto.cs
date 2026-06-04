@@ -32,7 +32,7 @@ namespace ClinicksApi.Business.DTOs
         /// <summary>Resultado o conclusión del procedimiento. Opcional; si se omite, se registra como "Sin resultado ingresado".</summary>
         public string? resultado { get; set; }
 
-        /// <summary>ID opcional del turno que se está atendiendo para vincularlo a este procedimiento.</summary>
-        public int? idturno { get; set; }
+        /// <summary>ID opcional del Turno pre-existente que se asocia a este procedimiento.</summary>
+        public int? idTurno { get; set; }
     }
 }

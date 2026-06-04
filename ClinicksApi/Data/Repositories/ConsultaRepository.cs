@@ -1,5 +1,7 @@
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
+using ClinicksApi.Data.Interfaces;
+using ClinicksApi.Constants;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClinicksApi.Data.Repositories
@@ -28,16 +30,6 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<List<ConsultaMedica>> HistorialPaciente(int pacienteId)
-        {
-            return await _context.ConsultaMedicas
-                .AsNoTracking()
-                .Where(c => c.IdPaciente == pacienteId)
-                .Include(c => c.IdMedicoNavigation) // JOIN con la tabla medico para traer nombre y apellido
-                .OrderByDescending(c => c.FechaConsulta)
-                .ToListAsync();
-        }
-
         /// <inheritdoc/>
         public async Task<ConsultaMedica> RegistrarConsulta(ConsultaMedica consulta)
         {
@@ -46,27 +38,7 @@ namespace ClinicksApi.Data.Repositories
             return consulta;
         }
 
-        /// <inheritdoc/>
-        public async Task<int> AsegurarEstadoTurnoExiste(string nombreEstado)
-        {
-            var estadoExistente = await _context.EstadoTurnos
-                .FirstOrDefaultAsync(e => e.Nombre.ToLower() == nombreEstado.ToLower());
-            
-            if (estadoExistente != null)
-            {
-                return estadoExistente.IdEstadoTurno;
-            }
 
-            var nuevoEstado = new EstadoTurno
-            {
-                Nombre = nombreEstado
-            };
-
-            _context.EstadoTurnos.Add(nuevoEstado);
-            await _context.SaveChangesAsync();
-
-            return nuevoEstado.IdEstadoTurno;
-        }
 
         /// <inheritdoc/>
         public async Task CrearTurnoVinculado(Turno turno)
@@ -82,7 +54,7 @@ namespace ClinicksApi.Data.Repositories
             if (turno != null)
             {
                 turno.IdConsulta = idConsulta;
-                turno.IdEstadoTurno = 1; // Realizado
+                turno.IdEstadoTurno = ConstantesGenerales.EstadosTurno.RealizadoId;
                 await _context.SaveChangesAsync();
             }
         }

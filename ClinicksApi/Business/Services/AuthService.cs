@@ -27,7 +27,7 @@ namespace ClinicksApi.Business.Services
         /// <inheritdoc/>
         public async Task<LoginResponseDto?> AuthenticateAsync(string username, string password)
         {
-            // PASO 1: Buscar el usuario por username o matrícula (fallback coordinado en la capa de servicios)
+            // Buscar el usuario por username o matrícula (fallback coordinado en la capa de servicios)
             var usuario = await _authRepository.GetUsuarioByUsernameAsync(username);
 
             if (usuario == null)
@@ -35,14 +35,14 @@ namespace ClinicksApi.Business.Services
                 usuario = await _authRepository.GetUsuarioByMedicoMatriculaAsync(username);
             }
 
-            if (usuario == null) 
+            if (usuario == null)
             {
                 return null;
             }
 
-            // PASO 2: Verificar contraseña
+            // Verificar contraseña
             bool isPasswordValid = false;
-            
+
             string dbPassword = usuario.Password?.Trim() ?? "";
             string inputPassword = password?.Trim() ?? "";
 
@@ -52,20 +52,17 @@ namespace ClinicksApi.Business.Services
             }
             catch (Exception)
             {
-                // VULNERABILIDAD CRÍTICA PARCHEADA:
-                // Jamás hacer fallback a texto plano si falla la verificación del hash.
                 isPasswordValid = false;
             }
 
-            if (!isPasswordValid) 
+            if (!isPasswordValid)
             {
                 return null;
             }
 
-            // PASO 3: Buscar al médico vinculado
+            // Buscar al médico vinculado
             var medico = await _authRepository.GetMedicoByUsuarioIdAsync(usuario.IdUsuario);
 
-            // CORRECCIÓN DE SEGURIDAD CRÍTICA:
             // Si el usuario no tiene médico vinculado, rechazamos el login de inmediato en lugar de usar un fallback
             // que suplantaría la identidad de otro médico.
             if (medico == null)
@@ -73,16 +70,16 @@ namespace ClinicksApi.Business.Services
                 return null;
             }
 
-            // PASO 4: Generar el Token JWT usando el servicio abstraído
+            // Generar el Token JWT usando el servicio abstraído
             var tokenString = _tokenService.GenerateToken(medico);
 
             return new LoginResponseDto
             {
-                IdMedico  = medico.IdMedico,
-                Nombre    = medico.Nombre,
-                Apellido  = medico.Apellido,
+                IdMedico = medico.IdMedico,
+                Nombre = medico.Nombre,
+                Apellido = medico.Apellido,
                 Matricula = medico.Matricula,
-                Token     = tokenString
+                Token = tokenString
             };
         }
 

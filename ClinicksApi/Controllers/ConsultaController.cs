@@ -65,28 +65,5 @@ namespace ClinicksApi.Controllers
             });
         }
 
-        /// <summary>
-        /// Obtiene el historial clínico completo de un paciente ordenado por fecha descendente.
-        /// </summary>
-        /// <param name="pacienteId">El ID numérico del paciente (extraído de la URL, ej: /api/consultas/historial/5).</param>
-        /// <returns>
-        /// <see cref="OkResult"/> (200) con la lista de consultas del paciente (puede ser vacía si no tiene).
-        /// <see cref="BadRequestResult"/> (400) si el ID proporcionado es inválido (menor o igual a cero).
-        /// </returns>
-        [HttpGet("historial/{pacienteId}")]
-        public async Task<IActionResult> GetHistorial(int pacienteId)
-        {
-            if (pacienteId <= 0)
-            {
-                return BadRequest(new
-                {
-                    success = false,
-                    mensaje = "El Id del paciente debe ser mayor a cero."
-                });
-            }
-
-            var historial = await _consultaService.ObtenerHistorialPaciente(pacienteId);
-            return Ok(historial);
-        }
     }
 }

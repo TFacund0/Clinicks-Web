@@ -94,4 +94,18 @@ public class PacientesController : ControllerBase
             mensaje = "El DNI ingresado no corresponde a un paciente registrado." 
         });
     }
+
+    /// <summary>
+    /// Obtiene el historial clínico completo del paciente (datos, consultas y procesos) en una sola respuesta.
+    /// </summary>
+    /// <param name="id">El ID del paciente.</param>
+    [HttpGet("{id}/historial")]
+    public async Task<IActionResult> GetHistorialClinico(int id)
+    {
+        var historial = await _pacienteService.ObtenerHistorialClinico(id);
+        if (historial == null)
+            return NotFound(new { message = "Paciente no encontrado" });
+
+        return Ok(historial);
+    }
 }

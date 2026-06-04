@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import agendaService from '../services/agendaService';
-import pacienteService from '../services/pacienteService';
+import { ESTADOS_TURNO } from '../utils/constants';
 
 export const useAgenda = () => {
   const [vistaActual, setVistaActual] = useState('dia'); // 'dia', 'semana', 'mes'
@@ -10,15 +10,17 @@ export const useAgenda = () => {
   const [cargandoTurnos, setCargandoTurnos] = useState(true);
   const [busquedaTurno, setBusquedaTurno] = useState('');
 
+  const mesSeleccionado = fechaSeleccionada.getMonth();
+  const anioSeleccionado = fechaSeleccionada.getFullYear();
+
   // Efecto principal: Cargar datos cuando cambia el mes seleccionado
   useEffect(() => {
     const cargarDatos = async () => {
       try {
         setCargandoTurnos(true);
 
-        const fSel = new Date(fechaSeleccionada);
-        const primerDia = new Date(fSel.getFullYear(), fSel.getMonth(), 1);
-        const ultimoDia = new Date(fSel.getFullYear(), fSel.getMonth() + 1, 0);
+        const primerDia = new Date(anioSeleccionado, mesSeleccionado, 1);
+        const ultimoDia = new Date(anioSeleccionado, mesSeleccionado + 1, 0);
 
         const turnosBackend = await agendaService.obtenerMisTurnos(primerDia, ultimoDia);
         
@@ -34,7 +36,7 @@ export const useAgenda = () => {
             duracion: 20,
             tipo: "Consulta", 
             motivo: t.motivo || "Sin motivo especificado",
-            estado: t.estado || "Pendiente"
+            estado: t.estado || ESTADOS_TURNO.PENDIENTE
           };
         });
 
@@ -48,7 +50,7 @@ export const useAgenda = () => {
     };
 
     cargarDatos();
-  }, [fechaSeleccionada.getMonth(), fechaSeleccionada.getFullYear()]); 
+  }, [mesSeleccionado, anioSeleccionado]); 
 
   // Funciones de navegación
   const navegarTemporal = (direccion) => {

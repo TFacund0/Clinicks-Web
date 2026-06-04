@@ -1,10 +1,11 @@
 // src/pages/medico/Agenda.jsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/Sidebar';
 import Header from '../../components/Header';
 import { useAgenda } from '../../hooks/useAgenda';
 import { useAuth } from '../../context/AuthContext';
+import { ESTADOS_TURNO } from '../../utils/constants';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -121,32 +122,47 @@ const Agenda = () => {
   const estadisticasVista = useMemo(() => {
     return {
       totales: turnosFiltrados.length,
-      atendidos: turnosFiltrados.filter(t => t.estado === 'Atendido').length,
-      enEspera: turnosFiltrados.filter(t => t.estado === 'Confirmado' || t.estado === 'Pendiente' || t.estado === 'En Curso').length,
-      cancelados: turnosFiltrados.filter(t => t.estado === 'Cancelado' || t.estado === 'Rechazado').length
+      atendidos: turnosFiltrados.filter(t => t.estado === ESTADOS_TURNO.ATENDIDO).length,
+      enEspera: turnosFiltrados.filter(t => t.estado === ESTADOS_TURNO.CONFIRMADO || t.estado === ESTADOS_TURNO.PENDIENTE || t.estado === ESTADOS_TURNO.EN_CURSO).length,
+      cancelados: turnosFiltrados.filter(t => t.estado === ESTADOS_TURNO.CANCELADO || t.estado === ESTADOS_TURNO.RECHAZADO).length
     };
   }, [turnosFiltrados]);
 
   // ==========================================
   // CONTROLADORES DE ACCIONES MÉDICAS
   // ==========================================
+  const [showSelectionModal, setShowSelectionModal] = useState(false);
+  const [turnoParaAtencion, setTurnoParaAtencion] = useState(null);
+
   const iniciarAtencion = (turno) => {
     // Cambiamos el estado del turno a "En Curso" localmente para reflejar que está siendo atendido
     const actualizados = turnos.map(t => {
       if (t.id === turno.id) {
-        return { ...t, estado: 'En Curso' };
+        return { ...t, estado: ESTADOS_TURNO.EN_CURSO };
       }
       // Si había otro "En Curso", lo dejamos como Confirmado para que no haya dos simultáneos
-      if (t.estado === 'En Curso' && t.id !== turno.id) {
-        return { ...t, estado: 'Confirmado' };
+      if (t.estado === ESTADOS_TURNO.EN_CURSO && t.id !== turno.id) {
+        return { ...t, estado: ESTADOS_TURNO.CONFIRMADO };
       }
       return t;
     });
     guardarTurnos(actualizados);
 
-    // Redireccionamos a la pantalla correspondiente inyectando el DNI y el ID del turno en el state de react-router
-    const rutaDestino = turno.tipo === 'Procedimiento' ? '/nuevo-procedimiento' : '/nueva-consulta';
-    navigate(rutaDestino, { state: { dniIngresado: turno.pacienteDni, idTurno: turno.id } });
+    setTurnoParaAtencion(turno);
+    setShowSelectionModal(true);
+  };
+
+  const seleccionarAtencion = (tipoAtencion) => {
+    setShowSelectionModal(false);
+    if (turnoParaAtencion) {
+      const rutaDestino = tipoAtencion === 'Procedimiento' ? '/nuevo-procedimiento' : '/nueva-consulta';
+      navigate(rutaDestino, { 
+        state: { 
+          idTurno: turnoParaAtencion.id, 
+          dniIngresado: turnoParaAtencion.pacienteDni 
+        } 
+      });
+    }
   };
 
   const verHistorialClinico = (turno) => {
@@ -175,36 +191,36 @@ const Agenda = () => {
   // ==========================================
   const obtenerEstiloEstado = (estado) => {
     switch (estado) {
-      case 'Atendido':
+      case ESTADOS_TURNO.ATENDIDO:
         return {
           badge: 'bg-slate-800 text-slate-400 border-slate-700/50',
           card: 'border-slate-800 opacity-60 hover:opacity-100 bg-slate-900/30',
           dot: 'bg-slate-600',
           texto: 'text-slate-500 line-through'
         };
-      case 'Confirmado':
+      case ESTADOS_TURNO.CONFIRMADO:
         return {
           badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
           card: 'border-slate-800 hover:border-emerald-500/40 bg-slate-900/80 shadow-md shadow-emerald-950/5',
           dot: 'bg-emerald-400 animate-pulse',
           texto: 'text-slate-200 font-semibold'
         };
-      case 'En Curso':
+      case ESTADOS_TURNO.EN_CURSO:
         return {
           badge: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30 animate-pulse',
           card: 'border-cyan-500 bg-slate-900 shadow-lg shadow-cyan-950/20 border-l-4 ring-1 ring-cyan-500/20',
           dot: 'bg-cyan-400 ring-4 ring-cyan-500/25 animate-ping',
           texto: 'text-white font-bold'
         };
-      case 'Cancelado':
-      case 'Rechazado':
+      case ESTADOS_TURNO.CANCELADO:
+      case ESTADOS_TURNO.RECHAZADO:
         return {
           badge: 'bg-red-500/10 text-red-400 border-red-500/20',
           card: 'border-slate-800 opacity-40 bg-slate-950',
           dot: 'bg-red-500',
           texto: 'text-slate-600 line-through'
         };
-      case 'Pendiente':
+      case ESTADOS_TURNO.PENDIENTE:
       default:
         return {
           badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
@@ -247,6 +263,10 @@ const Agenda = () => {
                 {/* Tarjeta del Turno */}
                 <div 
                   onClick={() => setTurnoSeleccionado(turno)}
+                  onDoubleClick={(e) => {
+                    e.stopPropagation();
+                    iniciarAtencion(turno);
+                  }}
                   className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-4 ${estilo.card}`}
                 >
                   <div className="space-y-1">
@@ -294,20 +314,20 @@ const Agenda = () => {
                       <FileText size={16} />
                     </button>
                     
-                    {turno.estado !== 'Atendido' && turno.estado !== 'Cancelado' && (
+                    {turno.estado !== ESTADOS_TURNO.ATENDIDO && turno.estado !== ESTADOS_TURNO.CANCELADO && (
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
                           iniciarAtencion(turno);
                         }}
                         className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-md active:scale-95 ${
-                          turno.estado === 'En Curso'
+                          turno.estado === ESTADOS_TURNO.EN_CURSO
                           ? 'bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-cyan-500/15'
                           : 'bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 hover:border-cyan-500/20'
                         }`}
                       >
                         <Play size={12} fill="currentColor" />
-                        {turno.estado === 'En Curso' ? 'Retomar' : 'Iniciar'}
+                        {turno.estado === ESTADOS_TURNO.EN_CURSO ? 'Retomar' : 'Iniciar'}
                       </button>
                     )}
                   </div>
@@ -385,6 +405,10 @@ const Agenda = () => {
                       <div 
                         key={turno.id}
                         onClick={() => setTurnoSeleccionado(turno)}
+                        onDoubleClick={(e) => {
+                          e.stopPropagation();
+                          iniciarAtencion(turno);
+                        }}
                         className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all hover:scale-[1.02] ${estilo.card} text-xs`}
                       >
                         <div className="flex items-center justify-between mb-1.5">
@@ -817,9 +841,9 @@ const Agenda = () => {
                   </h4>
                   <div className="flex gap-2">
                     <button 
-                      onClick={() => cambiarEstadoTurno(turnoSeleccionado.id, 'Confirmado')}
+                      onClick={() => cambiarEstadoTurno(turnoSeleccionado.id, ESTADOS_TURNO.CONFIRMADO)}
                       className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all ${
-                        turnoSeleccionado.estado === 'Confirmado'
+                        turnoSeleccionado.estado === ESTADOS_TURNO.CONFIRMADO
                         ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                         : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
                       }`}
@@ -827,9 +851,9 @@ const Agenda = () => {
                       En Espera
                     </button>
                     <button 
-                      onClick={() => cambiarEstadoTurno(turnoSeleccionado.id, 'Atendido')}
+                      onClick={() => cambiarEstadoTurno(turnoSeleccionado.id, ESTADOS_TURNO.ATENDIDO)}
                       className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all ${
-                        turnoSeleccionado.estado === 'Atendido'
+                        turnoSeleccionado.estado === ESTADOS_TURNO.ATENDIDO
                         ? 'bg-slate-800 text-slate-400 border-slate-700'
                         : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
                       }`}
@@ -853,7 +877,7 @@ const Agenda = () => {
                   <FileText size={16} /> Ver Historial Clínico
                 </button>
 
-                {turnoSeleccionado.estado !== 'Atendido' && turnoSeleccionado.estado !== 'Cancelado' ? (
+                {turnoSeleccionado.estado !== ESTADOS_TURNO.ATENDIDO && turnoSeleccionado.estado !== ESTADOS_TURNO.CANCELADO ? (
                   <button
                     onClick={() => {
                       setTurnoSeleccionado(null);
@@ -861,15 +885,7 @@ const Agenda = () => {
                     }}
                     className="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-lg shadow-cyan-500/15"
                   >
-                    {turnoSeleccionado.tipo === 'Procedimiento' ? (
-                      <>
-                        <Activity size={16} /> Iniciar Procedimiento
-                      </>
-                    ) : (
-                      <>
-                        <ClipboardPlus size={16} /> Iniciar Consulta Médica
-                      </>
-                    )}
+                    <Play size={16} fill="currentColor" /> Iniciar Atención
                   </button>
                 ) : (
                   <div className="bg-slate-950 border border-slate-800/80 p-4 rounded-2xl text-center text-xs text-slate-500 font-semibold italic">
@@ -882,6 +898,77 @@ const Agenda = () => {
           </div>
         );
       })()}
+
+      {/* ==========================================
+          MODAL DE SELECCIÓN DE TIPO DE ATENCIÓN (CONSULTA VS PROCEDIMIENTO)
+          ========================================== */}
+      {showSelectionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl relative">
+            
+            {/* Botón cerrar */}
+            <button 
+              onClick={() => setShowSelectionModal(false)}
+              className="absolute top-4 right-4 p-2 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-slate-200 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            {/* Encabezado */}
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center text-cyan-400 mx-auto mb-4 border border-cyan-500/20">
+                <Play size={20} fill="currentColor" />
+              </div>
+              <h3 className="text-xl font-bold text-white">Iniciar Atención</h3>
+              <p className="text-xs text-slate-400 mt-2">
+                Seleccione el tipo de registro que desea realizar para el paciente.
+              </p>
+            </div>
+
+            {/* Opciones */}
+            <div className="space-y-4">
+              
+              {/* Opción 1: Consulta Médica */}
+              <button
+                onClick={() => seleccionarAtencion('Consulta')}
+                className="w-full p-4 bg-slate-950 hover:bg-slate-800/50 border border-slate-800 hover:border-cyan-500/30 rounded-2xl flex items-center gap-4 text-left transition-all group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <ClipboardPlus size={20} />
+                </div>
+                <div>
+                  <p className="font-bold text-slate-200 group-hover:text-cyan-400 transition-colors text-sm">Registrar Consulta Médica</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">Control de rutina, diagnóstico y receta de fármacos.</p>
+                </div>
+              </button>
+
+              {/* Opción 2: Procedimiento Médico */}
+              <button
+                onClick={() => seleccionarAtencion('Procedimiento')}
+                className="w-full p-4 bg-slate-950 hover:bg-slate-800/50 border border-slate-800 hover:border-purple-500/30 rounded-2xl flex items-center gap-4 text-left transition-all group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Activity size={20} />
+                </div>
+                <div>
+                  <p className="font-bold text-slate-200 group-hover:text-purple-400 transition-colors text-sm">Registrar Procedimiento</p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">Estudios, curaciones, cirugías menores u otros.</p>
+                </div>
+              </button>
+
+            </div>
+
+            {/* Cancelar */}
+            <button
+              onClick={() => setShowSelectionModal(false)}
+              className="w-full mt-6 py-3 bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-slate-300 font-bold rounded-xl text-xs transition-colors"
+            >
+              Cancelar
+            </button>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );

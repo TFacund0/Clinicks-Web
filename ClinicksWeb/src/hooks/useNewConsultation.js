@@ -14,7 +14,7 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
         tratamiento: '',
         observaciones: '',
         recomendacion: '',
-        idturno: idTurnoInicial,
+        idTurno: idTurnoInicial,
     });
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
@@ -34,9 +34,10 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
 
     useEffect(() => {
         isMounted.current = true;
+        const currentTimers = timersRef.current;
         return () => {
             isMounted.current = false;
-            timersRef.current.forEach(clearTimeout);
+            currentTimers.forEach(clearTimeout);
         };
     }, []);
 
@@ -78,7 +79,8 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
         try {
             const dataLimpia = {
                 ...formData,
-                fechaconsulta: formData.fechaconsulta || null
+                fechaconsulta: formData.fechaconsulta || null,
+                idTurno: formData.idTurno || null
             };
 
             await consultaService.registrarConsulta(dataLimpia);
@@ -86,7 +88,7 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
             if (isMounted.current) {
                 setShowSuccess(true);
                 addTimer(() => { if(isMounted.current) setShowSuccess(false); }, 3000);
-                setFormData({ dnipaciente: '', motivo: '', fechaconsulta: new Date().toISOString().split('T')[0], diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '', idturno: null });
+                setFormData({ dnipaciente: '', motivo: '', fechaconsulta: new Date().toISOString().split('T')[0], diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '', idTurno: null });
                 addTimer(() => { if(isMounted.current) navigate('/dashboard'); }, 1500);
             }
         } catch (error) {
@@ -109,7 +111,7 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
             tratamiento: '',
             observaciones: '',
             recomendacion: '',
-            idturno: null,
+            idTurno: null,
         });
         setErrors({});
         navigate('/acceso-consulta');

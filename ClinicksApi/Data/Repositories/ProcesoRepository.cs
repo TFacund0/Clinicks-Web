@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
+using ClinicksApi.Constants;
 
 namespace ClinicksApi.Data.Repositories
 {
@@ -36,14 +37,13 @@ namespace ClinicksApi.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        /// <inheritdoc/>
         public async Task ActualizarTurnoVinculado(int idTurno, int idProcedimiento)
         {
             var turno = await _context.Turnos.FirstOrDefaultAsync(t => t.IdTurno == idTurno);
             if (turno != null)
             {
                 turno.IdProcedimiento = idProcedimiento;
-                turno.IdEstadoTurno = 1; // Realizado
+                turno.IdEstadoTurno = ConstantesGenerales.EstadosTurno.RealizadoId;
                 await _context.SaveChangesAsync();
             }
         }

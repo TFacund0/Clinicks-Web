@@ -10,11 +10,6 @@ const consultaService = {
         return respuesta.data;
     },
 
-    // Recupera el historial clínico (consultas) de un paciente específico.
-    obtenerHistorialPaciente: async (pacienteId) => {
-        const respuesta = await clinicksApi.get(`/consultas/historial/${pacienteId}`);
-        return respuesta.data;
-    }
 };
 
 export default consultaService;

@@ -13,11 +13,6 @@ const procesoService = {
         return res.data;
     },
 
-    // Recupera el historial clínico de procedimientos de un paciente específico.
-    obtenerHistorialPaciente: async (pacienteId) => {
-        const respuesta = await clinicksApi.get(`/procesos/historial/${pacienteId}`);
-        return respuesta.data;
-    }
 };
 
 export default procesoService;

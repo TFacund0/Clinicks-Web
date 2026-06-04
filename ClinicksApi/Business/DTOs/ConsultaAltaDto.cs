@@ -35,7 +35,7 @@ namespace ClinicksApi.Business.DTOs
         [Required(ErrorMessage = "El DNI del paciente es obligatorio.")]
         public required string dnipaciente { get; set; }
 
-        /// <summary>ID opcional del turno que se está atendiendo para vincularlo a esta consulta.</summary>
-        public int? idturno { get; set; }
+        /// <summary>ID opcional del Turno pre-existente que se asocia a esta consulta.</summary>
+        public int? idTurno { get; set; }
     }
 }

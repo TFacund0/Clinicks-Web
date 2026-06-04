@@ -18,5 +18,8 @@ namespace ClinicksApi.Data.Interfaces
         /// <param name="fechaFin">La fecha de fin opcional para el filtro.</param>
         /// <returns>Una lista de turnos correspondientes al médico y período especificados.</returns>
         Task<IEnumerable<Turno>> GetTurnosByMedicoIdAsync(int idMedico, DateTime? fechaInicio, DateTime? fechaFin);
+
+        /// <summary>Obtiene un turno por su ID.</summary>
+        Task<Turno?> GetByIdAsync(int idTurno);
     }
 }

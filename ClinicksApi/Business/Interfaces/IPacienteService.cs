@@ -15,4 +15,5 @@ public interface IPacienteService
 
     Task<PacienteDto?> ObtenerPorDni(string dni);
     Task<PacienteDto?> ValidarPaciente(string dni);
+    Task<HistorialClinicoDto?> ObtenerHistorialClinico(int pacienteId);
 }

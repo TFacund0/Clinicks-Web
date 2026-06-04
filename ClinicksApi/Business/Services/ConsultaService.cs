@@ -3,6 +3,7 @@ using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
 using Microsoft.Extensions.Logging;
+using ClinicksApi.Constants;
 
 namespace ClinicksApi.Business.Services
 {
@@ -44,68 +45,59 @@ namespace ClinicksApi.Business.Services
             }).ToList();
         }
 
-        /// <inheritdoc/>
-        public async Task<List<ConsultaHistorialDto>> ObtenerHistorialPaciente(int pacienteId)
-        {
-            var consultas = await _consultaRepo.HistorialPaciente(pacienteId);
-            return consultas.Select(c => new ConsultaHistorialDto
-            {
-                IdConsulta = c.IdConsulta,
-                Motivo = c.Motivo,
-                Diagnostico = c.Diagnostico,
-                Tratamiento = c.Tratamiento ?? string.Empty,
-                Observacion = c.Observacion ?? string.Empty,
-                Recomendacion = c.Recomendacion ?? string.Empty,
-                FechaConsulta = c.FechaConsulta,
-                MedicoAtencion = c.IdMedicoNavigation != null ? $"{c.IdMedicoNavigation.Nombre} {c.IdMedicoNavigation.Apellido}" : "Médico Desconocido"
-            }).ToList();
-        }
-
-        public async Task<(bool Success, string Message, ConsultaMedica? Data)> RegistrarConsulta(ConsultaAltaDto consulta, int idMedicoLogueado)
+        public async Task<(bool Success, string Message, ConsultaMedica? Data)> RegistrarConsulta(ConsultaAltaDto dto, int idMedicoLogueado)
         {
             try
             {
-                if (consulta.fechaconsulta != null && consulta.fechaconsulta > DateTime.Now)
+                // 1. REGLAS DE NEGOCIO — Validaciones de negocio (los campos obligatorios ya se validan en el DTO).
+                // Prevenimos viajes en el tiempo: la fecha no puede ser del futuro.
+                if (dto.fechaconsulta != null && dto.fechaconsulta > DateTime.Now)
                     return (false, "La fecha de consulta no puede ser futura.", null);
- 
+
+                // El médico debe ser válido y provenir del Token JWT.
                 if (idMedicoLogueado <= 0)
                     return (false, "El Id del Médico logueado es obligatorio y debe ser mayor a cero.", null);
 
-                var pacienteDto = await _pacienteService.ObtenerPorDni(consulta.dnipaciente);
+                // 2. VERIFICACIÓN CRUZADA — Validamos que el DNI ingresado exista realmente en el sistema.
+                // Lo hacemos a través de IPacienteService para respetar SoC y aplicar sus reglas de negocio.
+                var pacienteDto = await _pacienteService.ObtenerPorDni(dto.dnipaciente);
                 if (pacienteDto == null)
                     return (false, "Paciente no encontrado o no apto para consultas.", null);
- 
+
+                // 3. MAPEO — Convertimos el DTO (JSON de React) en una Entidad que entiende Entity Framework.
                 var nuevaConsulta = new ConsultaMedica
                 {
-                    Motivo          = consulta.motivo,
-                    Diagnostico     = consulta.diagnostico,
-                    Tratamiento     = consulta.tratamiento   ?? "sin definir",
-                    Observacion     = consulta.observaciones ?? "sin observaciones relevantes",
-                    Recomendacion   = consulta.recomendacion ?? "sin recomendaciones",
-                    FechaConsulta   = consulta.fechaconsulta ?? DateTime.Now,
+                    Motivo          = dto.motivo,
+                    Diagnostico     = dto.diagnostico,
+                    // Si el frontend no mandó estos campos, usamos valores por defecto con el operador "??".
+                    Tratamiento     = dto.tratamiento   ?? "sin definir",
+                    Observacion     = dto.observaciones ?? "sin observaciones relevantes",
+                    Recomendacion   = dto.recomendacion ?? "sin recomendaciones",
+                    FechaConsulta   = dto.fechaconsulta ?? DateTime.Now,
                     IdMedico        = idMedicoLogueado,
+                    // Usamos el ID real de la BD proveído por el DTO; no confiamos en el DNI como identificador.
                     IdPaciente      = pacienteDto.Id
                 };
 
+                // 4. GUARDADO — El repositorio ejecuta el INSERT en PostgreSQL vinculándolo a un turno.
                 var resultado = await _consultaRepo.RegistrarConsulta(nuevaConsulta);
 
-                if (consulta.idturno.HasValue && consulta.idturno.Value > 0)
+                if (dto.idTurno.HasValue && dto.idTurno.Value > 0)
                 {
-                    await _consultaRepo.ActualizarTurnoVinculado(consulta.idturno.Value, resultado.IdConsulta);
+                    await _consultaRepo.ActualizarTurnoVinculado(dto.idTurno.Value, resultado.IdConsulta);
                 }
                 else
                 {
-                    int idEstadoHecho = 1; // ID 1 representa el estado "Realizado"
+                    int idEstadoHecho = ConstantesGenerales.EstadosTurno.RealizadoId;
                     var nuevoTurno = new Turno
                     {
                         IdPaciente      = pacienteDto.Id,
                         IdMedico        = idMedicoLogueado,
                         IdEstadoTurno   = idEstadoHecho,
                         FechaTurno      = nuevaConsulta.FechaConsulta ?? DateTime.Now,
-                        Motivo          = $"Consulta: {consulta.motivo}",
+                        Motivo          = $"Consulta: {dto.motivo}",
                         IdConsulta      = resultado.IdConsulta
                     };
-
                     await _consultaRepo.CrearTurnoVinculado(nuevoTurno);
                 }
 
@@ -113,7 +105,7 @@ namespace ClinicksApi.Business.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al registrar la consulta médica. Paciente DNI: {DniPaciente}", consulta.dnipaciente);
+                _logger.LogError(ex, "Error al registrar la consulta médica. Paciente DNI: {DniPaciente}", dto.dnipaciente);
                 return (false, "Error interno al registrar la consulta médica. Por favor, intente nuevamente más tarde.", null);
             }
         }

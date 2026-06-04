@@ -9,7 +9,6 @@ namespace ClinicksApi.Data.Interfaces
     {
         /// <summary>Ejecuta un SELECT * FROM Pacientes incluyendo las tablas relacionadas por defecto.</summary>
         Task<IEnumerable<Paciente>> GetAllAsync();
-
         /// <summary>Busca un paciente único por su Primary Key (IdPaciente).</summary>
         Task<Paciente?> GetByIdAsync(int id);
 
@@ -26,5 +25,7 @@ namespace ClinicksApi.Data.Interfaces
 
         /// <summary>Verifica si existe un paciente registrado con el DNI proporcionado.</summary>
         Task<bool> ValidarPaciente(string dni);
+        Task<List<Turno>> GetHistorialTurnosAsync(int pacienteId);
+        Task<List<ConsultaMedica>> GetHistorialConsultasAsync(int pacienteId);
     }
 }

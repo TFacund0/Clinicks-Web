@@ -26,6 +26,12 @@ export const pacienteService = {
     obtenerPorId: async (id) => {
         const respuesta = await clinicksApi.get(`/pacientes/${id}`);
         return respuesta.data;
+    },
+
+    // Obtiene el historial clínico consolidado del paciente en una sola petición.
+    obtenerHistorial: async (id) => {
+        const respuesta = await clinicksApi.get(`/pacientes/${id}/historial`);
+        return respuesta.data;
     }
 };
 export default pacienteService;

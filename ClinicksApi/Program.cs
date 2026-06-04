@@ -70,7 +70,12 @@ builder.Services.AddScoped<IProcesoService, ProcesoService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
 
 // ====================================================================
 // FASE 2: ENSAMBLAJE Y EJECUCIÓN DE LA APLICACIÓN (APP)

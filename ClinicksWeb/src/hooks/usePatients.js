@@ -34,6 +34,7 @@ export const usePatients = () => {
 
   // 3. FUNCIÓN DE CARGA (Conexión con la API)
   const fetchData = async (searchParam = "") => {
+    await Promise.resolve();
     try {
       setCargando(true);
       setError(null);
@@ -51,7 +52,11 @@ export const usePatients = () => {
     }
   };
 
-  useEffect(() => { fetchData(debouncedSearch); }, [debouncedSearch]);
+  useEffect(() => {
+    Promise.resolve().then(() => {
+      fetchData(debouncedSearch);
+    });
+  }, [debouncedSearch]);
 
   // 4. LO QUE DEVUELVE MI HOOK
   return {

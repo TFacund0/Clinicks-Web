@@ -13,7 +13,7 @@ export const useNewProcess = (dniInicial = '', idTurnoInicial = null) => {
         descripcion: '',
         fechaproceso: new Date().toISOString().split('T')[0],
         resultado: '',
-        idturno: idTurnoInicial,
+        idTurno: idTurnoInicial,
     });
     const [errors, setErrors] = useState({});
     const [showSuccess, setShowSuccess] = useState(false);
@@ -30,12 +30,24 @@ export const useNewProcess = (dniInicial = '', idTurnoInicial = null) => {
         return id;
     };
 
+    const cargarTiposDisponibles = async () => {
+        try {
+            const res = await procesoService.obtenerTiposProceso();
+            if (isMounted.current) setTiposDisponibles(res);
+        } catch {
+            // El select quedará vacío; el usuario verá el error al intentar enviar por validación.
+        }
+    };
+
     useEffect(() => {
         isMounted.current = true;
-        cargarTiposDisponibles();
+        Promise.resolve().then(() => {
+            cargarTiposDisponibles();
+        });
+        const currentTimers = timersRef.current;
         return () => {
             isMounted.current = false;
-            timersRef.current.forEach(clearTimeout);
+            currentTimers.forEach(clearTimeout);
         };
     }, []);
 
@@ -72,7 +84,8 @@ export const useNewProcess = (dniInicial = '', idTurnoInicial = null) => {
         try {
             const dataLimpia = {
                 ...formData,
-                fechaproceso: formData.fechaproceso || null
+                fechaproceso: formData.fechaproceso || null,
+                idTurno: formData.idTurno || null
             };
             await procesoService.registrarProcedimiento(dataLimpia);
             if (isMounted.current) {
@@ -97,19 +110,10 @@ export const useNewProcess = (dniInicial = '', idTurnoInicial = null) => {
             descripcion: '',
             fechaproceso: new Date().toISOString().split('T')[0],
             resultado: '',
-            idturno: null
+            idTurno: null
         });
         setErrors({});
         navigate('/acceso-procedimiento');
-    };
-
-    const cargarTiposDisponibles = async () => {
-        try {
-            const res = await procesoService.obtenerTiposProceso();
-            if (isMounted.current) setTiposDisponibles(res);
-        } catch {
-            // El select quedará vacío; el usuario verá el error al intentar enviar por validación.
-        }
     };
 
     return {
