@@ -2,8 +2,8 @@ import clinicksApi from '../api/clinicksApi';
 // Servicio que centraliza todas las peticiones a la API relacionadas con los procesos médicos.
 const procesoService = {
     // Envía los datos del formulario al backend para guardar un nuevo proceso en la base de datos (POST).
-    registrarProcedimiento: async (procedimientoData) => {
-        const respuesta = await clinicksApi.post('/procesos', procedimientoData);
+    registrarProcedimiento: async (procedimiento) => {
+        const respuesta = await clinicksApi.post('/procesos', procedimiento);
         return respuesta.data;
     },
 

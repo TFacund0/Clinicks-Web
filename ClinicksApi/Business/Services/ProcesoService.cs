@@ -40,41 +40,41 @@ namespace ClinicksApi.Business.Services
             _logger = logger;
         }
 
-        public async Task<(bool Success, string Message, Procedimiento? Data)> RegistrarProcedimiento(ProcedimientoAltaDto dto, int idMedicoLogueado)
+        public async Task<(bool Success, string Message, Procedimiento? Data)> RegistrarProcedimiento(ProcedimientoAltaDto procedimiento, int idMedico)
         {
             try
             {
                 // 1. REGLAS DE NEGOCIO — Validaciones (los campos obligatorios ya se validan en el DTO).
-                if (idMedicoLogueado <= 0)
+                if (idMedico <= 0)
                     return (false, "El médico logueado es inválido.", null);
 
-                if (dto.fechaproceso != null && dto.fechaproceso > DateTime.Now)
+                if (procedimiento.fechaproceso != null && procedimiento.fechaproceso > DateTime.Now)
                     return (false, "La fecha del proceso no puede ser futura.", null);
 
                 // 2. VERIFICACIÓN CRUZADA — Validamos que el DNI del paciente exista en el sistema.
                 // A través del IPacienteService para respetar la separación de incumbencias (SoC).
-                var pacienteDto = await _pacienteService.ObtenerPorDni(dto.dnipaciente);
+                var pacienteDto = await _pacienteService.ObtenerPorDni(procedimiento.dnipaciente);
                 if (pacienteDto == null)
                     return (false, "Paciente no encontrado en la base de datos o no apto para procedimientos.", null);
 
                 // Si no se envió fecha, usamos la fecha y hora actual del servidor.
-                var fechaAUsar = dto.fechaproceso ?? DateTime.Now;
+                var fechaAUsar = procedimiento.fechaproceso ?? DateTime.Now;
 
                 // 3. MAPEO — Construimos la entidad Procedimiento a partir del DTO del frontend.
                 var nuevoProcedimiento = new Procedimiento
                 {
-                    Tipo        = dto.tipoproceso,
-                    Descripcion = dto.descripcion,
-                    Resultado   = dto.resultado ?? "Sin resultado ingresado",
+                    Tipo        = procedimiento.tipoproceso,
+                    Descripcion = procedimiento.descripcion,
+                    Resultado   = procedimiento.resultado ?? "Sin resultado ingresado",
                     Fecha       = fechaAUsar
                 };
 
                 // 4. GUARDADO — El repositorio ejecuta el INSERT en PostgreSQL vinculándolo a un turno.
                 var procGuardado = await _procesoRepo.RegistrarProcedimiento(nuevoProcedimiento);
 
-                if (dto.idTurno.HasValue && dto.idTurno.Value > 0)
+                if (procedimiento.idTurno.HasValue && procedimiento.idTurno.Value > 0)
                 {
-                    await _procesoRepo.ActualizarTurnoVinculado(dto.idTurno.Value, procGuardado.IdProcedimiento);
+                    await _procesoRepo.ActualizarTurnoVinculado(procedimiento.idTurno.Value, procGuardado.IdProcedimiento);
                 }
                 else
                 {
@@ -82,10 +82,10 @@ namespace ClinicksApi.Business.Services
                     var nuevoTurno = new Turno
                     {
                         IdPaciente      = pacienteDto.Id,
-                        IdMedico        = idMedicoLogueado,
+                        IdMedico        = idMedico,
                         IdEstadoTurno   = idEstadoHecho,
                         FechaTurno      = fechaAUsar,
-                        Motivo          = $"Procedimiento: {dto.tipoproceso}",
+                        Motivo          = $"Procedimiento: {procedimiento.tipoproceso}",
                         IdProcedimiento = procGuardado.IdProcedimiento
                     };
 
@@ -97,7 +97,7 @@ namespace ClinicksApi.Business.Services
             catch (Exception ex)
             {
                 // Capturamos la causa raíz del error de base de datos en el log interno sin exponerla al cliente.
-                _logger.LogError(ex, "Error al registrar el procedimiento médico. Paciente DNI: {DniPaciente}", dto.dnipaciente);
+                _logger.LogError(ex, "Error al registrar el procedimiento médico. Paciente DNI: {DniPaciente}", procedimiento.dnipaciente);
                 return (false, "Error interno al registrar el procedimiento médico. Por favor, intente nuevamente más tarde.", null);
             }
         }
