@@ -1,8 +1,7 @@
 namespace ClinicksApi.Business.DTOs
 {
     /// <summary>
-    /// Objeto de Transferencia de Datos (DTO) utilizado para ENVIAR información al Frontend
-    /// tras un inicio de sesión exitoso. Contiene la información pública del médico y su Token JWT.
+    /// DTO para la respuesta del inicio de sesión.
     /// </summary>
     public class LoginResponseDto
     {
@@ -19,8 +18,7 @@ namespace ClinicksApi.Business.DTOs
         public string Matricula { get; set; } = string.Empty;
 
         /// <summary>
-        /// El Token JWT generado por el backend. React deberá guardarlo en el LocalStorage
-        /// y enviarlo en el header <c>Authorization: Bearer [token]</c> en todas las peticiones futuras.
+        /// El Token JWT generado.
         /// </summary>
         public string Token { get; set; } = string.Empty;
     }

@@ -10,10 +10,7 @@ using ClinicksApi.Constants;
 
 namespace ClinicksApi.Business.Services
 {
-    /// <summary>
-    /// Implementación de ITokenService para la generación de tokens JWT.
-    /// Encapsula las dependencias de Microsoft.IdentityModel.Tokens.
-    /// </summary>
+    /// <inheritdoc/>
     public class TokenService : ITokenService
     {
         private readonly IConfiguration _config;

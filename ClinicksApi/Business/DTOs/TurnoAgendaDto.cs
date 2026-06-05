@@ -1,7 +1,7 @@
 namespace ClinicksApi.Business.DTOs
 {
     /// <summary>
-    /// Objeto de Transferencia de Datos (DTO) para ENVIAR la información de los turnos agendados al Frontend.
+    /// DTO para los turnos agendados.
     /// </summary>
     public class TurnoAgendaDto
     {

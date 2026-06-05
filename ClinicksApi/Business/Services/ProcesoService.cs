@@ -7,11 +7,7 @@ using ClinicksApi.Constants;
 
 namespace ClinicksApi.Business.Services
 {
-    /// <summary>
-    /// Implementación del servicio de negocio para los procedimientos médicos.
-    /// Orquesta el flujo de registro: valida los datos del formulario, verifica al paciente,
-    /// persiste el procedimiento y crea el Turno que vincula todas las entidades.
-    /// </summary>
+    /// <inheritdoc/>
     public class ProcesoService : IProcesoService
     {
         private readonly IProcesoRepository _procesoRepo;
@@ -42,6 +38,7 @@ namespace ClinicksApi.Business.Services
             _logger = logger;
         }
 
+        /// <inheritdoc/>
         public async Task<(bool Success, string Message, Procedimiento? Data)> RegistrarProcedimiento(ProcedimientoAltaDto procedimiento, int idMedico)
         {
             try

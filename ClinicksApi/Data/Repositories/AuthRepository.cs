@@ -4,17 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClinicksApi.Data.Repositories
 {
-    /// <summary>
-    /// Implementación concreta del repositorio de autenticación, responsable de acceder a la tabla Usuarios y su relación con Medicos en PostgreSQL.
-    /// </summary>
+    /// <inheritdoc/>
     public class AuthRepository : IAuthRepository
     {
         private readonly ClinicksDbContext _context;
 
         /// <summary>
-        /// Constructor del repositorio de autenticación. Recibe el contexto de base de datos inyectado por .NET, que representa la sesión activa con PostgreSQL.
+        /// Constructor del repositorio.
         /// </summary>
-        /// <param name="context"></param>
         public AuthRepository(ClinicksDbContext context)
         {
             _context = context;

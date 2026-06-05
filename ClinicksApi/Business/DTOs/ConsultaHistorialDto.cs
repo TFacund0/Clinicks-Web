@@ -1,8 +1,7 @@
 namespace ClinicksApi.Business.DTOs
 {
     /// <summary>
-    /// Objeto de Transferencia de Datos (DTO) para ENVIAR el historial de consultas al Frontend.
-    /// Aísla la base de datos (ConsultaMedica) de la web, previniendo Entity Exposure y bucles JSON.
+    /// DTO para el historial de consultas médicas.
     /// </summary>
     public class ConsultaHistorialDto
     {
@@ -15,8 +14,7 @@ namespace ClinicksApi.Business.DTOs
         public DateTime? FechaConsulta { get; set; }
         
         /// <summary>
-        /// Nombre formateado del médico que atendió la consulta.
-        /// Abstrae la relación con la tabla Medico.
+        /// Nombre completo del médico que atendió la consulta.
         /// </summary>
         public string MedicoAtencion { get; set; } = string.Empty;
     }

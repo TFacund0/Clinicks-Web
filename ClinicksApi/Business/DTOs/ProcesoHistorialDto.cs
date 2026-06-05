@@ -1,7 +1,7 @@
 namespace ClinicksApi.Business.DTOs
 {
     /// <summary>
-    /// Objeto de Transferencia de Datos (DTO) para ENVIAR el historial de procedimientos al Frontend.
+    /// DTO para el historial de procedimientos.
     /// </summary>
     public class ProcesoHistorialDto
     {
@@ -12,8 +12,7 @@ namespace ClinicksApi.Business.DTOs
         public string Resultado { get; set; } = string.Empty;
         
         /// <summary>
-        /// Nombre formateado del médico que realizó el procedimiento.
-        /// Abstrae la relación con la tabla Medico extraída a través de Turno.
+        /// Nombre completo del médico.
         /// </summary>
         public string MedicoAtencion { get; set; } = string.Empty;
     }

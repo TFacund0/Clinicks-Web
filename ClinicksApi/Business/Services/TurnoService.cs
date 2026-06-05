@@ -5,10 +5,7 @@ using ClinicksApi.Data.Entities;
 
 namespace ClinicksApi.Business.Services
 {
-    /// <summary>
-    /// Servicio especialista en aplicar reglas de negocio sobre la información de la Agenda y los Turnos.
-    /// Transforma las entidades en DTOs listos para ser consumidos por la web.
-    /// </summary>
+    /// <inheritdoc/>
     public class TurnoService : ITurnoService
     {
         private readonly ITurnoRepository _turnoRepository;

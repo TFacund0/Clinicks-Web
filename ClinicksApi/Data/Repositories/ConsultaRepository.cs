@@ -6,18 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClinicksApi.Data.Repositories
 {
-    /// <summary>
-    /// Implementacion concreta del repositorio de consultas medicas utilizando Entity Framework Core.
-    /// Es la unica clase autorizada para ejecutar consultas SQL directas sobre la tabla consulta_medica.
-    /// </summary>
+    /// <inheritdoc/>
     public class ConsultaRepository : IConsultaRepository
     {
         private readonly ClinicksDbContext _context;
 
         /// <summary>
-        /// Constructor del repositorio. Recibe el contexto de base de datos inyectado por .NET.
+        /// Constructor del repositorio.
         /// </summary>
-        /// <param name="context">El contexto de EF Core que representa la sesion activa con PostgreSQL.</param>
         public ConsultaRepository(ClinicksDbContext context)
         {
             _context = context;
@@ -29,7 +25,6 @@ namespace ClinicksApi.Data.Repositories
             return await _context.ConsultaMedicas.AsNoTracking().ToListAsync();
         }
 
-        /// <inheritdoc/>
         /// <inheritdoc/>
         public async Task<ConsultaMedica> RegistrarConsulta(ConsultaMedica consulta)
         {

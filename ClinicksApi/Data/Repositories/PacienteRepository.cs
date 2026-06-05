@@ -4,16 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClinicksApi.Data.Repositories
 {
-    /// <summary>
-    /// Implementación concreta del repositorio de Pacientes.
-    /// Utiliza Entity Framework Core para traducir llamadas de C# a comandos SQL en PostgreSQL.
-    /// </summary>
+    /// <inheritdoc/>
     public class PacienteRepository : IPacienteRepository
     {
         private readonly ClinicksDbContext _context;
 
         /// <summary>
-        /// Inyecta el contexto de base de datos (sesión física con PostgreSQL).
+        /// Constructor del repositorio.
         /// </summary>
         public PacienteRepository(ClinicksDbContext context)
         {
@@ -79,6 +76,7 @@ namespace ClinicksApi.Data.Repositories
             return await query.ToListAsync();
         }
 
+        /// <inheritdoc/>
         public async Task<bool> ValidarPaciente(string dni)
         {
             return await _context.Pacientes.AnyAsync(p => p.Dni == dni);

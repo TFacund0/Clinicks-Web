@@ -7,7 +7,6 @@ namespace ClinicksApi.Controllers
 {
     /// <summary>
     /// Controlador responsable de gestionar la autenticación y seguridad de la API.
-    /// Es el "Recepcionista" que verifica credenciales y entrega los Tokens JWT (Gafetes).
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
@@ -16,9 +15,9 @@ namespace ClinicksApi.Controllers
         private readonly IAuthService _authService;
 
         /// <summary>
-        /// Constructor del controlador. Aquí se aplica la Inyección de Dependencias.
+        /// Constructor del controlador de autenticación.
         /// </summary>
-        /// <param name="authService">El servicio (Especialista) que contiene la lógica real de autenticación.</param>
+        /// <param name="authService">El servicio de autenticación.</param>
         public AuthController(IAuthService authService)
         {
             _authService = authService;

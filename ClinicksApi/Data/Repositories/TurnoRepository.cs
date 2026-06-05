@@ -4,17 +4,14 @@ using ClinicksApi.Data.Interfaces;
 
 namespace ClinicksApi.Data.Repositories
 {
-    /// <summary>
-    /// Implementación concreta del repositorio para la entidad Turno, utilizando Entity Framework Core para acceder a la base de datos PostgreSQL.
-    /// </summary>
+    /// <inheritdoc/>
     public class TurnoRepository : ITurnoRepository
     {
         private readonly ClinicksDbContext _context;
 
         /// <summary>
-        /// Constructor del repositorio de Turnos. Recibe el contexto de base de datos inyectado por .NET, que representa la sesión activa con PostgreSQL.
+        /// Constructor del repositorio.
         /// </summary>
-        /// <param name="context">El contexto de EF Core para acceder a la base de datos.</param>
         public TurnoRepository(ClinicksDbContext context)
         {
             _context = context;
@@ -65,12 +62,14 @@ namespace ClinicksApi.Data.Repositories
                 .FirstOrDefaultAsync(t => t.IdTurno == idTurno);
         }
 
+        /// <inheritdoc/>
         public async Task CrearTurnoAsync(Turno turno)
         {
             _context.Turnos.Add(turno);
             await _context.SaveChangesAsync();
         }
 
+        /// <inheritdoc/>
         public async Task ActualizarTurnoAsync(Turno turno)
         {
             _context.Turnos.Update(turno);

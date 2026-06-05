@@ -3,39 +3,37 @@ using System.ComponentModel.DataAnnotations;
 namespace ClinicksApi.Business.DTOs
 {
     /// <summary>
-    /// Objeto de Transferencia de Datos (DTO) utilizado para RECIBIR los datos de una nueva consulta médica.
-    /// Los campos con <c>null!</c> son obligatorios; los <c>?</c> son opcionales y tienen valores por defecto en el Servicio.
+    /// DTO para el alta de consultas médicas.
     /// </summary>
     public class ConsultaAltaDto
     {
-        /// <summary>Motivo principal por el que el paciente asiste a la consulta. Campo obligatorio.</summary>
+        /// <summary>Motivo de la consulta.</summary>
         [Required(ErrorMessage = "El Motivo es obligatorio.")]
         public string motivo { get; set; } = null!;
 
-        /// <summary>Diagnóstico del médico al finalizar la consulta. Campo obligatorio.</summary>
+        /// <summary>Diagnóstico.</summary>
         [Required(ErrorMessage = "El Diagnóstico es obligatorio.")]
         public string diagnostico { get; set; } = null!;
 
-        /// <summary>Plan de tratamiento indicado. Opcional; si se omite, se registra como "sin definir".</summary>
+        /// <summary>Plan de tratamiento.</summary>
         public string? tratamiento { get; set; }
 
-        /// <summary>Observaciones clínicas adicionales. Opcional; si se omite, se registra como "sin observaciones relevantes".</summary>
+        /// <summary>Observaciones adicionales.</summary>
         public string? observaciones { get; set; }
 
-        /// <summary>Recomendaciones para el paciente. Opcional; si se omite, se registra como "sin recomendaciones".</summary>
+        /// <summary>Recomendaciones.</summary>
         public string? recomendacion { get; set; }
 
         /// <summary>
-        /// Fecha de la consulta. Opcional; si no se envía, se usa la fecha y hora actuales del servidor.
-        /// No puede ser una fecha futura; esta validación se aplica en el Servicio.
+        /// Fecha de la consulta.
         /// </summary>
         public DateTime? fechaconsulta { get; set; }
 
-        /// <summary>DNI del paciente a registrar en la consulta. Se usa para buscarlo en la BD y obtener su ID real.</summary>
+        /// <summary>DNI del paciente.</summary>
         [Required(ErrorMessage = "El DNI del paciente es obligatorio.")]
         public required string dnipaciente { get; set; }
 
-        /// <summary>ID opcional del Turno pre-existente que se asocia a esta consulta.</summary>
+        /// <summary>ID del turno asociado.</summary>
         public int? idTurno { get; set; }
     }
 }

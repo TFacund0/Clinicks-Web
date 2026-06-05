@@ -3,8 +3,7 @@ using System.Collections.Generic;
 namespace ClinicksApi.Business.DTOs
 {
     /// <summary>
-    /// Objeto de Transferencia de Datos (DTO) que consolida el expediente clínico de un paciente.
-    /// Combina los datos personales del paciente con su historial completo de consultas y procedimientos.
+    /// DTO del historial clínico consolidado.
     /// </summary>
     public class HistorialClinicoDto
     {

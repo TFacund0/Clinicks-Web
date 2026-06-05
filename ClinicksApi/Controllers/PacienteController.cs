@@ -18,7 +18,7 @@ public class PacientesController : ControllerBase
     private readonly IPacienteService _pacienteService;
 
     /// <summary>
-    /// Constructor del controlador. Recibe el servicio inyectado por .NET.
+    /// Constructor de PacientesController.
     /// </summary>
     /// <param name="pacienteService">Servicio que contiene las reglas de negocio para los pacientes.</param>
     public PacientesController(IPacienteService pacienteService)
@@ -57,13 +57,11 @@ public class PacientesController : ControllerBase
 
     /// <summary>
     /// Obtiene la lista de pacientes que han sido atendidos por el médico que está actualmente logueado.
-    /// Soporta filtrado directo en la base de datos por nombre, apellido o DNI para escalar.
     /// </summary>
     /// <returns>Lista de pacientes del médico autenticado. Si no tiene, devuelve lista vacía (200 OK).</returns>
     [HttpGet("atendidos")]
     public async Task<IActionResult> ObtenerAtendidosPorMedico([FromQuery] string? search)
     {
-        // Leemos el ID del médico usando la extensión segura sobre ClaimsPrincipal
         var idMedico = User.GetMedicoId();
         if (idMedico == null)
             return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });

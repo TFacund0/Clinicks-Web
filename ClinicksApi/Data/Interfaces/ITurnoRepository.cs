@@ -22,7 +22,16 @@ namespace ClinicksApi.Data.Interfaces
         /// <summary>Obtiene un turno por su ID.</summary>
         Task<Turno?> ObtenerPorIdAsync(int idTurno);
 
+        /// <summary>
+        /// Crea y guarda un nuevo turno en la base de datos.
+        /// </summary>
+        /// <param name="turno">La entidad turno a persistir.</param>
         Task CrearTurnoAsync(Turno turno);
+
+        /// <summary>
+        /// Actualiza un turno existente en la base de datos.
+        /// </summary>
+        /// <param name="turno">La entidad turno a actualizar.</param>
         Task ActualizarTurnoAsync(Turno turno);
     }
 }

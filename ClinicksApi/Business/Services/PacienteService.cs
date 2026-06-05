@@ -6,10 +6,7 @@ using ClinicksApi.Constants;
 
 namespace ClinicksApi.Business.Services
 {
-    /// <summary>
-    /// Servicio especialista en aplicar reglas de negocio sobre la información de los pacientes.
-    /// Transforma los datos brutos de la Base de Datos (Entidades) en formatos ligeros (DTOs) para la web.
-    /// </summary>
+    /// <inheritdoc/>
     public class PacienteService : IPacienteService
     {
         private readonly IPacienteRepository _repository;
@@ -17,7 +14,7 @@ namespace ClinicksApi.Business.Services
         private readonly IProcesoRepository _procesoRepository;
 
         /// <summary>
-        /// Inyección de dependencias: ASP.NET nos da el repositorio listo para usar.
+        /// Constructor de PacienteService.
         /// </summary>
         public PacienteService(IPacienteRepository repository, IConsultaRepository consultaRepository, IProcesoRepository procesoRepository)
         {
@@ -26,27 +23,21 @@ namespace ClinicksApi.Business.Services
             _procesoRepository = procesoRepository;
         }
 
-        /// <summary>
-        /// Lógica de negocio para buscar a los pacientes asignados a un médico.
-        /// </summary>
+        /// <inheritdoc/>
         public async Task<IEnumerable<PacienteDto>> ObtenerAtendidosPorMedico(int medicoId, string? search = null)
         {
             var datos = await _repository.ObtenerAtendidosPorMedico(medicoId, search);
             return datos.Select(MapToDto);
         }
 
-        /// <summary>
-        /// Recupera y mapea la lista completa de pacientes activos e inactivos.
-        /// </summary>
+        /// <inheritdoc/>
         public async Task<IEnumerable<PacienteDto>> ObtenerListado()
         {
             var datos = await _repository.ObtenerTodosAsync();
             return datos.Select(MapToDto);
         }
 
-        /// <summary>
-        /// Recupera un paciente puntual y lo convierte en su DTO correspondiente.
-        /// </summary>
+        /// <inheritdoc/>
         public async Task<PacienteDto?> ObtenerPorId(int id)
         {
             var dato = await _repository.ObtenerPorIdAsync(id);
@@ -55,10 +46,7 @@ namespace ClinicksApi.Business.Services
             return MapToDto(dato);
         }
 
-        /// <summary>
-        /// Recupera un paciente por su DNI y lo devuelve como DTO seguro.
-        /// Este método centraliza las validaciones de negocio antes de devolver un paciente a otros servicios.
-        /// </summary>
+        /// <inheritdoc/>
         public async Task<PacienteDto?> ObtenerPorDni(string dni)
         {
             var dato = await _repository.ObtenerPorDniAsync(dni);
@@ -71,7 +59,7 @@ namespace ClinicksApi.Business.Services
         }
 
         /// <summary>
-        /// Método auxiliar (Privado) que realiza la conversión de Entidad a DTO.
+        /// Mapea la entidad Paciente a PacienteDto.
         /// </summary>
         private PacienteDto MapToDto(Paciente dato)
         {
@@ -93,17 +81,13 @@ namespace ClinicksApi.Business.Services
             };
         }
 
-        /// <summary>
-        /// Verifica la existencia de un paciente por su DNI.
-        /// </summary>
+        /// <inheritdoc/>
         public async Task<PacienteDto?> ValidarPaciente(string dni)
         { 
             return await ObtenerPorDni(dni);
         }
 
-        /// <summary>
-        /// Obtiene y consolida el expediente clínico del paciente consultando los turnos asociados.
-        /// </summary>
+        /// <inheritdoc/>
         public async Task<HistorialClinicoDto?> ObtenerHistorialClinico(int pacienteId)
         {
             var pacienteDto = await ObtenerPorId(pacienteId);

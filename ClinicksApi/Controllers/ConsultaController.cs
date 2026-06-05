@@ -20,7 +20,7 @@ namespace ClinicksApi.Controllers
         private readonly IConsultaService _consultaService;
 
         /// <summary>
-        /// Constructor del controlador. Recibe los servicios inyectados por el contenedor de dependencias de .NET.
+        /// Constructor de ConsultasController.
         /// </summary>
         /// <param name="consultaService">Servicio con la lógica de negocio de consultas médicas.</param>
         public ConsultasController(IConsultaService consultaService)
@@ -41,12 +41,10 @@ namespace ClinicksApi.Controllers
         [HttpPost]
         public async Task<IActionResult> RegistrarConsulta([FromBody] ConsultaAltaDto consulta)
         {
-            // Lee el ID del médico directamente del Token JWT (claim "idMedico") usando el método de extensión para evitar suplantaciones.
             var idMedico = User.GetMedicoId();
             if (idMedico == null)
                 return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
 
-            // Delega la validación completa y el guardado en base de datos al servicio de negocio.
             var resultado = await _consultaService.RegistrarConsulta(consulta, idMedico.Value);
 
             if (resultado.Success)

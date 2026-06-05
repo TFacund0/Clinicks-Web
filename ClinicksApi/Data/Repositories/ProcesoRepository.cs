@@ -5,18 +5,14 @@ using ClinicksApi.Constants;
 
 namespace ClinicksApi.Data.Repositories
 {
-    /// <summary>
-    /// Implementación concreta del repositorio de procedimientos médicos utilizando Entity Framework Core.
-    /// Gestiona la persistencia en las tablas <c>procedimiento</c>, <c>turno</c> y <c>estado_turno</c>.
-    /// </summary>
+    /// <inheritdoc/>
     public class ProcesoRepository : IProcesoRepository
     {
         private readonly ClinicksDbContext _context;
 
         /// <summary>
-        /// Constructor del repositorio. Recibe el contexto de base de datos inyectado por .NET.
+        /// Constructor del repositorio.
         /// </summary>
-        /// <param name="context">El contexto de EF Core que representa la sesión activa con PostgreSQL.</param>
         public ProcesoRepository(ClinicksDbContext context)
         {
             _context = context;

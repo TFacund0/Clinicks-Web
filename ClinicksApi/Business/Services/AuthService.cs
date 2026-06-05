@@ -8,11 +8,7 @@ using System.Threading.Tasks;
 
 namespace ClinicksApi.Business.Services
 {
-    /// <summary>
-    /// Servicio de autenticación.
-    /// Contiene las reglas de negocio para validar credenciales de acceso, verificar roles y generar
-    /// las sesiones seguras del personal médico a través de tokens JWT mediante ITokenService.
-    /// </summary>
+    /// <inheritdoc/>
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;

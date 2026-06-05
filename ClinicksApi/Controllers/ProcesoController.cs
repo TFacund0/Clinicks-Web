@@ -21,7 +21,7 @@ namespace ClinicksApi.Controllers
         private readonly IProcesoService _procesoService;
 
         /// <summary>
-        /// Constructor del controlador. Recibe el servicio inyectado por el contenedor de dependencias de .NET.
+        /// Constructor de ProcesosController.
         /// </summary>
         /// <param name="procesoService">Servicio con la lógica de negocio de procedimientos médicos.</param>
         public ProcesosController(IProcesoService procesoService)
@@ -44,7 +44,6 @@ namespace ClinicksApi.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            // Lee el ID del médico directamente del Token JWT para evitar suplantaciones usando el método de extensión.
             var idMedico = User.GetMedicoId();
             if (idMedico == null)
                 return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });

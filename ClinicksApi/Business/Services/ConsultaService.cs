@@ -7,12 +7,7 @@ using ClinicksApi.Constants;
 
 namespace ClinicksApi.Business.Services
 {
-    /// <summary>
-    /// Implementación del servicio de negocio para las consultas médicas.
-    /// Es la capa intermedia entre el Controlador (que recibe las peticiones de React) 
-    /// y el Repositorio (que habla directamente con PostgreSQL).
-    /// Se encarga de aplicar las reglas de negocio y validaciones antes de que los datos toquen la base de datos.
-    /// </summary>
+    /// <inheritdoc/>
     public class ConsultaService : IConsultaService
     {
         private readonly IConsultaRepository _consultaRepo;
@@ -47,6 +42,7 @@ namespace ClinicksApi.Business.Services
             }).ToList();
         }
 
+        /// <inheritdoc/>
         public async Task<(bool Success, string Message, ConsultaMedica? Data)> RegistrarConsulta(ConsultaAltaDto consulta, int idMedico)
         {
             try
