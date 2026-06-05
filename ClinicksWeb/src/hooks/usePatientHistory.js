@@ -26,10 +26,10 @@ export const usePatientHistory = (pacienteId) => {
 
         const cargarDatos = async () => {
             if (!pacienteId) return;
-            
+
             setCargando(true);
             setError(null);
-            
+
             try {
                 // Obtenemos el historial clínico consolidado directamente desde el backend en una sola petición
                 const data = await pacienteService.obtenerHistorialClinico(pacienteId);
@@ -83,9 +83,9 @@ export const usePatientHistory = (pacienteId) => {
 
         // 2. Filtro por texto libre
         if (filtros.texto.trim() === '') return true;
-        
+
         const busqueda = filtros.texto.toLowerCase();
-        
+
         // Unificar los textos donde el médico podría buscar, dependiendo de si es consulta o proceso
         let textoBuscable = '';
         if (item.tipoRegistro === 'consulta') {
@@ -97,10 +97,11 @@ export const usePatientHistory = (pacienteId) => {
         return textoBuscable.toLowerCase().includes(busqueda);
     });
 
-    return { 
-        paciente, 
-        historial: historialFiltrado, // Exponemos el array ya filtrado a la vista
-        cargando, 
+    return {
+        paciente,
+        historialOriginal: historial,
+        historial: historialFiltrado,
+        cargando,
         error,
         filtros,
         setFiltros

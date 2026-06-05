@@ -9,7 +9,7 @@ const PatientHistory = () => {
   const navigate = useNavigate();
 
   // Obtenemos los datos y lógica de filtrado encapsulada en el hook
-  const { paciente, historial, cargando, error, filtros, setFiltros } = usePatientHistory(id);
+  const { paciente, historialOriginal, historial, cargando, error, filtros, setFiltros } = usePatientHistory(id);
 
   if (cargando) {
       return (
@@ -130,13 +130,19 @@ const PatientHistory = () => {
       {historial.length === 0 ? (
         <div className="p-16 text-center border border-dashed border-slate-800 rounded-3xl bg-slate-900/30">
             <Search className="mx-auto text-slate-600 mb-4" size={48} />
-            <p className="text-slate-400 font-medium text-lg">No se encontraron registros que coincidan con tu búsqueda.</p>
-            <button 
-                onClick={() => setFiltros({ texto: '', mostrarConsultas: true, mostrarProcedimientos: true })}
-                className="mt-4 text-cyan-500 font-bold hover:underline"
-            >
-                Limpiar Filtros
-            </button>
+            <p className="text-slate-400 font-medium text-lg">
+                {historialOriginal.length === 0 
+                    ? "El paciente no posee registros en su historial clínico" 
+                    : "No hay registros para el filtro seleccionado"}
+            </p>
+            {historialOriginal.length > 0 && (
+                <button 
+                    onClick={() => setFiltros({ texto: '', mostrarConsultas: true, mostrarProcedimientos: true })}
+                    className="mt-4 text-cyan-500 font-bold hover:underline"
+                >
+                    Limpiar Filtros
+                </button>
+            )}
         </div>
       ) : (
         <div className="relative border-l-2 border-slate-800 ml-4 sm:ml-8 pl-8 sm:pl-12 pb-8 space-y-10">

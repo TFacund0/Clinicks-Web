@@ -90,17 +90,29 @@ namespace ClinicksApi.Business.Services
                 }
                 else
                 {
-                    var nuevoTurno = new Turno
+                    // Buscar si hay un turno pendiente para hoy
+                    var turnoPendiente = await _turnoRepository.ObtenerTurnoPendienteDelDiaAsync(pacienteDto.Id, idMedico, fechaAUsar);
+                    
+                    if (turnoPendiente != null)
                     {
-                        IdPaciente      = pacienteDto.Id,
-                        IdMedico        = idMedico,
-                        IdEstadoTurno   = idEstadoHecho,
-                        FechaTurno      = fechaAUsar,
-                        Motivo          = $"Procedimiento: {procedimiento.tipoproceso}",
-                        IdProcedimiento = procGuardado.IdProcedimiento
-                    };
+                        turnoPendiente.IdProcedimiento = procGuardado.IdProcedimiento;
+                        turnoPendiente.IdEstadoTurno = idEstadoHecho;
+                        await _turnoRepository.ActualizarTurnoAsync(turnoPendiente);
+                    }
+                    else
+                    {
+                        var nuevoTurno = new Turno
+                        {
+                            IdPaciente      = pacienteDto.Id,
+                            IdMedico        = idMedico,
+                            IdEstadoTurno   = idEstadoHecho,
+                            FechaTurno      = fechaAUsar,
+                            Motivo          = $"Procedimiento: {procedimiento.tipoproceso}",
+                            IdProcedimiento = procGuardado.IdProcedimiento
+                        };
 
-                    await _turnoRepository.CrearTurnoAsync(nuevoTurno);
+                        await _turnoRepository.CrearTurnoAsync(nuevoTurno);
+                    }
                 }
 
                 return (true, "Procedimiento registrado exitosamente", procGuardado);

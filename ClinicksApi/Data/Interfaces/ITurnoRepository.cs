@@ -26,6 +26,11 @@ namespace ClinicksApi.Data.Interfaces
         Task<Turno?> ObtenerParaActualizarAsync(int idTurno);
 
         /// <summary>
+        /// Obtiene el primer turno pendiente (Confirmado o Pendiente) de un paciente con un médico específico en una fecha dada.
+        /// </summary>
+        Task<Turno?> ObtenerTurnoPendienteDelDiaAsync(int idPaciente, int idMedico, DateTime fecha);
+
+        /// <summary>
         /// Crea y guarda un nuevo turno en la base de datos.
         /// </summary>
         /// <param name="turno">La entidad turno a persistir.</param>
