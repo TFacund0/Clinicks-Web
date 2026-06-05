@@ -69,7 +69,7 @@ export const usePatientVerification = (destino) => {
             }
         } catch (error) {
             if (isMounted.current) {
-                setErrorMsg(extraerMensajeError(error, "DNI no registrado en la base de datos."));
+                setErrorMsg(extraerMensajeError(error, "El DNI ingresado no corresponde a un paciente registrado"));
                 addTimer(() => { if(isMounted.current) setErrorMsg(null); }, 4000);
             }
         } finally {
