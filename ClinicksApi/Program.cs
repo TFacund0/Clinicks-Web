@@ -1,3 +1,4 @@
+using ClinicksApi.Workers;
 using ClinicksApi.Business.Interfaces;
 using ClinicksApi.Business.Services;
 using ClinicksApi.Data;
