@@ -22,6 +22,9 @@ namespace ClinicksApi.Data.Interfaces
         /// <summary>Obtiene un turno por su ID.</summary>
         Task<Turno?> ObtenerPorIdAsync(int idTurno);
 
+        /// <summary>Obtiene un turno por su ID sin relaciones de navegacion para evitar conflictos al actualizar.</summary>
+        Task<Turno?> ObtenerParaActualizarAsync(int idTurno);
+
         /// <summary>
         /// Crea y guarda un nuevo turno en la base de datos.
         /// </summary>
@@ -33,5 +36,25 @@ namespace ClinicksApi.Data.Interfaces
         /// </summary>
         /// <param name="turno">La entidad turno a actualizar.</param>
         Task ActualizarTurnoAsync(Turno turno);
+
+        /// <summary>
+        /// Obtiene dinámicamente el ID de un estado a partir de su nombre.
+        /// </summary>
+        Task<int?> ObtenerIdEstadoPorNombreAsync(string nombre);
+
+        /// <summary>
+        /// Obtiene dinámicamente los IDs de varios estados a partir de sus nombres.
+        /// </summary>
+        Task<List<int>> ObtenerIdsEstadosPorNombresAsync(List<string> nombres);
+
+        /// <summary>
+        /// Obtiene los turnos anteriores a una fecha límite que tengan alguno de los IDs de estado proporcionados.
+        /// </summary>
+        Task<List<Turno>> ObtenerTurnosPorFechaYEstadosAsync(DateTime fechaLimite, List<int> estadosIds);
+
+        /// <summary>
+        /// Actualiza un lote de turnos y guarda los cambios en la base de datos.
+        /// </summary>
+        Task ActualizarLoteTurnosAsync(List<Turno> turnos);
     }
 }

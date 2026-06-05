@@ -47,23 +47,22 @@ namespace ClinicksApi.Business.Services
         {
             try
             {
-                // 1. REGLAS DE NEGOCIO — Validaciones (los campos obligatorios ya se validan en el DTO).
+
                 if (idMedico <= 0)
                     return (false, "El médico logueado es inválido.", null);
 
                 if (procedimiento.fechaproceso != null && procedimiento.fechaproceso > DateTime.Now)
                     return (false, "La fecha del proceso no puede ser futura.", null);
 
-                // 2. VERIFICACIÓN CRUZADA — Validamos que el DNI del paciente exista en el sistema.
-                // A través del IPacienteService para respetar la separación de incumbencias (SoC).
+
                 var pacienteDto = await _pacienteService.ObtenerPorDni(procedimiento.dnipaciente);
                 if (pacienteDto == null)
                     return (false, "Paciente no encontrado en la base de datos o no apto para procedimientos.", null);
 
-                // Si no se envió fecha, usamos la fecha y hora actual del servidor.
+
                 var fechaAUsar = procedimiento.fechaproceso ?? DateTime.Now;
 
-                // 3. MAPEO — Construimos la entidad Procedimiento a partir del DTO del frontend.
+
                 var nuevoProcedimiento = new Procedimiento
                 {
                     Tipo        = procedimiento.tipoproceso,
@@ -72,22 +71,25 @@ namespace ClinicksApi.Business.Services
                     Fecha       = fechaAUsar
                 };
 
-                // 4. GUARDADO — El repositorio ejecuta el INSERT en PostgreSQL vinculándolo a un turno.
+
+                int idEstadoHecho = await _turnoRepository.ObtenerIdEstadoPorNombreAsync("Atendido") 
+                                 ?? ConstantesGenerales.EstadosTurno.AtendidoId;
+
+
                 var procGuardado = await _procesoRepo.RegistrarProcedimiento(nuevoProcedimiento);
 
                 if (procedimiento.idTurno.HasValue && procedimiento.idTurno.Value > 0)
                 {
-                    var turnoAActualizar = await _turnoRepository.ObtenerPorIdAsync(procedimiento.idTurno.Value);
-                    if (turnoAActualizar != null)
+                    var turnoExistente = await _turnoRepository.ObtenerParaActualizarAsync(procedimiento.idTurno.Value);
+                    if (turnoExistente != null)
                     {
-                        turnoAActualizar.IdProcedimiento = procGuardado.IdProcedimiento;
-                        turnoAActualizar.IdEstadoTurno = ConstantesGenerales.EstadosTurno.RealizadoId;
-                        await _turnoRepository.ActualizarTurnoAsync(turnoAActualizar);
+                        turnoExistente.IdProcedimiento = procGuardado.IdProcedimiento;
+                        turnoExistente.IdEstadoTurno = idEstadoHecho;
+                        await _turnoRepository.ActualizarTurnoAsync(turnoExistente);
                     }
                 }
                 else
                 {
-                    int idEstadoHecho = ConstantesGenerales.EstadosTurno.RealizadoId;
                     var nuevoTurno = new Turno
                     {
                         IdPaciente      = pacienteDto.Id,
@@ -105,7 +107,7 @@ namespace ClinicksApi.Business.Services
             }
             catch (Exception ex)
             {
-                // Capturamos la causa raíz del error de base de datos en el log interno sin exponerla al cliente.
+
                 _logger.LogError(ex, "Error al registrar el procedimiento médico. Paciente DNI: {DniPaciente}", procedimiento.dnipaciente);
                 return (false, "Error interno al registrar el procedimiento médico. Por favor, intente nuevamente más tarde.", null);
             }

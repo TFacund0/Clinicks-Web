@@ -4,12 +4,19 @@ import consultaService from '../services/consultaService';
 import { useNavigate } from 'react-router-dom';
 import { extraerMensajeError } from '../utils/errorUtils';
 
+/**
+ * Hook para gestionar el formulario de una nueva consulta médica.
+ */
 export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
-    // 1. Estado del formulario
+    const obtenerFechaHoraLocal = () => {
+        const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+        return new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
+    };
+
     const [formData, setFormData] = useState({
         dnipaciente: dniInicial,
         motivo: '',
-        fechaconsulta: new Date().toISOString().split('T')[0],
+        fechaconsulta: obtenerFechaHoraLocal(),
         diagnostico: '',
         tratamiento: '',
         observaciones: '',
@@ -23,8 +30,6 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const isMounted = useRef(true);
 
-    // Ref para acumular todos los timers activos y cancelarlos al desmontar.
-    // Evita el error "Can't perform a React state update on an unmounted component".
     const timersRef = useRef([]);
     const addTimer = (fn, ms) => {
         const id = setTimeout(fn, ms);
@@ -41,7 +46,6 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
         };
     }, []);
 
-    // 3. MANEJADOR DE CAMBIOS EN LOS INPUTS
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -50,7 +54,6 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
         }
     };
 
-    // 4. LÓGICA DE VALIDACIÓN
     const validarFormulario = () => {
         let erroresTemporales = {};
         const hoy = new Date().toISOString().split('T')[0];
@@ -60,7 +63,7 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
         if (!formData.diagnostico.trim()) erroresTemporales.diagnostico = "El diagnóstico es obligatorio.";
         if (!formData.tratamiento.trim()) erroresTemporales.tratamiento = "El tratamiento indicado es obligatorio.";
 
-        if (formData.fechaconsulta && formData.fechaconsulta > hoy) {
+        if (formData.fechaconsulta && formData.fechaconsulta.split('T')[0] > hoy) {
             erroresTemporales.fechaconsulta = "La fecha no puede ser posterior a hoy.";
         }
 
@@ -68,7 +71,6 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
         return Object.keys(erroresTemporales).length === 0;
     };
 
-    // 5. ENVÍO DEL FORMULARIO A LA API
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validarFormulario()) return;
@@ -88,7 +90,7 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
             if (isMounted.current) {
                 setShowSuccess(true);
                 addTimer(() => { if(isMounted.current) setShowSuccess(false); }, 3000);
-                setFormData({ dnipaciente: '', motivo: '', fechaconsulta: new Date().toISOString().split('T')[0], diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '', idTurno: null });
+                setFormData({ dnipaciente: '', motivo: '', fechaconsulta: obtenerFechaHoraLocal(), diagnostico: '', tratamiento: '', observaciones: '', recomendacion: '', idTurno: null });
                 addTimer(() => { if(isMounted.current) navigate('/dashboard'); }, 1500);
             }
         } catch (error) {
@@ -101,12 +103,11 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
         }
     };
 
-    // 6. CANCELAR Y LIMPIAR
     const handleCancel = () => {
         setFormData({
             dnipaciente: '',
             motivo: '',
-            fechaconsulta: new Date().toISOString().split('T')[0],
+            fechaconsulta: obtenerFechaHoraLocal(),
             diagnostico: '',
             tratamiento: '',
             observaciones: '',

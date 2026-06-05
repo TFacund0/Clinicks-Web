@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import agendaService from '../services/agendaService';
 import { ESTADOS_TURNO } from '../utils/constants';
 
+/**
+ * Hook para gestionar el estado y la lógica de la Agenda médica.
+ */
 export const useAgenda = () => {
   const [vistaActual, setVistaActual] = useState('dia'); // 'dia', 'semana', 'mes'
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date());
@@ -13,7 +16,7 @@ export const useAgenda = () => {
   const mesSeleccionado = fechaSeleccionada.getMonth();
   const anioSeleccionado = fechaSeleccionada.getFullYear();
 
-  // Efecto principal: Cargar datos cuando cambia el mes seleccionado
+
   useEffect(() => {
     const cargarDatos = async () => {
       try {
@@ -34,7 +37,7 @@ export const useAgenda = () => {
             fecha: fechaObj,
             hora: fechaObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }),
             duracion: 20,
-            tipo: "Consulta", 
+            tipo: t.idProcedimiento ? "Procedimiento" : (t.idConsulta ? "Consulta" : "A definir"),
             motivo: t.motivo || "Sin motivo especificado",
             estado: t.estado || ESTADOS_TURNO.PENDIENTE
           };
@@ -52,7 +55,7 @@ export const useAgenda = () => {
     cargarDatos();
   }, [mesSeleccionado, anioSeleccionado]); 
 
-  // Funciones de navegación
+
   const navegarTemporal = (direccion) => {
     const nueva = new Date(fechaSeleccionada);
     if (vistaActual === 'dia') {
@@ -71,13 +74,12 @@ export const useAgenda = () => {
     setTurnoSeleccionado(null);
   };
 
-  // Función para guardar cambios locales temporalmente (hasta implementar el PUT en API)
+
   const guardarTurnos = (nuevosTurnos) => {
     setTurnos(nuevosTurnos);
   };
 
   return {
-    // Estados
     vistaActual,
     setVistaActual,
     fechaSeleccionada,
@@ -88,7 +90,6 @@ export const useAgenda = () => {
     cargandoTurnos,
     busquedaTurno,
     setBusquedaTurno,
-    // Acciones
     navegarTemporal,
     irAHoy,
     guardarTurnos

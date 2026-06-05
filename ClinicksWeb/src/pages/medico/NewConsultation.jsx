@@ -6,9 +6,7 @@ import { useNewConsultation } from '../../hooks/useNewConsultation';
 import PageLayout from '../../components/PageLayout';
 import Toast from '../../components/Toast';
 
-// Componente visual principal para registrar una nueva consulta médica.
 const NewConsultation = () => {
-    // Destructuramos (extraemos) todo lo que nos devuelve el hook
     const location = useLocation();
     const navigate = useNavigate();
     const dniEntrante = location.state?.dniIngresado || '';
@@ -25,7 +23,7 @@ const NewConsultation = () => {
         handleCancel
     } = useNewConsultation(dniEntrante, idTurnoEntrante);
 
-    // PROTECCIÓN DE RUTA: Si no hay DNI (acceso directo por URL), volvemos al buscador.
+
     React.useEffect(() => {
         if (!dniEntrante) {
             navigate('/acceso-consulta');
@@ -35,17 +33,17 @@ const NewConsultation = () => {
     return (
         <PageLayout title="Nueva Consulta">
             <div className="max-w-4xl mx-auto">
-                {/* SOC-2: Corregido el saludo copiado del Dashboard */}
+
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold text-white tracking-tight">Nueva Consulta Médica</h1>
                     <p className="text-slate-500 mt-1">Complete el formulario para registrar la atención clínica del paciente.</p>
                 </div>
 
-                {/* Formulario principal: el evento onSubmit está conectado a la función del Hook */}
+
                 <form onSubmit={handleSubmit} className="w-full">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 
-                        {/* Panel Izquierdo: Datos básicos de contexto (DNI, Motivo, Fecha) */}
+
                         <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
                             <h3 className="text-lg font-bold flex items-center gap-2 border-b border-slate-800 pb-3">
                                 <ClipboardList size={20} className="text-cyan-400" />
@@ -59,7 +57,7 @@ const NewConsultation = () => {
                                 </div>
                                 <div>
                                     <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Fecha de consulta</label>
-                                    <input type="date" name="fechaconsulta" value={formData.fechaconsulta} onChange={handleChange} className={`w-full bg-slate-950 border ${errors.fechaconsulta ? 'border-red-500' : 'border-slate-800'} rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors scheme-dark`} />
+                                    <input type="datetime-local" name="fechaconsulta" value={formData.fechaconsulta} disabled className={`w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed`} />
                                     {errors.fechaconsulta && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.fechaconsulta}</p>}
                                 </div>
                             </div>
@@ -71,7 +69,7 @@ const NewConsultation = () => {
                             </div>
                         </div>
 
-                        {/* Panel Derecho: Datos de la evaluación médica */}
+
                         <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
                             <h3 className="text-lg font-bold flex items-center gap-2 border-b border-slate-800 pb-3">
                                 <User size={20} className="text-cyan-400" />
@@ -91,7 +89,7 @@ const NewConsultation = () => {
                         </div>
                     </div>
 
-                    {/* Fila Inferior: Campo extenso para notas privadas */}
+
                     <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 mb-8">
 
                         <h3 className="text-lg font-bold flex items-center gap-2 mb-6 border-b border-slate-800 pb-3">

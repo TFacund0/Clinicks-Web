@@ -63,6 +63,13 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
+        public async Task<Turno?> ObtenerParaActualizarAsync(int idTurno)
+        {
+            return await _context.Turnos
+                .FirstOrDefaultAsync(t => t.IdTurno == idTurno);
+        }
+
+        /// <inheritdoc/>
         public async Task CrearTurnoAsync(Turno turno)
         {
             _context.Turnos.Add(turno);
@@ -72,7 +79,40 @@ namespace ClinicksApi.Data.Repositories
         /// <inheritdoc/>
         public async Task ActualizarTurnoAsync(Turno turno)
         {
-            _context.Turnos.Update(turno);
+            // El objeto es cargado con seguimiento, por lo que no es necesario _context.Turnos.Update(turno),
+            // lo cual además genera errores por intentar actualizar entidades relacionadas navegables nulas.
+            await _context.SaveChangesAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<int?> ObtenerIdEstadoPorNombreAsync(string nombre)
+        {
+            var estado = await _context.EstadoTurnos.FirstOrDefaultAsync(e => e.Nombre.ToLower() == nombre.ToLower());
+            return estado?.IdEstadoTurno;
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<int>> ObtenerIdsEstadosPorNombresAsync(List<string> nombres)
+        {
+            var nombresLower = nombres.Select(n => n.ToLower()).ToList();
+            return await _context.EstadoTurnos
+                .Where(e => nombresLower.Contains(e.Nombre.ToLower()))
+                .Select(e => e.IdEstadoTurno)
+                .ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<List<Turno>> ObtenerTurnosPorFechaYEstadosAsync(DateTime fechaLimite, List<int> estadosIds)
+        {
+            return await _context.Turnos
+                .Where(t => t.FechaTurno.Date < fechaLimite && estadosIds.Contains(t.IdEstadoTurno))
+                .ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task ActualizarLoteTurnosAsync(List<Turno> turnos)
+        {
+            // Entidades ya trackeadas, simplemente hacemos save
             await _context.SaveChangesAsync();
         }
     }

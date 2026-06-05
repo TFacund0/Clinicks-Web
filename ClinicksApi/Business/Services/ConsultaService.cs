@@ -50,52 +50,52 @@ namespace ClinicksApi.Business.Services
         {
             try
             {
-                // 1. REGLAS DE NEGOCIO — Validaciones de negocio (los campos obligatorios ya se validan en el DTO).
-                // Prevenimos viajes en el tiempo: la fecha no puede ser del futuro.
+
                 if (consulta.fechaconsulta != null && consulta.fechaconsulta > DateTime.Now)
                     return (false, "La fecha de consulta no puede ser futura.", null);
 
-                // El médico debe ser válido y provenir del Token JWT.
+
                 if (idMedico <= 0)
                     return (false, "El Id del Médico logueado es obligatorio y debe ser mayor a cero.", null);
 
-                // 2. VERIFICACIÓN CRUZADA — Validamos que el DNI ingresado exista realmente en el sistema.
-                // Lo hacemos a través de IPacienteService para respetar SoC y aplicar sus reglas de negocio.
+
                 var pacienteDto = await _pacienteService.ObtenerPorDni(consulta.dnipaciente);
                 if (pacienteDto == null)
                     return (false, "Paciente no encontrado o no apto para consultas.", null);
 
-                // 3. MAPEO — Convertimos el DTO (JSON de React) en una Entidad que entiende Entity Framework.
+
                 var nuevaConsulta = new ConsultaMedica
                 {
                     Motivo          = consulta.motivo,
                     Diagnostico     = consulta.diagnostico,
-                    // Si el frontend no mandó estos campos, usamos valores por defecto con el operador "??".
+
                     Tratamiento     = consulta.tratamiento   ?? "sin definir",
                     Observacion     = consulta.observaciones ?? "sin observaciones relevantes",
                     Recomendacion   = consulta.recomendacion ?? "sin recomendaciones",
                     FechaConsulta   = consulta.fechaconsulta ?? DateTime.Now,
                     IdMedico        = idMedico,
-                    // Usamos el ID real de la BD proveído por el DTO; no confiamos en el DNI como identificador.
+
                     IdPaciente      = pacienteDto.Id
                 };
 
-                // 4. GUARDADO — El repositorio ejecuta el INSERT en PostgreSQL vinculándolo a un turno.
+
                 var resultado = await _consultaRepo.RegistrarConsulta(nuevaConsulta);
+
+                int idEstadoHecho = await _turnoRepository.ObtenerIdEstadoPorNombreAsync("Atendido") 
+                                 ?? ConstantesGenerales.EstadosTurno.AtendidoId;
 
                 if (consulta.idTurno.HasValue && consulta.idTurno.Value > 0)
                 {
-                    var turnoAActualizar = await _turnoRepository.ObtenerPorIdAsync(consulta.idTurno.Value);
+                    var turnoAActualizar = await _turnoRepository.ObtenerParaActualizarAsync(consulta.idTurno.Value);
                     if (turnoAActualizar != null)
                     {
                         turnoAActualizar.IdConsulta = resultado.IdConsulta;
-                        turnoAActualizar.IdEstadoTurno = ConstantesGenerales.EstadosTurno.RealizadoId;
+                        turnoAActualizar.IdEstadoTurno = idEstadoHecho;
                         await _turnoRepository.ActualizarTurnoAsync(turnoAActualizar);
                     }
                 }
                 else
                 {
-                    int idEstadoHecho = ConstantesGenerales.EstadosTurno.RealizadoId;
                     var nuevoTurno = new Turno
                     {
                         IdPaciente      = pacienteDto.Id,

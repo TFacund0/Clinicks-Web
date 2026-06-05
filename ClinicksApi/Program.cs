@@ -8,19 +8,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-// ====================================================================
-// FASE 1: CONSTRUCCIÓN DEL SERVIDOR (BUILDER)
-// Aquí configuramos todas las "herramientas" que nuestro servidor 
-// necesitará antes de arrancar (Base de datos, CORS, JWT, etc.)
-// ====================================================================
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Obtener la cadena de conexión del appsettings.json
+
 var connectionString = builder.Configuration.GetConnectionString("ClinicksDataBase");
 builder.Services.AddDbContext<ClinicksDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Configurar CORS para que React pueda conectarse usando configuración
+
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? new[] { "http://localhost:5173" };
 
 builder.Services.AddCors(options =>
@@ -33,7 +29,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Configurar Autenticación con JWT
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -49,18 +45,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// ====================================================================
-// INYECCIÓN DE DEPENDENCIAS (LA FÁBRICA DE OBJETOS)
-// ====================================================================
 
-// Capa de Datos (Repositorios)
 builder.Services.AddScoped<ITurnoRepository, TurnoRepository>();
 builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddScoped<IProcesoRepository, ProcesoRepository>();
 
-// Capa de Negocio (Servicios)
+
 builder.Services.AddScoped<ITurnoService, TurnoService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPacienteService, PacienteService>();
@@ -68,6 +60,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IConsultaService, ConsultaService>();
 builder.Services.AddScoped<IProcesoService, ProcesoService>();
 
+
+builder.Services.AddHostedService<ServicioLimpiezaTurnos>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -77,12 +71,7 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(xmlPath);
 });
 
-// ====================================================================
-// FASE 2: ENSAMBLAJE Y EJECUCIÓN DE LA APLICACIÓN (APP)
-// ====================================================================
 var app = builder.Build();
-
-// 1. MIDDLEWARE GLOBAL DE EXCEPCIONES: Atrapa cualquier error fatal
 app.UseMiddleware<ClinicksApi.Middlewares.ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -96,9 +85,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// ====================================================================
-// FASE 3: INICIALIZACIÓN DE DATOS MAESTROS (SEEDING)
-// ====================================================================
+
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ClinicksDbContext>();

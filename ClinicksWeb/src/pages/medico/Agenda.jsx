@@ -28,9 +28,7 @@ import {
 const Agenda = () => {
   const navigate = useNavigate();
 
-  // ==========================================
-  // ESTADOS Y LÓGICA (Extraídos en useAgenda)
-  // ==========================================
+
   const {
     vistaActual, setVistaActual,
     fechaSeleccionada, setFechaSeleccionada,
@@ -40,10 +38,10 @@ const Agenda = () => {
     navegarTemporal, irAHoy, guardarTurnos
   } = useAgenda();
 
-  // Guardamos el nombre del médico para el encabezado/saludo desde el Contexto (No desde localStorage)
+
   const { medicoNombre } = useAuth();
 
-  // Formateadores de fecha para el título principal
+
   const tituloFecha = useMemo(() => {
     if (vistaActual === 'dia') {
       return fechaSeleccionada.toLocaleDateString('es-AR', {
@@ -71,9 +69,7 @@ const Agenda = () => {
     }
   }, [fechaSeleccionada, vistaActual]);
 
-  // ==========================================
-  // FILTRADO Y PROCESAMIENTO DE TURNOS
-  // ==========================================
+
   const turnosFiltrados = useMemo(() => {
     return turnos.filter(t => {
       // Filtro de búsqueda textual (Nombre o DNI)
@@ -124,7 +120,7 @@ const Agenda = () => {
       totales: turnosFiltrados.length,
       atendidos: turnosFiltrados.filter(t => t.estado === ESTADOS_TURNO.ATENDIDO).length,
       enEspera: turnosFiltrados.filter(t => t.estado === ESTADOS_TURNO.CONFIRMADO || t.estado === ESTADOS_TURNO.PENDIENTE || t.estado === ESTADOS_TURNO.EN_CURSO).length,
-      cancelados: turnosFiltrados.filter(t => t.estado === ESTADOS_TURNO.CANCELADO || t.estado === ESTADOS_TURNO.RECHAZADO).length
+      cancelados: turnosFiltrados.filter(t => t.estado === ESTADOS_TURNO.CANCELADO).length
     };
   }, [turnosFiltrados]);
 
@@ -213,7 +209,6 @@ const Agenda = () => {
           texto: 'text-white font-bold'
         };
       case ESTADOS_TURNO.CANCELADO:
-      case ESTADOS_TURNO.RECHAZADO:
         return {
           badge: 'bg-red-500/10 text-red-400 border-red-500/20',
           card: 'border-slate-800 opacity-40 bg-slate-950',
@@ -289,7 +284,9 @@ const Agenda = () => {
                       </span>
                       <span className="text-slate-600">•</span>
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                        turno.tipo === 'Procedimiento' ? 'bg-purple-500/10 text-purple-400' : 'bg-cyan-500/10 text-cyan-400'
+                        turno.tipo === 'Procedimiento' ? 'bg-purple-500/10 text-purple-400' : 
+                        turno.tipo === 'Consulta' ? 'bg-cyan-500/10 text-cyan-400' :
+                        'bg-slate-500/10 text-slate-400'
                       }`}>
                         {turno.tipo}
                       </span>
@@ -810,7 +807,9 @@ const Agenda = () => {
                     <div className="bg-slate-900 border border-slate-850 p-4 rounded-xl">
                       <p className="text-[9px] text-slate-500 uppercase font-black">Tipo de Atención</p>
                       <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold mt-1.5 ${
-                        turnoSeleccionado.tipo === 'Procedimiento' ? 'bg-purple-500/10 text-purple-400' : 'bg-cyan-500/10 text-cyan-400'
+                        turnoSeleccionado.tipo === 'Procedimiento' ? 'bg-purple-500/10 text-purple-400' : 
+                        turnoSeleccionado.tipo === 'Consulta' ? 'bg-cyan-500/10 text-cyan-400' :
+                        'bg-slate-500/10 text-slate-400'
                       }`}>
                         {turnoSeleccionado.tipo}
                       </span>
@@ -834,34 +833,7 @@ const Agenda = () => {
                   )}
                 </div>
 
-                {/* Control Administrativo Simulado (Check-in manual en el consultorio) */}
-                <div className="space-y-3">
-                  <h4 className="text-[10px] text-slate-500 uppercase tracking-widest font-black">
-                    Check-in en Consultorio
-                  </h4>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => cambiarEstadoTurno(turnoSeleccionado.id, ESTADOS_TURNO.CONFIRMADO)}
-                      className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all ${
-                        turnoSeleccionado.estado === ESTADOS_TURNO.CONFIRMADO
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
-                      }`}
-                    >
-                      En Espera
-                    </button>
-                    <button 
-                      onClick={() => cambiarEstadoTurno(turnoSeleccionado.id, ESTADOS_TURNO.ATENDIDO)}
-                      className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all ${
-                        turnoSeleccionado.estado === ESTADOS_TURNO.ATENDIDO
-                        ? 'bg-slate-800 text-slate-400 border-slate-700'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
-                      }`}
-                    >
-                      Atendido
-                    </button>
-                  </div>
-                </div>
+
 
               </div>
 

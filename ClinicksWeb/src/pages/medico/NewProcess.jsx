@@ -24,7 +24,7 @@ const NewProcess = () => {
         tiposDisponibles,
     } = useNewProcess(dniEntrante, idTurnoEntrante);
 
-    // PROTECCIÓN DE RUTA: Si no hay DNI (acceso directo por URL), volvemos al buscador.
+
     React.useEffect(() => {
         if (!dniEntrante) {
             navigate('/acceso-procedimiento');
@@ -35,7 +35,7 @@ const NewProcess = () => {
     return (
         <PageLayout title="Nuevo Procedimiento">
             <div className="max-w-4xl mx-auto">
-                {/* SOC-2: Corregido el saludo copiado del Dashboard */}
+
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold text-white tracking-tight">Nuevo Procedimiento</h1>
                     <p className="text-slate-500 mt-1">Complete el formulario para registrar el procedimiento médico.</p>
@@ -56,7 +56,7 @@ const NewProcess = () => {
                                     </div>
                                     <div>
                                         <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Fecha del proceso</label>
-                                        <input type="date" name="fechaproceso" value={formData.fechaproceso} onChange={handleChange} className={`w-full bg-slate-950 border ${errors.fechaproceso ? 'border-red-500' : 'border-slate-800'} rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors scheme-dark`} />
+                                        <input type="datetime-local" name="fechaproceso" value={formData.fechaproceso} disabled className={`w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed`} />
                                         {errors.fechaproceso && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.fechaproceso}</p>}
                                     </div>
                                 </div>

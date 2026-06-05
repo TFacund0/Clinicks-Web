@@ -19,25 +19,46 @@ namespace ClinicksApi.Data
                 // Asegurar que la base de datos esté creada (y aplicar migraciones si corresponde)
                 // context.Database.Migrate(); // Opcional, pero útil si se ejecuta en entornos nuevos.
                 
-                // 1. Garantizar que el estado de turno 'Realizado' (ID = RealizadoId) exista.
-                var existeRealizado = await context.EstadoTurnos.AnyAsync(e => e.IdEstadoTurno == ConstantesGenerales.EstadosTurno.RealizadoId);
-                if (!existeRealizado)
-                {
-                    var realizado = new EstadoTurno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.RealizadoId, Nombre = "Realizado" };
-                    context.EstadoTurnos.Add(realizado);
-                    Console.WriteLine($"[DB INITIALIZER] Seed de Estado de Turno 'Realizado' (ID = {ConstantesGenerales.EstadosTurno.RealizadoId}) agregado.");
-                }
+                // Limpiar la tabla si no es muy costoso, pero mejor simplemente asegurarnos que los 5 existan.
+                // Como los IDs podrían estar tomados, usamos Upsert o verificamos uno a uno.
 
-                // 2. Garantizar que el estado de turno 'Atendido' (buscado por PacienteRepository) exista.
-                var existeAtendido = await context.EstadoTurnos.AnyAsync(e => e.IdEstadoTurno == ConstantesGenerales.EstadosTurno.AtendidoId);
-                if (!existeAtendido)
+                var estados = new[]
                 {
-                    var atendido = new EstadoTurno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.AtendidoId, Nombre = "Atendido" };
-                    context.EstadoTurnos.Add(atendido);
-                    Console.WriteLine("[DB INITIALIZER] Seed de Estado de Turno 'Atendido' agregado.");
+                    new EstadoTurno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.PendienteId, Nombre = "Pendiente" },
+                    new EstadoTurno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.ConfirmadoId, Nombre = "Confirmado" },
+                    new EstadoTurno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.EnCursoId, Nombre = "En curso" },
+                    new EstadoTurno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.AtendidoId, Nombre = "Atendido" },
+                    new EstadoTurno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.CanceladoId, Nombre = "Cancelado" }
+                };
+
+                foreach (var estado in estados)
+                {
+                    var existe = await context.EstadoTurnos.AnyAsync(e => e.IdEstadoTurno == estado.IdEstadoTurno);
+                    if (!existe)
+                    {
+                        context.EstadoTurnos.Add(estado);
+                        Console.WriteLine($"[DB INITIALIZER] Seed de Estado '{estado.Nombre}' (ID={estado.IdEstadoTurno}) agregado.");
+                    }
+                    else
+                    {
+                        var eBD = await context.EstadoTurnos.FindAsync(estado.IdEstadoTurno);
+                        if (eBD != null && eBD.Nombre != estado.Nombre)
+                        {
+                            eBD.Nombre = estado.Nombre;
+                            Console.WriteLine($"[DB INITIALIZER] Seed de Estado (ID={estado.IdEstadoTurno}) actualizado a '{estado.Nombre}'.");
+                        }
+                    }
                 }
 
                 await context.SaveChangesAsync();
+
+                var todosLosEstados = await context.EstadoTurnos.ToListAsync();
+                Console.WriteLine("\n[DEBUG] --- ESTADOS DE TURNO EN LA BD ---");
+                foreach (var est in todosLosEstados)
+                {
+                    Console.WriteLine($"ID: {est.IdEstadoTurno} | Nombre: {est.Nombre}");
+                }
+                Console.WriteLine("[DEBUG] ---------------------------------\n");
             }
             catch (Exception ex)
             {

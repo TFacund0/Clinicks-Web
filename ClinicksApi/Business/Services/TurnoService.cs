@@ -40,6 +40,40 @@ namespace ClinicksApi.Business.Services
             return MapToDto(t);
         }
 
+        /// <inheritdoc/>
+        public async Task<int> CancelarTurnosVencidosAsync()
+        {
+            var fechaLimite = DateTime.Now.Date;
+
+            var estadosPendientesNombres = new List<string> { "pendiente", "confirmado" };
+            var estadosPendientesIds = await _turnoRepository.ObtenerIdsEstadosPorNombresAsync(estadosPendientesNombres);
+
+            if (!estadosPendientesIds.Any())
+            {
+                estadosPendientesIds.Add(ClinicksApi.Constants.ConstantesGenerales.EstadosTurno.ConfirmadoId);
+            }
+
+            var idCancelado = await _turnoRepository.ObtenerIdEstadoPorNombreAsync("cancelado");
+            if (idCancelado == null || idCancelado == 0)
+            {
+                idCancelado = ClinicksApi.Constants.ConstantesGenerales.EstadosTurno.CanceladoId;
+            }
+
+            var turnosVencidos = await _turnoRepository.ObtenerTurnosPorFechaYEstadosAsync(fechaLimite, estadosPendientesIds);
+
+            if (turnosVencidos.Any())
+            {
+                foreach (var turno in turnosVencidos)
+                {
+                    turno.IdEstadoTurno = idCancelado.Value;
+                }
+
+                await _turnoRepository.ActualizarLoteTurnosAsync(turnosVencidos);
+            }
+
+            return turnosVencidos.Count;
+        }
+
         /// <summary>
         /// Método auxiliar para mapear la entidad Turno a TurnoAgendaDto.
         /// </summary>
@@ -53,7 +87,9 @@ namespace ClinicksApi.Business.Services
                 PacienteNombreCompleto = t.IdPacienteNavigation != null ? $"{t.IdPacienteNavigation.Nombre} {t.IdPacienteNavigation.Apellido}".Trim() : "Paciente desconocido",
                 DniPaciente = t.IdPacienteNavigation?.Dni ?? string.Empty,
                 Motivo = t.Motivo ?? string.Empty,
-                Estado = t.IdEstadoTurnoNavigation?.Nombre ?? string.Empty
+                Estado = t.IdEstadoTurnoNavigation?.Nombre ?? string.Empty,
+                IdConsulta = t.IdConsulta,
+                IdProcedimiento = t.IdProcedimiento
             };
         }
     }

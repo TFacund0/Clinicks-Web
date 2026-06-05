@@ -24,5 +24,11 @@ namespace ClinicksApi.Business.Interfaces
 
         /// <summary>Obtiene un turno mapeado a DTO por su ID.</summary>
         Task<TurnoAgendaDto?> ObtenerTurnoPorIdAsync(int idTurno);
+
+        /// <summary>
+        /// Busca todos los turnos anteriores a hoy que sigan Pendientes o Agendados y los marca como Cancelados.
+        /// Retorna la cantidad de turnos que fueron cancelados.
+        /// </summary>
+        Task<int> CancelarTurnosVencidosAsync();
     }
 }

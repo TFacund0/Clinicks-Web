@@ -12,5 +12,7 @@ namespace ClinicksApi.Business.DTOs
         public string DniPaciente { get; set; } = string.Empty;
         public string Motivo { get; set; } = string.Empty;
         public string Estado { get; set; } = string.Empty;
+        public int? IdConsulta { get; set; }
+        public int? IdProcedimiento { get; set; }
     }
 }
