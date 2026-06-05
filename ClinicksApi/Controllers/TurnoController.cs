@@ -17,7 +17,7 @@ namespace ClinicksApi.Controllers
     /// Es el "Recepcionista" que muestra la agenda diaria al médico.
     /// </summary>
     [Authorize] // Requiere autenticación para acceder a los endpoints de este controlador
-    public class AgendaController : ControllerBase
+    public class TurnoController : ControllerBase
     {
         private readonly ITurnoService _turnoService;
 
@@ -25,7 +25,7 @@ namespace ClinicksApi.Controllers
         /// Constructor del controlador. Aquí se aplica la Inyección de Dependencias para obtener una instancia del servicio de turnos.
         /// </summary>
         /// <param name="turnoService">El servicio (Especialista) que contiene la lógica real para obtener los turnos agendados.</param>
-        public AgendaController(ITurnoService turnoService)
+        public TurnoController(ITurnoService turnoService)
         {
             _turnoService = turnoService;
         }

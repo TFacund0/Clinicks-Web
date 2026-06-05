@@ -28,11 +28,11 @@ namespace ClinicksApi.Business.Services
         public async Task<LoginResponseDto?> AuthenticateAsync(string username, string password)
         {
             // Buscar el usuario por username o matrícula (fallback coordinado en la capa de servicios)
-            var usuario = await _authRepository.GetUsuarioByUsernameAsync(username);
+            var usuario = await _authRepository.ObtenerUsuarioPorUsernameAsync(username);
 
             if (usuario == null)
             {
-                usuario = await _authRepository.GetUsuarioByMedicoMatriculaAsync(username);
+                usuario = await _authRepository.ObtenerUsuarioPorMatriculaAsync(username);
             }
 
             if (usuario == null)
@@ -61,7 +61,7 @@ namespace ClinicksApi.Business.Services
             }
 
             // Buscar al médico vinculado
-            var medico = await _authRepository.GetMedicoByUsuarioIdAsync(usuario.IdUsuario);
+            var medico = await _authRepository.ObtenerMedicoPorUsuarioIdAsync(usuario.IdUsuario);
 
             // Si el usuario no tiene médico vinculado, rechazamos el login de inmediato en lugar de usar un fallback
             // que suplantaría la identidad de otro médico.
@@ -86,7 +86,7 @@ namespace ClinicksApi.Business.Services
         /// <inheritdoc/>
         public async Task<int> HashExistingPasswordsAsync()
         {
-            var usuarios = await _authRepository.GetAllUsuariosAsync();
+            var usuarios = await _authRepository.ObtenerTodosLosUsuariosAsync();
             int count = 0;
 
             foreach (var usuario in usuarios)
@@ -94,7 +94,7 @@ namespace ClinicksApi.Business.Services
                 if (!usuario.Password.StartsWith("$2"))
                 {
                     usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password.Trim());
-                    await _authRepository.UpdateUsuarioAsync(usuario);
+                    await _authRepository.ActualizarUsuarioAsync(usuario);
                     count++;
                 }
             }

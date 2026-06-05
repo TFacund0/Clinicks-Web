@@ -11,6 +11,8 @@ namespace ClinicksApi.Tests
     {
         // El Mock (Simulador) de la base de datos
         private readonly Mock<IPacienteRepository> _pacienteRepoMock;
+        private readonly Mock<IConsultaRepository> _consultaRepoMock;
+        private readonly Mock<IProcesoRepository> _procesoRepoMock;
         // El servicio REAL que queremos probar
         private readonly PacienteService _pacienteService;
 
@@ -18,8 +20,10 @@ namespace ClinicksApi.Tests
         {
             // 1. Inicializamos el simulador vacío
             _pacienteRepoMock = new Mock<IPacienteRepository>();
+            _consultaRepoMock = new Mock<IConsultaRepository>();
+            _procesoRepoMock = new Mock<IProcesoRepository>();
             // 2. Le pasamos el objeto simulado (.Object) a nuestro servicio real
-            _pacienteService = new PacienteService(_pacienteRepoMock.Object);
+            _pacienteService = new PacienteService(_pacienteRepoMock.Object, _consultaRepoMock.Object, _procesoRepoMock.Object);
         }
 
         [Fact]
@@ -39,7 +43,7 @@ namespace ClinicksApi.Tests
             };
 
             // ACÁ USAMOS MOQ: Le ordenamos qué responder
-            _pacienteRepoMock.Setup(repo => repo.GetByIdAsync(idPrueba))
+            _pacienteRepoMock.Setup(repo => repo.ObtenerPorIdAsync(idPrueba))
                              .ReturnsAsync(pacienteFake);
 
             // ACT
@@ -67,7 +71,7 @@ namespace ClinicksApi.Tests
             };
 
             // ACÁ USAMOS MOQ OTRA VEZ
-            _pacienteRepoMock.Setup(repo => repo.GetByIdAsync(idPrueba))
+            _pacienteRepoMock.Setup(repo => repo.ObtenerPorIdAsync(idPrueba))
                              .ReturnsAsync(pacienteFake);
 
             // ACT
@@ -85,7 +89,7 @@ namespace ClinicksApi.Tests
             string dniInexistente = "11222333";
 
             // MOQ simulando que la base de datos no encontró el DNI
-            _pacienteRepoMock.Setup(repo => repo.GetByDniAsync(dniInexistente))
+            _pacienteRepoMock.Setup(repo => repo.ObtenerPorDniAsync(dniInexistente))
                              .ReturnsAsync((Paciente?)null);
 
             // ACT

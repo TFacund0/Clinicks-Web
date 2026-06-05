@@ -28,8 +28,8 @@ const agendaService = {
           : fechaFin;
       }
 
-      // Hacemos la petición GET a /api/Agenda/turnos-medico enviando los parámetros
-      const response = await clinicksApi.get('/Agenda/turnos-medico', { params });
+      // Hacemos la petición GET a /api/Turno/turnos-medico enviando los parámetros
+      const response = await clinicksApi.get('/Turno/turnos-medico', { params });
       
       // Nuestra API devuelve un objeto que contiene el array de turnos: { turnos: [...] }
       // (Si no había turnos, también trae un 'mensaje', pero siempre trae el array 'turnos')
@@ -48,7 +48,7 @@ const agendaService = {
    */
   obtenerTurnoPorId: async (idTurno) => {
     try {
-      const response = await clinicksApi.get(`/Agenda/${idTurno}`);
+      const response = await clinicksApi.get(`/Turno/${idTurno}`);
       return response.data;
     } catch (error) {
       console.error(`Error al obtener el turno ${idTurno}:`, error);

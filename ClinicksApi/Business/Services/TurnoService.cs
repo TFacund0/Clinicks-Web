@@ -21,7 +21,7 @@ namespace ClinicksApi.Business.Services
         /// <inheritdoc/>
         public async Task<IEnumerable<TurnoAgendaDto>> ObtenerTurnosAgendadosAsync()
         {
-            var turnosDB = await _turnoRepository.GetAllAsync();
+            var turnosDB = await _turnoRepository.ObtenerTodosAsync();
 
             return turnosDB.Select(MapToDto);
         }
@@ -29,7 +29,7 @@ namespace ClinicksApi.Business.Services
         /// <inheritdoc/>
         public async Task<IEnumerable<TurnoAgendaDto>> ObtenerTurnosMedicoAsync(int idMedico, DateTime? fechaInicio, DateTime? fechaFin)
         {
-            var turnosDB = await _turnoRepository.GetTurnosByMedicoIdAsync(idMedico, fechaInicio, fechaFin);
+            var turnosDB = await _turnoRepository.ObtenerTurnosMedicoAsync(idMedico, fechaInicio, fechaFin);
 
             return turnosDB.Select(MapToDto);
         }
@@ -37,7 +37,7 @@ namespace ClinicksApi.Business.Services
         /// <inheritdoc/>
         public async Task<TurnoAgendaDto?> ObtenerTurnoPorIdAsync(int idTurno)
         {
-            var t = await _turnoRepository.GetByIdAsync(idTurno);
+            var t = await _turnoRepository.ObtenerPorIdAsync(idTurno);
             if (t == null) return null;
 
             return MapToDto(t);

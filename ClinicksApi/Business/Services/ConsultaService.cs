@@ -86,7 +86,7 @@ namespace ClinicksApi.Business.Services
 
                 if (consulta.idTurno.HasValue && consulta.idTurno.Value > 0)
                 {
-                    var turnoAActualizar = await _turnoRepository.GetByIdAsync(consulta.idTurno.Value);
+                    var turnoAActualizar = await _turnoRepository.ObtenerPorIdAsync(consulta.idTurno.Value);
                     if (turnoAActualizar != null)
                     {
                         turnoAActualizar.IdConsulta = resultado.IdConsulta;

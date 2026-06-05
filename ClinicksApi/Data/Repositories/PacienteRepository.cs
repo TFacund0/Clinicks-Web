@@ -21,7 +21,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Paciente>> GetAllAsync()
+        public async Task<IEnumerable<Paciente>> ObtenerTodosAsync()
         {
             return await _context.Pacientes
                 .AsNoTracking()
@@ -32,7 +32,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<Paciente?> GetByIdAsync(int id)
+        public async Task<Paciente?> ObtenerPorIdAsync(int id)
         {
             return await _context.Pacientes
                 .AsNoTracking()
@@ -43,7 +43,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<Paciente?> GetByDniAsync(string dni)
+        public async Task<Paciente?> ObtenerPorDniAsync(string dni)
         {
             return await _context.Pacientes
                 .AsNoTracking()

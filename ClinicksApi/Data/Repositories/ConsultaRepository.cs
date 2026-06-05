@@ -39,22 +39,14 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task CrearTurnoVinculado(Turno turno)
+        public async Task<List<ConsultaMedica>> ObtenerHistorialConsultasAsync(int pacienteId)
         {
-            _context.Turnos.Add(turno);
-            await _context.SaveChangesAsync();
-        }
-
-        /// <inheritdoc/>
-        public async Task ActualizarTurnoVinculado(int idTurno, int idConsulta)
-        {
-            var turno = await _context.Turnos.FirstOrDefaultAsync(t => t.IdTurno == idTurno);
-            if (turno != null)
-            {
-                turno.IdConsulta = idConsulta;
-                turno.IdEstadoTurno = ConstantesGenerales.EstadosTurno.RealizadoId;
-                await _context.SaveChangesAsync();
-            }
+            return await _context.ConsultaMedicas
+                .AsNoTracking()
+                .Include(c => c.IdMedicoNavigation)
+                .Where(c => c.IdPaciente == pacienteId)
+                .OrderByDescending(c => c.FechaConsulta)
+                .ToListAsync();
         }
     }
 }

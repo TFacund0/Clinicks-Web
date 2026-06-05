@@ -21,7 +21,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Turno>> GetAllAsync()
+        public async Task<IEnumerable<Turno>> ObtenerTodosAsync()
         {
             var turnos = await _context.Turnos
             .Include(t => t.IdPacienteNavigation)
@@ -35,7 +35,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Turno>> GetTurnosByMedicoIdAsync(int idMedico, DateTime? fechaInicio, DateTime? fechaFin)
+        public async Task<IEnumerable<Turno>> ObtenerTurnosMedicoAsync(int idMedico, DateTime? fechaInicio, DateTime? fechaFin)
         {
             var query = _context.Turnos
                 .Include(t => t.IdPacienteNavigation)
@@ -56,7 +56,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<Turno?> GetByIdAsync(int idTurno)
+        public async Task<Turno?> ObtenerPorIdAsync(int idTurno)
         {
             return await _context.Turnos
                 .Include(t => t.IdPacienteNavigation)

@@ -99,7 +99,7 @@ public class PacientesController : ControllerBase
     /// Obtiene el historial clínico completo del paciente (datos, consultas y procesos) en una sola respuesta.
     /// </summary>
     /// <param name="id">El ID del paciente.</param>
-    [HttpGet("{id}/historial")]
+    [HttpGet("{pacienteId}/historial")]
     public async Task<IActionResult> ObtenerHistorialClinico(int pacienteId)
     {
         var historial = await _pacienteService.ObtenerHistorialClinico(pacienteId);

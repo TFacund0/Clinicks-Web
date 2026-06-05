@@ -21,7 +21,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<Usuario?> GetUsuarioByUsernameAsync(string username)
+        public async Task<Usuario?> ObtenerUsuarioPorUsernameAsync(string username)
         {
             var cleanUsername = username.Trim().ToLower();
             return await _context.Usuarios
@@ -30,7 +30,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<Usuario?> GetUsuarioByMedicoMatriculaAsync(string matricula)
+        public async Task<Usuario?> ObtenerUsuarioPorMatriculaAsync(string matricula)
         {
             var cleanMatricula = matricula.Trim().ToLower();
             var medico = await _context.Medicos
@@ -48,7 +48,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<Medico?> GetMedicoByUsuarioIdAsync(int usuarioId)
+        public async Task<Medico?> ObtenerMedicoPorUsuarioIdAsync(int usuarioId)
         {
             return await _context.Medicos
                 .AsNoTracking()
@@ -56,13 +56,13 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Usuario>> GetAllUsuariosAsync()
+        public async Task<IEnumerable<Usuario>> ObtenerTodosLosUsuariosAsync()
         {
             return await _context.Usuarios.ToListAsync();
         }
 
         /// <inheritdoc/>
-        public async Task UpdateUsuarioAsync(Usuario usuario)
+        public async Task ActualizarUsuarioAsync(Usuario usuario)
         {
             _context.Usuarios.Update(usuario);
             await _context.SaveChangesAsync();

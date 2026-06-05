@@ -13,13 +13,17 @@ namespace ClinicksApi.Business.Services
     public class PacienteService : IPacienteService
     {
         private readonly IPacienteRepository _repository;
+        private readonly IConsultaRepository _consultaRepository;
+        private readonly IProcesoRepository _procesoRepository;
 
         /// <summary>
         /// Inyección de dependencias: ASP.NET nos da el repositorio listo para usar.
         /// </summary>
-        public PacienteService(IPacienteRepository repository)
+        public PacienteService(IPacienteRepository repository, IConsultaRepository consultaRepository, IProcesoRepository procesoRepository)
         {
             _repository = repository;
+            _consultaRepository = consultaRepository;
+            _procesoRepository = procesoRepository;
         }
 
         /// <summary>
@@ -36,7 +40,7 @@ namespace ClinicksApi.Business.Services
         /// </summary>
         public async Task<IEnumerable<PacienteDto>> ObtenerListado()
         {
-            var datos = await _repository.GetAllAsync();
+            var datos = await _repository.ObtenerTodosAsync();
             return datos.Select(MapToDto);
         }
 
@@ -45,7 +49,7 @@ namespace ClinicksApi.Business.Services
         /// </summary>
         public async Task<PacienteDto?> ObtenerPorId(int id)
         {
-            var dato = await _repository.GetByIdAsync(id);
+            var dato = await _repository.ObtenerPorIdAsync(id);
             if (dato == null) return null;
 
             return MapToDto(dato);
@@ -57,7 +61,7 @@ namespace ClinicksApi.Business.Services
         /// </summary>
         public async Task<PacienteDto?> ObtenerPorDni(string dni)
         {
-            var dato = await _repository.GetByDniAsync(dni);
+            var dato = await _repository.ObtenerPorDniAsync(dni);
             if (dato == null) return null;
 
             // Aquí se pueden agregar reglas de negocio (ej. retornar null si el paciente está inactivo)
@@ -105,8 +109,8 @@ namespace ClinicksApi.Business.Services
             var pacienteDto = await ObtenerPorId(pacienteId);
             if (pacienteDto == null) return null;
 
-            var consultasDirectas = await _repository.ObtenerHistorialConsultasAsync(pacienteId);
-            var procedimientosDB = await _repository.ObtenerHistorialProcedimientosAsync(pacienteId);
+            var consultasDirectas = await _consultaRepository.ObtenerHistorialConsultasAsync(pacienteId);
+            var procedimientosDB = await _procesoRepository.ObtenerHistorialProcedimientosAsync(pacienteId);
 
             var consultas = consultasDirectas
                 .Select(c => new ConsultaHistorialDto
@@ -125,17 +129,19 @@ namespace ClinicksApi.Business.Services
                 .ToList();
 
             var procedimientos = procedimientosDB
-                .Where(t => t.IdProcedimientoNavigation != null)
-                .Select(t => new ProcesoHistorialDto
-                {
-                    IdProcedimiento = t.IdProcedimientoNavigation!.IdProcedimiento,
-                    Tipo = t.IdProcedimientoNavigation.Tipo,
-                    Descripcion = t.IdProcedimientoNavigation.Descripcion ?? string.Empty,
-                    Resultado = t.IdProcedimientoNavigation.Resultado ?? string.Empty,
-                    Fecha = t.IdProcedimientoNavigation.Fecha,
-                    MedicoAtencion = t.IdMedicoNavigation != null 
-                        ? $"Dr/Dra. {t.IdMedicoNavigation.Nombre} {t.IdMedicoNavigation.Apellido}" 
-                        : "No registrado"
+                .Select(p => {
+                    var turnoAsociado = p.Turnos.FirstOrDefault();
+                    return new ProcesoHistorialDto
+                    {
+                        IdProcedimiento = p.IdProcedimiento,
+                        Tipo = p.Tipo,
+                        Descripcion = p.Descripcion ?? string.Empty,
+                        Resultado = p.Resultado ?? string.Empty,
+                        Fecha = p.Fecha,
+                        MedicoAtencion = turnoAsociado?.IdMedicoNavigation != null 
+                            ? $"Dr/Dra. {turnoAsociado.IdMedicoNavigation.Nombre} {turnoAsociado.IdMedicoNavigation.Apellido}" 
+                            : "No registrado"
+                    };
                 })
                 .ToList();
 

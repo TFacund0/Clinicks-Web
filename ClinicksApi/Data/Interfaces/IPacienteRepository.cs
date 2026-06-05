@@ -8,12 +8,12 @@ namespace ClinicksApi.Data.Interfaces
     public interface IPacienteRepository
     {
         /// <summary>Ejecuta un SELECT * FROM Pacientes incluyendo las tablas relacionadas por defecto.</summary>
-        Task<IEnumerable<Paciente>> GetAllAsync();
+        Task<IEnumerable<Paciente>> ObtenerTodosAsync();
         /// <summary>Busca un paciente único por su Primary Key (IdPaciente).</summary>
-        Task<Paciente?> GetByIdAsync(int id);
+        Task<Paciente?> ObtenerPorIdAsync(int id);
 
         /// <summary>Busca un paciente filtrando por la columna DNI.</summary>
-        Task<Paciente?> GetByDniAsync(string dni);
+        Task<Paciente?> ObtenerPorDniAsync(string dni);
 
         /// <summary>
         /// Busca pacientes cruzando la tabla Turnos para encontrar aquellos que han sido
