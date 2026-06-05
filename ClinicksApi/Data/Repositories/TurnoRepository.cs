@@ -70,6 +70,18 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
+        public async Task<Turno?> ObtenerTurnoPendienteDelDiaAsync(int idPaciente, int idMedico, DateTime fecha)
+        {
+            return await _context.Turnos
+                .Where(t => t.IdPaciente == idPaciente 
+                         && t.IdMedico == idMedico 
+                         && t.FechaTurno.Date == fecha.Date
+                         && (t.IdEstadoTurnoNavigation.Nombre.ToLower() == "confirmado" || t.IdEstadoTurnoNavigation.Nombre.ToLower() == "pendiente"))
+                .OrderBy(t => t.FechaTurno)
+                .FirstOrDefaultAsync();
+        }
+
+        /// <inheritdoc/>
         public async Task CrearTurnoAsync(Turno turno)
         {
             _context.Turnos.Add(turno);
