@@ -21,7 +21,7 @@ namespace ClinicksApi.Business.Services
         }
 
         /// <inheritdoc/>
-        public string GenerateToken(Medico medico)
+        public string GenerarToken(Medico medico)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtKey = _config["Jwt:Key"] ?? throw new InvalidOperationException("La clave secreta JWT no está configurada.");

@@ -33,7 +33,7 @@ namespace ClinicksApi.Controllers
         /// Registra un nuevo procedimiento médico vinculado al paciente y al médico autenticado.
         /// Crea automáticamente un Turno en la base de datos para asociar el procedimiento con ambas partes.
         /// </summary>
-        /// <param name="dto">DTO con los datos del procedimiento (tipo, descripción, DNI del paciente, fecha, resultado).</param>
+        /// <param name="procedimiento">DTO con los datos del procedimiento (tipo, descripción, DNI del paciente, fecha, resultado).</param>
         /// <returns>
         /// <see cref="OkResult"/> (200) con un mensaje de éxito si el procedimiento se registró correctamente.
         /// <see cref="BadRequestResult"/> (400) si los datos son inválidos o el paciente no existe.
@@ -72,7 +72,7 @@ namespace ClinicksApi.Controllers
         /// </summary>
         /// <returns><see cref="OkResult"/> (200) con la lista de tipos de procedimiento disponibles.</returns>
         [HttpGet("tipos")]
-        public IActionResult GetTiposProceso()
+        public IActionResult ObtenerTiposProceso()
         {
             var tipos = _procesoService.ObtenerTiposProceso();
             return Ok(tipos);

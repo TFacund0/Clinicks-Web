@@ -13,8 +13,8 @@ namespace ClinicksApi.Business.Interfaces
         /// Aplica las reglas de negocio y persiste un nuevo procedimiento médico en la base de datos,
         /// creando además el Turno de vinculación entre el procedimiento, el paciente y el médico.
         /// </summary>
-        /// <param name="dto">DTO con los datos del formulario (tipo de proceso, descripción, DNI del paciente, etc.).</param>
-        /// <param name="idMedicoLogueado">ID del médico autenticado, extraído del Token JWT en el Controlador.</param>
+        /// <param name="procedimiento">DTO con los datos del formulario (tipo de proceso, descripción, DNI del paciente, etc.).</param>
+        /// <param name="idMedico">ID del médico autenticado, extraído del Token JWT en el Controlador.</param>
         /// <returns>
         /// Una tupla con tres valores:
         /// <c>Success</c> (bool): indica si la operación fue exitosa.

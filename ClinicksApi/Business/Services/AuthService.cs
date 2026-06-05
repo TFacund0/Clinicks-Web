@@ -21,7 +21,7 @@ namespace ClinicksApi.Business.Services
         }
 
         /// <inheritdoc/>
-        public async Task<LoginResponseDto?> AuthenticateAsync(string username, string password)
+        public async Task<LoginResponseDto?> AutenticarAsync(string username, string password)
         {
             // Buscar el usuario por username o matrícula (fallback coordinado en la capa de servicios)
             var usuario = await _authRepository.ObtenerUsuarioPorUsernameAsync(username);
@@ -67,7 +67,7 @@ namespace ClinicksApi.Business.Services
             }
 
             // Generar el Token JWT usando el servicio abstraído
-            var tokenString = _tokenService.GenerateToken(medico);
+            var token = _tokenService.GenerarToken(medico);
 
             return new LoginResponseDto
             {
@@ -75,12 +75,12 @@ namespace ClinicksApi.Business.Services
                 Nombre = medico.Nombre,
                 Apellido = medico.Apellido,
                 Matricula = medico.Matricula,
-                Token = tokenString
+                Token = token
             };
         }
 
         /// <inheritdoc/>
-        public async Task<int> HashExistingPasswordsAsync()
+        public async Task<int> EncriptarClavesExistentesAsync()
         {
             var usuarios = await _authRepository.ObtenerTodosLosUsuariosAsync();
             int count = 0;

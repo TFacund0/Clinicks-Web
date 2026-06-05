@@ -13,6 +13,6 @@ namespace ClinicksApi.Business.Interfaces
         /// </summary>
         /// <param name="medico">Entidad de médico para la cual generar el token.</param>
         /// <returns>String con el token JWT.</returns>
-        string GenerateToken(Medico medico);
+        string GenerarToken(Medico medico);
     }
 }

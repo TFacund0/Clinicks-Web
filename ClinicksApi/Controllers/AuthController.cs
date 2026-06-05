@@ -34,9 +34,9 @@ namespace ClinicksApi.Controllers
         /// <see cref="UnauthorizedResult"/> (401) si las credenciales son inválidas.
         /// </returns>
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> IniciarSesion([FromBody] LoginRequest request)
         {
-            var medico = await _authService.AuthenticateAsync(request.Username, request.Password);
+            var medico = await _authService.AutenticarAsync(request.Username, request.Password);
 
             if (medico == null)
                 return Unauthorized(new { message = "Usuario o contraseña incorrectos." });
@@ -56,7 +56,7 @@ namespace ClinicksApi.Controllers
             {
                 return Unauthorized(new { message = "Clave secreta incorrecta." });
             }
-            var cantidad = await _authService.HashExistingPasswordsAsync();
+            var cantidad = await _authService.EncriptarClavesExistentesAsync();
             return Ok(new { message = $"Se han encriptado {cantidad} contraseñas exitosamente." });
         }
     }

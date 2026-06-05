@@ -15,8 +15,7 @@ namespace ClinicksApi.Business.Services
         private readonly ITurnoRepository _turnoRepository;
         private readonly ILogger<ProcesoService> _logger;
         
-        /// <param name="pacienteService">Servicio para verificar la existencia del paciente por DNI antes de registrar.</param>
-        /// <param name="logger">Logger de diagnóstico del servicio.</param>
+
         private static readonly List<object> _tiposProceso = new List<object>
         {
             new { id = 1, nombre = "Cirugía Menor" },
@@ -30,6 +29,11 @@ namespace ClinicksApi.Business.Services
             new { id = 9, nombre = "Otro" }
         };
 
+        /// <summary>Constructor de ProcesoService</summary>
+        /// <param name="procesoRepo">Repositorio de procesos</param>
+        /// <param name="pacienteService">Servicio para verificar la existencia del paciente por DNI antes de registrar.</param>
+        /// <param name="turnoRepository">Repositorio de turnos</param>
+        /// <param name="logger">Logger de diagnóstico del servicio.</param>
         public ProcesoService(IProcesoRepository procesoRepo, IPacienteService pacienteService, ITurnoRepository turnoRepository, ILogger<ProcesoService> logger)
         {
             _procesoRepo = procesoRepo;
@@ -112,8 +116,6 @@ namespace ClinicksApi.Business.Services
         {
             return _tiposProceso;
         }
-
-        /// <inheritdoc/>
 
     }
 }

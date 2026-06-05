@@ -15,7 +15,10 @@ namespace ClinicksApi.Business.Services
         private readonly ITurnoRepository _turnoRepository;
         private readonly ILogger<ConsultaService> _logger;
         
+        /// <summary>Constructor de ConsultaService</summary>
+        /// <param name="consultaRepo">Repositorio de consultas</param>
         /// <param name="pacienteService">Servicio para verificar la existencia del paciente por DNI antes de registrar.</param>
+        /// <param name="turnoRepository">Repositorio de turnos</param>
         /// <param name="logger">Logger de diagnóstico del servicio.</param>
         public ConsultaService(IConsultaRepository consultaRepo, IPacienteService pacienteService, ITurnoRepository turnoRepository, ILogger<ConsultaService> logger)
         {

@@ -8,13 +8,12 @@ using ClinicksApi.Constants;
 
 namespace ClinicksApi.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-
     /// <summary>
     /// Controlador responsable de gestionar la agenda de turnos en la clínica.
     /// Proporciona endpoints para obtener la lista de turnos agendados, con detalles del paciente, motivo y estado del turno.
     /// </summary>
+    [Route("api/[controller]")]
+    [ApiController]
     [Authorize] // Requiere autenticación para acceder a los endpoints de este controlador
     public class TurnoController : ControllerBase
     {

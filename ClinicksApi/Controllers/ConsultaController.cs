@@ -32,7 +32,7 @@ namespace ClinicksApi.Controllers
         /// Registra una nueva consulta médica en el sistema.
         /// Valida que el paciente exista por DNI antes de persistir la información.
         /// </summary>
-        /// <param name="dto">DTO con los datos de la consulta enviados por el frontend (motivo, diagnóstico, DNI del paciente, etc.).</param>
+        /// <param name="consulta">DTO con los datos de la consulta enviados por el frontend (motivo, diagnóstico, DNI del paciente, etc.).</param>
         /// <returns>
         /// <see cref="OkResult"/> (200) con un mensaje de éxito si la consulta se registró correctamente.
         /// <see cref="BadRequestResult"/> (400) si el paciente no existe o faltan campos obligatorios.

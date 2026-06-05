@@ -19,8 +19,8 @@ namespace ClinicksApi.Business.Interfaces
         /// <summary>
         /// Aplica las reglas de negocio, valida los datos y persiste una nueva consulta médica en la base de datos.
         /// </summary>
-        /// <param name="dto">DTO con los datos del formulario enviados desde el frontend.</param>
-        /// <param name="idMedicoLogueado">ID del médico autenticado, extraído del Token JWT en el Controlador.</param>
+        /// <param name="consulta">DTO con los datos del formulario enviados desde el frontend.</param>
+        /// <param name="idMedico">ID del médico autenticado, extraído del Token JWT en el Controlador.</param>
         /// <returns>
         /// Una tupla con tres valores:
         /// <c>Success</c> (bool): indica si la operación fue exitosa.

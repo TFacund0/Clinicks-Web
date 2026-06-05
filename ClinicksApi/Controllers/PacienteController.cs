@@ -31,7 +31,7 @@ public class PacientesController : ControllerBase
     /// </summary>
     /// <returns>Una lista de DTOs de pacientes con código de estado 200 (OK).</returns>
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> ObtenerTodos()
     {
         var pacientes = await _pacienteService.ObtenerListado();
         return Ok(pacientes);
@@ -45,7 +45,7 @@ public class PacientesController : ControllerBase
     /// El paciente encontrado (200 OK) o un mensaje de error (404 Not Found) si no existe.
     /// </returns>
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> ObtenerPorId(int id)
     {
         var paciente = await _pacienteService.ObtenerPorId(id);
 
@@ -96,7 +96,7 @@ public class PacientesController : ControllerBase
     /// <summary>
     /// Obtiene el historial clínico completo del paciente (datos, consultas y procesos) en una sola respuesta.
     /// </summary>
-    /// <param name="id">El ID del paciente.</param>
+    /// <param name="pacienteId">El ID del paciente.</param>
     [HttpGet("{pacienteId}/historial")]
     public async Task<IActionResult> ObtenerHistorialClinico(int pacienteId)
     {

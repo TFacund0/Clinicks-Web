@@ -1,6 +1,6 @@
 using ClinicksApi.Data.Entities;
 using ClinicksApi.Data.Interfaces;
-using ClinicksApi.Data.Interfaces;
+
 using ClinicksApi.Constants;
 using Microsoft.EntityFrameworkCore;
 

@@ -9,11 +9,9 @@ namespace ClinicksApi.Data.Interfaces
     public interface IProcesoRepository
     {
         /// <summary>
-        /// Persiste de forma atómica (usando una transacción de base de datos) un nuevo Procedimiento
-        /// y su Turno asociado, garantizando la consistencia e integridad de datos (Unit of Work).
+        /// Persiste un nuevo Procedimiento en la base de datos.
         /// </summary>
         /// <param name="procedimiento">La entidad Procedimiento a crear.</param>
-        /// <param name="turno">La entidad Turno a crear vinculada al procedimiento.</param>
         /// <returns>La entidad Procedimiento guardada con su ID asignado.</returns>
         Task<Procedimiento> RegistrarProcedimiento(Procedimiento procedimiento);
         /// <summary>
