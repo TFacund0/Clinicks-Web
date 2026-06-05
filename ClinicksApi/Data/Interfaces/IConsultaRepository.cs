@@ -23,16 +23,8 @@ namespace ClinicksApi.Data.Interfaces
         Task<ConsultaMedica> RegistrarConsulta(ConsultaMedica consulta);
 
         /// <summary>
-        /// Persiste un Turno en la base de datos.
+        /// Recupera el historial de consultas de un paciente.
         /// </summary>
-        /// <param name="turno">El Turno a guardar.</param>
-        Task CrearTurnoVinculado(Turno turno);
-
-        /// <summary>
-        /// Asocia una consulta a un Turno existente y lo marca como Realizado.
-        /// </summary>
-        /// <param name="idTurno">El identificador del turno a actualizar.</param>
-        /// <param name="idConsulta">El identificador de la consulta a asociar.</param>
-        Task ActualizarTurnoVinculado(int idTurno, int idConsulta);
+        Task<List<ConsultaMedica>> ObtenerHistorialConsultasAsync(int pacienteId);
     }
 }

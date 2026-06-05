@@ -16,6 +16,7 @@ namespace ClinicksApi.Business.Services
     {
         private readonly IProcesoRepository _procesoRepo;
         private readonly IPacienteService _pacienteService;
+        private readonly ITurnoRepository _turnoRepository;
         private readonly ILogger<ProcesoService> _logger;
         
         /// <param name="pacienteService">Servicio para verificar la existencia del paciente por DNI antes de registrar.</param>
@@ -33,10 +34,11 @@ namespace ClinicksApi.Business.Services
             new { id = 9, nombre = "Otro" }
         };
 
-        public ProcesoService(IProcesoRepository procesoRepo, IPacienteService pacienteService, ILogger<ProcesoService> logger)
+        public ProcesoService(IProcesoRepository procesoRepo, IPacienteService pacienteService, ITurnoRepository turnoRepository, ILogger<ProcesoService> logger)
         {
             _procesoRepo = procesoRepo;
             _pacienteService = pacienteService;
+            _turnoRepository = turnoRepository;
             _logger = logger;
         }
 
@@ -74,7 +76,13 @@ namespace ClinicksApi.Business.Services
 
                 if (procedimiento.idTurno.HasValue && procedimiento.idTurno.Value > 0)
                 {
-                    await _procesoRepo.ActualizarTurnoVinculado(procedimiento.idTurno.Value, procGuardado.IdProcedimiento);
+                    var turnoAActualizar = await _turnoRepository.GetByIdAsync(procedimiento.idTurno.Value);
+                    if (turnoAActualizar != null)
+                    {
+                        turnoAActualizar.IdProcedimiento = procGuardado.IdProcedimiento;
+                        turnoAActualizar.IdEstadoTurno = ConstantesGenerales.EstadosTurno.RealizadoId;
+                        await _turnoRepository.ActualizarTurnoAsync(turnoAActualizar);
+                    }
                 }
                 else
                 {
@@ -89,7 +97,7 @@ namespace ClinicksApi.Business.Services
                         IdProcedimiento = procGuardado.IdProcedimiento
                     };
 
-                    await _procesoRepo.CrearTurnoVinculado(nuevoTurno);
+                    await _turnoRepository.CrearTurnoAsync(nuevoTurno);
                 }
 
                 return (true, "Procedimiento registrado exitosamente", procGuardado);

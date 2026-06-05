@@ -16,8 +16,9 @@ namespace ClinicksApi.Data.Interfaces
         /// <param name="turno">La entidad Turno a crear vinculada al procedimiento.</param>
         /// <returns>La entidad Procedimiento guardada con su ID asignado.</returns>
         Task<Procedimiento> RegistrarProcedimiento(Procedimiento procedimiento);
-        Task<List<Procedimiento>> HistorialPaciente(int pacienteId);
-        Task CrearTurnoVinculado(Turno turno);
-        Task ActualizarTurnoVinculado(int idTurno, int idProcedimiento);
+        /// <summary>
+        /// Recupera el historial de procedimientos médicos de un paciente.
+        /// </summary>
+        Task<List<Procedimiento>> ObtenerHistorialProcedimientosAsync(int pacienteId);
     }
 }

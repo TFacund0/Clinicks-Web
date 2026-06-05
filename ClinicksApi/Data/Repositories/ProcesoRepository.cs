@@ -31,25 +31,7 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task CrearTurnoVinculado(Turno turno)
-        {
-            _context.Turnos.Add(turno);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task ActualizarTurnoVinculado(int idTurno, int idProcedimiento)
-        {
-            var turno = await _context.Turnos.FirstOrDefaultAsync(t => t.IdTurno == idTurno);
-            if (turno != null)
-            {
-                turno.IdProcedimiento = idProcedimiento;
-                turno.IdEstadoTurno = ConstantesGenerales.EstadosTurno.RealizadoId;
-                await _context.SaveChangesAsync();
-            }
-        }
-
-        /// <inheritdoc/>
-        public async Task<List<Procedimiento>> HistorialPaciente(int pacienteId)
+        public async Task<List<Procedimiento>> ObtenerHistorialProcedimientosAsync(int pacienteId)
         {
             return await _context.Procedimientos
                 .AsNoTracking()

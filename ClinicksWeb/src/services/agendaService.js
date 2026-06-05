@@ -10,7 +10,7 @@ const agendaService = {
    * @param {Date|string} fechaFin - Filtro de fecha final (opcional)
    * @returns {Promise<Array>} Lista de turnos
    */
-  obtenerMisTurnos: async (fechaInicio = null, fechaFin = null) => {
+  obtenerTurnosMedico: async (fechaInicio = null, fechaFin = null) => {
     try {
       // Construimos los parámetros de la URL (Query String) si hay fechas
       const params = {};
@@ -28,8 +28,8 @@ const agendaService = {
           : fechaFin;
       }
 
-      // Hacemos la petición GET a /api/Agenda/mis-turnos enviando los parámetros
-      const response = await clinicksApi.get('/Agenda/mis-turnos', { params });
+      // Hacemos la petición GET a /api/Agenda/turnos-medico enviando los parámetros
+      const response = await clinicksApi.get('/Agenda/turnos-medico', { params });
       
       // Nuestra API devuelve un objeto que contiene el array de turnos: { turnos: [...] }
       // (Si no había turnos, también trae un 'mensaje', pero siempre trae el array 'turnos')

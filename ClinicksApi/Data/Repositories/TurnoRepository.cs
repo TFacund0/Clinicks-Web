@@ -64,5 +64,17 @@ namespace ClinicksApi.Data.Repositories
                 .Include(t => t.IdEstadoTurnoNavigation)
                 .FirstOrDefaultAsync(t => t.IdTurno == idTurno);
         }
+
+        public async Task CrearTurnoAsync(Turno turno)
+        {
+            _context.Turnos.Add(turno);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task ActualizarTurnoAsync(Turno turno)
+        {
+            _context.Turnos.Update(turno);
+            await _context.SaveChangesAsync();
+        }
     }
 }

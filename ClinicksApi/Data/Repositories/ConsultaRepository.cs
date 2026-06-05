@@ -38,8 +38,6 @@ namespace ClinicksApi.Data.Repositories
             return consulta;
         }
 
-
-
         /// <inheritdoc/>
         public async Task CrearTurnoVinculado(Turno turno)
         {

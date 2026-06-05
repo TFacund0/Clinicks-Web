@@ -17,14 +17,16 @@ namespace ClinicksApi.Business.Services
     {
         private readonly IConsultaRepository _consultaRepo;
         private readonly IPacienteService _pacienteService;
+        private readonly ITurnoRepository _turnoRepository;
         private readonly ILogger<ConsultaService> _logger;
         
         /// <param name="pacienteService">Servicio para verificar la existencia del paciente por DNI antes de registrar.</param>
         /// <param name="logger">Logger de diagnóstico del servicio.</param>
-        public ConsultaService(IConsultaRepository consultaRepo, IPacienteService pacienteService, ILogger<ConsultaService> logger)
+        public ConsultaService(IConsultaRepository consultaRepo, IPacienteService pacienteService, ITurnoRepository turnoRepository, ILogger<ConsultaService> logger)
         {
             _consultaRepo = consultaRepo;
             _pacienteService = pacienteService;
+            _turnoRepository = turnoRepository;
             _logger = logger;
         }
 
@@ -84,7 +86,13 @@ namespace ClinicksApi.Business.Services
 
                 if (consulta.idTurno.HasValue && consulta.idTurno.Value > 0)
                 {
-                    await _consultaRepo.ActualizarTurnoVinculado(consulta.idTurno.Value, resultado.IdConsulta);
+                    var turnoAActualizar = await _turnoRepository.GetByIdAsync(consulta.idTurno.Value);
+                    if (turnoAActualizar != null)
+                    {
+                        turnoAActualizar.IdConsulta = resultado.IdConsulta;
+                        turnoAActualizar.IdEstadoTurno = ConstantesGenerales.EstadosTurno.RealizadoId;
+                        await _turnoRepository.ActualizarTurnoAsync(turnoAActualizar);
+                    }
                 }
                 else
                 {
@@ -98,7 +106,7 @@ namespace ClinicksApi.Business.Services
                         Motivo          = $"Consulta: {consulta.motivo}",
                         IdConsulta      = resultado.IdConsulta
                     };
-                    await _consultaRepo.CrearTurnoVinculado(nuevoTurno);
+                    await _turnoRepository.CrearTurnoAsync(nuevoTurno);
                 }
 
                 return (true, "Consulta registrada exitosamente", resultado);

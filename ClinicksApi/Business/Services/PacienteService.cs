@@ -105,8 +105,8 @@ namespace ClinicksApi.Business.Services
             var pacienteDto = await ObtenerPorId(pacienteId);
             if (pacienteDto == null) return null;
 
-            var turnos = await _repository.GetHistorialTurnosAsync(pacienteId);
-            var consultasDirectas = await _repository.GetHistorialConsultasAsync(pacienteId);
+            var consultasDirectas = await _repository.ObtenerHistorialConsultasAsync(pacienteId);
+            var procedimientosDB = await _repository.ObtenerHistorialProcedimientosAsync(pacienteId);
 
             var consultas = consultasDirectas
                 .Select(c => new ConsultaHistorialDto
@@ -124,7 +124,7 @@ namespace ClinicksApi.Business.Services
                 })
                 .ToList();
 
-            var procedimientos = turnos
+            var procedimientos = procedimientosDB
                 .Where(t => t.IdProcedimientoNavigation != null)
                 .Select(t => new ProcesoHistorialDto
                 {

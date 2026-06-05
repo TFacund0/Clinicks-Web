@@ -55,8 +55,8 @@ namespace ClinicksApi.Controllers
         /// <see cref="UnauthorizedResult"/> (401) si no es un médico autenticado.
         /// </returns>
         [Authorize(Roles = ConstantesGenerales.Roles.Medico)]
-        [HttpGet("mis-turnos")]
-        public async Task<IActionResult> ObtenerMisTurnosAsync([FromQuery] DateTime? fechaInicio, [FromQuery] DateTime? fechaFin)
+        [HttpGet("turnos-medico")]
+        public async Task<IActionResult> ObtenerTurnosMedicoAsync([FromQuery] DateTime? fechaInicio, [FromQuery] DateTime? fechaFin)
         {
             var idMedico = User.GetMedicoId();
             if (idMedico == null)

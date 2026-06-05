@@ -32,7 +32,7 @@ export const usePatientHistory = (pacienteId) => {
             
             try {
                 // Obtenemos el historial clínico consolidado directamente desde el backend en una sola petición
-                const data = await pacienteService.obtenerHistorial(pacienteId);
+                const data = await pacienteService.obtenerHistorialClinico(pacienteId);
 
                 if (isMounted) {
                     setPaciente(data.paciente);

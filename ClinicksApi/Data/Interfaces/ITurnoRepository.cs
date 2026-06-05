@@ -21,5 +21,8 @@ namespace ClinicksApi.Data.Interfaces
 
         /// <summary>Obtiene un turno por su ID.</summary>
         Task<Turno?> GetByIdAsync(int idTurno);
+
+        Task CrearTurnoAsync(Turno turno);
+        Task ActualizarTurnoAsync(Turno turno);
     }
 }

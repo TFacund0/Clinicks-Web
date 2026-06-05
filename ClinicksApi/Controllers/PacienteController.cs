@@ -100,9 +100,9 @@ public class PacientesController : ControllerBase
     /// </summary>
     /// <param name="id">El ID del paciente.</param>
     [HttpGet("{id}/historial")]
-    public async Task<IActionResult> GetHistorialClinico(int id)
+    public async Task<IActionResult> ObtenerHistorialClinico(int pacienteId)
     {
-        var historial = await _pacienteService.ObtenerHistorialClinico(id);
+        var historial = await _pacienteService.ObtenerHistorialClinico(pacienteId);
         if (historial == null)
             return NotFound(new { message = "Paciente no encontrado" });
 

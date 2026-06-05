@@ -22,7 +22,7 @@ export const useAgenda = () => {
         const primerDia = new Date(anioSeleccionado, mesSeleccionado, 1);
         const ultimoDia = new Date(anioSeleccionado, mesSeleccionado + 1, 0);
 
-        const turnosBackend = await agendaService.obtenerMisTurnos(primerDia, ultimoDia);
+        const turnosBackend = await agendaService.obtenerTurnosMedico(primerDia, ultimoDia);
         
         const turnosMapeados = turnosBackend.map(t => {
           const fechaObj = new Date(t.fechaTurno);

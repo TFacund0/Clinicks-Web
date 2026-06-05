@@ -3,7 +3,7 @@ import clinicksApi from '../api/clinicksApi';
 
 // Servicio que concentra y maneja todas las peticiones a la API relacionadas con los pacientes.
 export const pacienteService = {
-    
+
     // Pide al servidor el listado completo de todos los pacientes registrados en el sistema (GET).
     obtenerTodos: async () => {
         const respuesta = await clinicksApi.get('/pacientes');
@@ -29,8 +29,8 @@ export const pacienteService = {
     },
 
     // Obtiene el historial clínico consolidado del paciente en una sola petición.
-    obtenerHistorial: async (id) => {
-        const respuesta = await clinicksApi.get(`/pacientes/${id}/historial`);
+    obtenerHistorialClinico: async (pacienteId) => {
+        const respuesta = await clinicksApi.get(`/pacientes/${pacienteId}/historial`);
         return respuesta.data;
     }
 };
