@@ -90,7 +90,7 @@ namespace ClinicksApi.Business.Services
                     if (turnoAActualizar != null)
                     {
                         turnoAActualizar.IdConsulta = resultado.IdConsulta;
-                        turnoAActualizar.IdEstadoTurno = idEstadoHecho;
+                        turnoAActualizar.FinalizarAtencion();
                         await _turnoRepository.ActualizarTurnoAsync(turnoAActualizar);
                     }
                 }

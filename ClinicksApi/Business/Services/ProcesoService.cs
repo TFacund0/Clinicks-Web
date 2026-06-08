@@ -84,7 +84,7 @@ namespace ClinicksApi.Business.Services
                     if (turnoExistente != null)
                     {
                         turnoExistente.IdProcedimiento = procGuardado.IdProcedimiento;
-                        turnoExistente.IdEstadoTurno = idEstadoHecho;
+                        turnoExistente.FinalizarAtencion();
                         await _turnoRepository.ActualizarTurnoAsync(turnoExistente);
                     }
                 }
