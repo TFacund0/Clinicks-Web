@@ -126,7 +126,7 @@ namespace ClinicksApi.Tests
                           .ReturnsAsync(new List<int> { 1, 2 });
             
             _turnoRepoMock.Setup(repo => repo.ObtenerIdEstadoPorNombreAsync("cancelado"))
-                          .ReturnsAsync(3);
+                          .ReturnsAsync(ConstantesGenerales.EstadosTurno.CanceladoId);
 
             _turnoRepoMock.Setup(repo => repo.ObtenerTurnosPorFechaYEstadosAsync(It.IsAny<DateTime>(), It.IsAny<List<int>>()))
                           .ReturnsAsync(turnosVencidosFake);
@@ -136,8 +136,8 @@ namespace ClinicksApi.Tests
 
             // ASSERT
             Assert.Equal(2, resultado);
-            Assert.Equal(3, turnosVencidosFake[0].IdEstadoTurno);
-            Assert.Equal(3, turnosVencidosFake[1].IdEstadoTurno);
+            Assert.Equal(ConstantesGenerales.EstadosTurno.CanceladoId, turnosVencidosFake[0].IdEstadoTurno);
+            Assert.Equal(ConstantesGenerales.EstadosTurno.CanceladoId, turnosVencidosFake[1].IdEstadoTurno);
             _turnoRepoMock.Verify(repo => repo.ActualizarLoteTurnosAsync(turnosVencidosFake), Times.Once);
         }
 
@@ -149,7 +149,7 @@ namespace ClinicksApi.Tests
                           .ReturnsAsync(new List<int> { 1, 2 });
             
             _turnoRepoMock.Setup(repo => repo.ObtenerIdEstadoPorNombreAsync("cancelado"))
-                          .ReturnsAsync(3);
+                          .ReturnsAsync(ConstantesGenerales.EstadosTurno.CanceladoId);
 
             _turnoRepoMock.Setup(repo => repo.ObtenerTurnosPorFechaYEstadosAsync(It.IsAny<DateTime>(), It.IsAny<List<int>>()))
                           .ReturnsAsync(new List<Turno>());

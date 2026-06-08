@@ -50,11 +50,6 @@ namespace ClinicksApi.Business.Services
         {
             try
             {
-
-                if (consulta.fechaconsulta != null && consulta.fechaconsulta > DateTime.Now)
-                    return (false, "La fecha de consulta no puede ser futura.", null);
-
-
                 if (idMedico <= 0)
                     return (false, "El Id del Médico logueado es obligatorio y debe ser mayor a cero.", null);
 
@@ -90,7 +85,7 @@ namespace ClinicksApi.Business.Services
                     if (turnoAActualizar != null)
                     {
                         turnoAActualizar.IdConsulta = resultado.IdConsulta;
-                        turnoAActualizar.IdEstadoTurno = idEstadoHecho;
+                        turnoAActualizar.FinalizarAtencion();
                         await _turnoRepository.ActualizarTurnoAsync(turnoAActualizar);
                     }
                 }

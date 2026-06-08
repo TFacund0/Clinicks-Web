@@ -63,20 +63,6 @@ namespace ClinicksApi.Tests
             Assert.Equal("El médico logueado es inválido.", resultado.Message);
         }
 
-        [Fact]
-        public async Task RegistrarProcedimiento_DeberiaDarError_CuandoFechaEsFutura()
-        {
-            // ARRANGE
-            var procDto = new ProcedimientoAltaDto { fechaproceso = DateTime.Now.AddDays(1), dnipaciente = "111" };
-            int idMedico = 1;
-
-            // ACT
-            var resultado = await _procesoService.RegistrarProcedimiento(procDto, idMedico);
-
-            // ASSERT
-            Assert.False(resultado.Success);
-            Assert.Equal("La fecha del proceso no puede ser futura.", resultado.Message);
-        }
 
         [Fact]
         public async Task RegistrarProcedimiento_DeberiaDarError_CuandoPacienteNoExiste()
@@ -106,7 +92,7 @@ namespace ClinicksApi.Tests
                 idTurno = 10
             };
             int idMedico = 1;
-            int estadoAtendidoId = 5;
+            int estadoAtendidoId = ConstantesGenerales.EstadosTurno.AtendidoId;
 
             var pacienteMock = new PacienteDto { Id = 100 };
             var turnoExistente = new Turno { IdTurno = 10, IdEstadoTurno = 1 };

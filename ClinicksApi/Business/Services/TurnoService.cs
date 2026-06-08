@@ -65,7 +65,7 @@ namespace ClinicksApi.Business.Services
             {
                 foreach (var turno in turnosVencidos)
                 {
-                    turno.IdEstadoTurno = idCancelado.Value;
+                    turno.Cancelar();
                 }
 
                 await _turnoRepository.ActualizarLoteTurnosAsync(turnosVencidos);

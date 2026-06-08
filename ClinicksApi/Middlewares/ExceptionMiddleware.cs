@@ -51,12 +51,22 @@ namespace ClinicksApi.Middlewares
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+            var statusCode = HttpStatusCode.InternalServerError;
+            var message = "Ocurrió un error interno en el servidor. Por favor, intente más tarde.";
+
+            if (exception is InvalidOperationException)
+            {
+                statusCode = HttpStatusCode.BadRequest;
+                message = exception.Message;
+            }
+
+            context.Response.StatusCode = (int)statusCode;
 
             var response = new
             {
                 StatusCode = context.Response.StatusCode,
-                Message = "Ocurrió un error interno en el servidor. Por favor, intente más tarde.",
+                Message = message,
                 Detail = _env.IsDevelopment() ? exception.StackTrace?.ToString() : null
             };
 

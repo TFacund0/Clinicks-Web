@@ -47,13 +47,8 @@ namespace ClinicksApi.Business.Services
         {
             try
             {
-
                 if (idMedico <= 0)
                     return (false, "El médico logueado es inválido.", null);
-
-                if (procedimiento.fechaproceso != null && procedimiento.fechaproceso > DateTime.Now)
-                    return (false, "La fecha del proceso no puede ser futura.", null);
-
 
                 var pacienteDto = await _pacienteService.ObtenerPorDni(procedimiento.dnipaciente);
                 if (pacienteDto == null)
@@ -84,7 +79,7 @@ namespace ClinicksApi.Business.Services
                     if (turnoExistente != null)
                     {
                         turnoExistente.IdProcedimiento = procGuardado.IdProcedimiento;
-                        turnoExistente.IdEstadoTurno = idEstadoHecho;
+                        turnoExistente.FinalizarAtencion();
                         await _turnoRepository.ActualizarTurnoAsync(turnoExistente);
                     }
                 }
