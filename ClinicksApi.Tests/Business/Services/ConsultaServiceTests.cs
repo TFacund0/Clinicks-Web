@@ -126,7 +126,7 @@ namespace ClinicksApi.Tests
                 idTurno = 10 // Viene un ID de turno agendado
             };
             int idMedico = 1;
-            int estadoAtendidoId = 5;
+            int estadoAtendidoId = ConstantesGenerales.EstadosTurno.AtendidoId;
 
             var pacienteMock = new PacienteDto { Id = 100 };
             var turnoAActualizar = new Turno { IdTurno = 10, IdEstadoTurno = 1 };
