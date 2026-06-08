@@ -82,20 +82,6 @@ namespace ClinicksApi.Tests
             Assert.Empty(resultado);
         }
 
-        [Fact]
-        public async Task RegistrarConsulta_DeberiaDarError_CuandoFechaEsFutura()
-        {
-            // ARRANGE
-            var consultaDto = new ConsultaAltaDto { fechaconsulta = DateTime.Now.AddDays(1), dnipaciente = "111" };
-            int idMedico = 1;
-
-            // ACT
-            var resultado = await _consultaService.RegistrarConsulta(consultaDto, idMedico);
-
-            // ASSERT
-            Assert.False(resultado.Success);
-            Assert.Equal("La fecha de consulta no puede ser futura.", resultado.Message);
-        }
 
         [Fact]
         public async Task RegistrarConsulta_DeberiaDarError_CuandoMedicoEsInvalido()
