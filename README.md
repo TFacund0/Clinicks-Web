@@ -62,6 +62,61 @@ Interfaz fluida (Single Page Application) enfocada en la experiencia del usuario
 
 ---
 
+## Manual de Usuario (Flujo Médico)
+
+El sistema ha sido diseñado priorizando la eficiencia en la atención y reduciendo la curva de aprendizaje. A continuación, se detalla el flujo básico operativo para un usuario con rol **Médico**:
+
+1. **Autenticación (Login)**: 
+   - Accede a la pantalla principal e ingresa tus credenciales (Usuario/DNI y Contraseña).
+   - El sistema validará tu rol y te otorgará acceso seguro.
+
+2. **Dashboard Principal**: 
+   - Al ingresar, visualizarás el panel de control con un resumen rápido de tu actividad.
+   - Podrás ver métricas clave como "Turnos Atendidos" y accesos directos a "Nueva Consulta".
+
+3. **Mi Agenda**: 
+   - Desde el menú lateral, dirígete a `Mi Agenda`. 
+   - Aquí encontrarás un listado interactivo con todos tus turnos programados del día, ordenados cronológicamente.
+   - Selecciona un turno para desplegar una ventana con su detalle completo (datos filiatorios del paciente, motivo, estado).
+   - Haz clic en `Iniciar Consulta` para ser redirigido automáticamente al formulario clínico.
+
+4. **Registrar Consulta / Procedimiento**: 
+   - Completa los datos médicos (Diagnóstico Presuntivo, Tratamiento, Recomendaciones, Observaciones).
+   - Al confirmar y guardar, el sistema cambiará automáticamente el estado del turno a "Atendido" y la consulta quedará persistida de forma segura en la base de datos.
+
+5. **Historial Clínico**: 
+   - Desde el apartado de "Pacientes", podrás buscar rápidamente a las personas que atendiste.
+   - Selecciona "Ver Historial" para acceder al expediente completo, donde verás como línea de tiempo cada evolución, consulta y práctica médica documentada, sin importar qué médico lo haya atendido previamente.
+
+---
+
+## Empezando (Configuración y Despliegue)
+
+Sigue estas instrucciones detalladas para configurar el entorno de desarrollo, levantar la base de datos y correr el proyecto en tu máquina local.
+
+### Requisitos Previos
+
+Asegúrate de contar con el siguiente software instalado y configurado en tu variables de entorno:
+* [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) - Para compilar y correr la API.
+* [Node.js](https://nodejs.org/) (v18 o superior) - Para ejecutar el servidor de desarrollo de Vite.
+* [PostgreSQL](https://www.postgresql.org/) (v14 o superior) - Motor de base de datos relacional.
+
+### Instalación Paso a Paso
+
+1. **Clonar el repositorio:**
+   Descarga el código fuente a tu equipo local.
+=======
+
+### Frontend (SPA)
+Interfaz fluida (Single Page Application) enfocada en la experiencia del usuario (UX) médico:
+- **Librería Core:** React 18 (Vite)
+- **Estilos:** Tailwind CSS (Diseño Responsivo y utilitario)
+- **Ruteo:** React Router DOM
+- **Cliente HTTP:** Axios (Con interceptores para inyección automática de Token JWT)
+- **Estado:** Custom Hooks y Context API.
+
+---
+
 ## Empezando (Getting Started)
 
 Sigue estas instrucciones para configurar el entorno de desarrollo y levantar el proyecto localmente.
