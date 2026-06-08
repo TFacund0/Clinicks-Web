@@ -105,41 +105,65 @@ Asegúrate de contar con el siguiente software instalado y configurado en tu var
 
 1. **Clonar el repositorio:**
    Descarga el código fuente a tu equipo local.
+=======
+
+### Frontend (SPA)
+Interfaz fluida (Single Page Application) enfocada en la experiencia del usuario (UX) médico:
+- **Librería Core:** React 18 (Vite)
+- **Estilos:** Tailwind CSS (Diseño Responsivo y utilitario)
+- **Ruteo:** React Router DOM
+- **Cliente HTTP:** Axios (Con interceptores para inyección automática de Token JWT)
+- **Estado:** Custom Hooks y Context API.
+
+---
+
+## Empezando (Getting Started)
+
+Sigue estas instrucciones para configurar el entorno de desarrollo y levantar el proyecto localmente.
+
+### Requisitos Previos
+
+Asegúrate de contar con el siguiente software instalado:
+* [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+* [Node.js](https://nodejs.org/) (v18 o superior)
+* [PostgreSQL](https://www.postgresql.org/) (v14 o superior)
+
+### Instalación
+
+1. **Clonar el repositorio:**
    ```bash
    git clone https://github.com/TFacund0/Clinicks-Web.git
    cd Clinicks-Web
    ```
 
 2. **Configuración de la Base de Datos:**
-   Abre el archivo `appsettings.Development.json` ubicado dentro de la carpeta `ClinicksApi` y actualiza la cadena de conexión con tus credenciales locales de PostgreSQL.
+   Actualiza el archivo `appsettings.Development.json` dentro de `ClinicksApi` con tu cadena de conexión local de PostgreSQL:
    ```json
    "ConnectionStrings": {
-     "ClinicksDb": "Host=localhost;Database=ClinicksDb;Username=postgres;Password=tu_password"
+     "ClinicksDb": "Host=localhost;Database=ClinicksDb;Username=tu_usuario;Password=tu_password"
    }
    ```
 
 3. **Aplicar Migraciones (Backend):**
-   Este paso creará automáticamente las tablas y procedimientos almacenados en tu base de datos mediante Entity Framework Core.
    ```bash
    cd ClinicksApi
    dotnet ef database update
    ```
 
-4. **Ejecutar el Backend (API):**
-   Levanta el servidor .NET.
+4. **Ejecutar el Backend:**
    ```bash
    dotnet run
    ```
-   *La API iniciará y escuchará peticiones típicamente en `https://localhost:7198` o `http://localhost:5198`.*
+   *La API iniciará típicamente en `https://localhost:7198` o `http://localhost:5198`.*
 
 5. **Instalar Dependencias y Ejecutar el Frontend:**
-   Abre una nueva terminal en paralelo (dejando la API corriendo) y ejecuta:
+   En una nueva terminal:
    ```bash
    cd ClinicksWeb
    npm install
    npm run dev
    ```
-   *La aplicación web estará disponible y lista para usar en tu navegador entrando a `http://localhost:5173`.*
+   *La aplicación web estará disponible en `http://localhost:5173`.*
 
 ---
 
