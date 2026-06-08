@@ -35,9 +35,10 @@ namespace ClinicksApi.Data.Repositories
         public async Task<IEnumerable<Turno>> ObtenerTurnosMedicoAsync(int idMedico, DateTime? fechaInicio, DateTime? fechaFin)
         {
             var query = _context.Turnos
+                .FromSqlRaw("SELECT * FROM ObtenerTurnosPorMedico({0})", idMedico)
                 .Include(t => t.IdPacienteNavigation)
                 .Include(t => t.IdEstadoTurnoNavigation)
-                .Where(t => t.IdMedico == idMedico);
+                .AsQueryable();
 
             if (fechaInicio.HasValue)
             {
@@ -91,9 +92,14 @@ namespace ClinicksApi.Data.Repositories
         /// <inheritdoc/>
         public async Task ActualizarTurnoAsync(Turno turno)
         {
-            // El objeto es cargado con seguimiento, por lo que no es necesario _context.Turnos.Update(turno),
-            // lo cual además genera errores por intentar actualizar entidades relacionadas navegables nulas.
-            await _context.SaveChangesAsync();
+            // Reemplazo de SaveChangesAsync por invocación al Procedimiento Almacenado
+            await _context.Database.ExecuteSqlRawAsync(
+                "CALL ActualizarEstadoTurnoSP({0}, {1}, {2}, {3})", 
+                turno.IdTurno, 
+                turno.IdEstadoTurno,
+                turno.IdConsulta,
+                turno.IdProcedimiento
+            );
         }
 
         /// <inheritdoc/>
