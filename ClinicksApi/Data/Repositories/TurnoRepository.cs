@@ -34,6 +34,7 @@ namespace ClinicksApi.Data.Repositories
         /// <inheritdoc/>
         public async Task<IEnumerable<Turno>> ObtenerTurnosMedicoAsync(int idMedico, DateTime? fechaInicio, DateTime? fechaFin)
         {
+            // Funcion Almacenada
             var query = _context.Turnos
                 .FromSqlRaw("SELECT * FROM ObtenerTurnosPorMedico({0})", idMedico)
                 .Include(t => t.IdPacienteNavigation)
@@ -92,7 +93,7 @@ namespace ClinicksApi.Data.Repositories
         /// <inheritdoc/>
         public async Task ActualizarTurnoAsync(Turno turno)
         {
-            // Reemplazo de SaveChangesAsync por invocación al Procedimiento Almacenado
+            // Procedimiento Almacenado
             await _context.Database.ExecuteSqlRawAsync(
                 "CALL ActualizarEstadoTurnoSP({0}, {1}, {2}, {3})", 
                 turno.IdTurno, 
@@ -130,7 +131,6 @@ namespace ClinicksApi.Data.Repositories
         /// <inheritdoc/>
         public async Task ActualizarLoteTurnosAsync(List<Turno> turnos)
         {
-            // Entidades ya trackeadas, simplemente hacemos save
             await _context.SaveChangesAsync();
         }
     }
