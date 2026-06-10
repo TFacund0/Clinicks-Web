@@ -53,7 +53,7 @@ namespace ClinicksApi.Tests
                 { 
                     IdConsulta = 2, 
                     Motivo = "Dolor", 
-                    IdMedicoNavigation = null // Para probar "Médico Desconocido"
+                    IdMedicoNavigation = null! // Para probar "Médico Desconocido"
                 }
             };
 

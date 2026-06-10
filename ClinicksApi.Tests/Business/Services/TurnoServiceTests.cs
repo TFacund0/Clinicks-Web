@@ -196,7 +196,7 @@ namespace ClinicksApi.Tests
         {
             // ARRANGE
             int idTurno = 1;
-            var turnoFake = new Turno { IdTurno = idTurno, IdPacienteNavigation = null }; // Sin paciente
+            var turnoFake = new Turno { IdTurno = idTurno, IdPacienteNavigation = null! }; // Sin paciente
 
             _turnoRepoMock.Setup(repo => repo.ObtenerPorIdAsync(idTurno)).ReturnsAsync(turnoFake);
 

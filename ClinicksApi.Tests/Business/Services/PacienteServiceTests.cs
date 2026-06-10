@@ -411,7 +411,7 @@ namespace ClinicksApi.Tests
             
             var consultasFake = new List<ConsultaMedica>
             {
-                new ConsultaMedica { IdConsulta = 1, Motivo = "Prueba", IdMedicoNavigation = null } // Sin médico
+                new ConsultaMedica { IdConsulta = 1, Motivo = "Prueba", IdMedicoNavigation = null! } // Sin médico
             };
 
             _pacienteRepoMock.Setup(repo => repo.ObtenerPorIdAsync(idPrueba)).ReturnsAsync(pacienteFake);
