@@ -123,7 +123,7 @@ namespace ClinicksApi.Business.Services
                         Resultado = p.Resultado ?? string.Empty,
                         Fecha = p.Fecha,
                         MedicoAtencion = turnoAsociado?.IdMedicoNavigation != null 
-                            ? $"Dr/Dra. {turnoAsociado.IdMedicoNavigation.Nombre} {turnoAsociado.IdMedicoNavigation.Apellido}" 
+                            ? $"{turnoAsociado.IdMedicoNavigation.Nombre} {turnoAsociado.IdMedicoNavigation.Apellido}" 
                             : "No registrado"
                     };
                 })

@@ -62,58 +62,44 @@ Interfaz fluida (Single Page Application) enfocada en la experiencia del usuario
 
 ---
 
-## Manual de Usuario (Flujo Médico)
+## Manual de Usuario (Uso del Sistema)
 
-El sistema ha sido diseñado priorizando la eficiencia en la atención y reduciendo la curva de aprendizaje. A continuación, se detalla el flujo básico operativo para un usuario con rol **Médico**:
+El sistema ha sido diseñado priorizando la eficiencia en la atención y reduciendo la curva de aprendizaje. A continuación, se detalla el flujo básico operativo y las funcionalidades de la plataforma para el usuario con rol **Médico** según el manual de usuario oficial:
 
-1. **Autenticación (Login)**: 
-   - Accede a la pantalla principal e ingresa tus credenciales (Usuario/DNI y Contraseña).
-   - El sistema validará tu rol y te otorgará acceso seguro.
+1. **Ingreso al sistema (Autenticación)**:
+   * **Navegación**: Ingrese a la URL de acceso del sistema de la clínica (`http://localhost:5173`).
+   * **Credenciales**: Ingrese su Nombre de Usuario (Username) y Contraseña.
+   * **Validación**: Haga clic en el botón Ingresar. El sistema validará sus credenciales con la API REST, guardará de forma segura su sesión web e ingresará a la pantalla principal.
 
-2. **Dashboard Principal**: 
-   - Al ingresar, visualizarás el panel de control con un resumen rápido de tu actividad.
-   - Podrás ver métricas clave como "Turnos Atendidos" y accesos directos a "Nueva Consulta".
+2. **Panel de Control (Dashboard)**:
+   * **Estadísticas rápidas**: Visualice tarjetas informativas con la cantidad de turnos del día (totales, en espera, atendidos y cancelados).
+   * **Accesos rápidos**: Botones y widgets que permiten buscar un historial clínico, registrar una urgencia o verificar a un paciente directamente.
 
-3. **Mi Agenda**: 
-   - Desde el menú lateral, dirígete a `Mi Agenda`. 
-   - Aquí encontrarás un listado interactivo con todos tus turnos programados del día, ordenados cronológicamente.
-   - Selecciona un turno para desplegar una ventana con su detalle completo (datos filiatorios del paciente, motivo, estado).
-   - Haz clic en `Iniciar Consulta` para ser redirigido automáticamente al formulario clínico.
+3. **Agenda Médica (Gestión de Turnos)**:
+   * **Visualización de citas**: Muestra los turnos programados en el rango de tiempo seleccionado, detallando hora, nombre del paciente, DNI, motivo y estado actual.
+   * **Ciclo de vida del Turno**:
+     * Un turno nuevo inicia en estado **Pendiente** (1).
+     * Puede ser **Confirmado** (2) o **Cancelado** (5).
+     * Al llegar el paciente, el médico selecciona *Iniciar Atención*, pasando el turno a **En curso** (3).
+     * Al guardar los datos clínicos del paciente, el turno pasa automáticamente al estado terminal **Atendido** (4).
+     * Un turno vencido no atendido en el día es marcado como **Cancelado** automáticamente en segundo plano.
 
-4. **Registrar Consulta / Procedimiento**: 
-   - Completa los datos médicos (Diagnóstico Presuntivo, Tratamiento, Recomendaciones, Observaciones).
-   - Al confirmar y guardar, el sistema cambiará automáticamente el estado del turno a "Atendido" y la consulta quedará persistida de forma segura en la base de datos.
+4. **Búsqueda por DNI**:
+   * **Uso**: Para crear una nueva consulta o procedimiento sin turno previo.
+   * **Verificación**: Ingrese el DNI (campo numérico) del paciente. El sistema buscará al paciente en la base de datos y lo redirigirá al formulario de consulta o procedimiento correspondiente.
 
-5. **Historial Clínico**: 
-   - Desde el apartado de "Pacientes", podrás buscar rápidamente a las personas que atendiste.
-   - Selecciona "Ver Historial" para acceder al expediente completo, donde verás como línea de tiempo cada evolución, consulta y práctica médica documentada, sin importar qué médico lo haya atendido previamente.
+5. **Registro de Nueva Consulta Médica**:
+   * **Formulario clínico**: Permite registrar el motivo de consulta, diagnóstico presuntivo, tratamiento, observaciones y recomendaciones.
+   * **Asociación**: Vincula automáticamente los datos del paciente y del turno activo. Al guardar, el sistema registra la consulta en el expediente, finaliza el turno en la agenda (**Atendido**) de forma atómica y regresa a la Agenda.
 
----
+6. **Registro de Nuevo Procedimiento**:
+   * **Intervenciones**: Formulario para registrar cirugías menores, rayos X, análisis de laboratorio, curaciones, etc.
+   * **Campos**: Selección del tipo de procedimiento del catálogo, descripción detallada y resultado obtenido. Al guardar, vincula el procedimiento al historial y actualiza el estado del turno a **Atendido**.
 
-## Empezando (Configuración y Despliegue)
-
-Sigue estas instrucciones detalladas para configurar el entorno de desarrollo, levantar la base de datos y correr el proyecto en tu máquina local.
-
-### Requisitos Previos
-
-Asegúrate de contar con el siguiente software instalado y configurado en tu variables de entorno:
-* [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) - Para compilar y correr la API.
-* [Node.js](https://nodejs.org/) (v18 o superior) - Para ejecutar el servidor de desarrollo de Vite.
-* [PostgreSQL](https://www.postgresql.org/) (v14 o superior) - Motor de base de datos relacional.
-
-### Instalación Paso a Paso
-
-1. **Clonar el repositorio:**
-   Descarga el código fuente a tu equipo local.
-=======
-
-### Frontend (SPA)
-Interfaz fluida (Single Page Application) enfocada en la experiencia del usuario (UX) médico:
-- **Librería Core:** React 18 (Vite)
-- **Estilos:** Tailwind CSS (Diseño Responsivo y utilitario)
-- **Ruteo:** React Router DOM
-- **Cliente HTTP:** Axios (Con interceptores para inyección automática de Token JWT)
-- **Estado:** Custom Hooks y Context API.
+7. **Historial Clínico**:
+   * **Ficha del Paciente**: Información demográfica e histórica del paciente.
+   * **Línea de tiempo clínica**: Listado cronológico de todas las consultas médicas y todos los procedimientos realizados por cualquier profesional.
+   * **Búsqueda optimizada**: Permite filtrar antecedentes clínicos localmente en tiempo real.
 
 ---
 

@@ -343,7 +343,7 @@ namespace ClinicksApi.Tests
             Assert.Equal("Dr. House", resultado.Consultas.First().MedicoAtencion);
             
             Assert.Single(resultado.Procedimientos);
-            Assert.Equal("Dr/Dra. Dra. Grey", resultado.Procedimientos.First().MedicoAtencion);
+            Assert.Equal("Dra. Grey", resultado.Procedimientos.First().MedicoAtencion);
         }
         [Fact]
         public async Task ObtenerPorId_DeberiaMapearFechaUltimaConsulta_CuandoTieneTurnos()
