@@ -279,10 +279,6 @@ const Agenda = () => {
                     <p className="text-xs text-slate-400 flex items-center gap-4">
                       <span className="font-mono">DNI: {turno.pacienteDni}</span>
                       <span className="text-slate-600">•</span>
-                      <span className="flex items-center gap-1">
-                        <Clock size={12} className="text-slate-500" /> {turno.duracion} min
-                      </span>
-                      <span className="text-slate-600">•</span>
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
                         turno.tipo === 'Procedimiento' ? 'bg-purple-500/10 text-purple-400' : 
                         turno.tipo === 'Consulta' ? 'bg-cyan-500/10 text-cyan-400' :

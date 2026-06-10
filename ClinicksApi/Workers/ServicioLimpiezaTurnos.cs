@@ -42,7 +42,7 @@ namespace ClinicksApi.Workers
                     _logger.LogError(ex, "Error en ServicioLimpiezaTurnos durante la limpieza de turnos vencidos.");
                 }
 
-                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
             }
         }
     }
