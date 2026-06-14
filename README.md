@@ -49,7 +49,7 @@ Desarrollado bajo el marco **ASP.NET Core Web API (C#)** utilizando Arquitectura
 - **Framework:** .NET 8
 - **ORM:** Entity Framework Core (Code-First)
 - **Base de Datos:** PostgreSQL
-- **Patrones:** Repository Pattern, Dependency Injection (DI), State Pattern, Factory Pattern.
+- **Patrones:** Repository Pattern, Dependency Injection (DI), State Pattern.
 - **Testing:** xUnit + Moq (Cobertura exhaustiva en la Capa de Negocio).
 
 ### Frontend (SPA)
@@ -163,7 +163,7 @@ Para ejecutar los tests, sitúate en el directorio raíz o en `ClinicksApi.Tests
 dotnet test
 ```
 
-*Se han validado los flujos de `PacienteService`, `ConsultaService`, `ProcesoService`, `TurnoService` y las transiciones del `TurnoStateFactory`.*
+*Se han validado los flujos de `PacienteService`, `ConsultaService`, `ProcesoService`, `TurnoService` y las transiciones del `TurnoState`.*
 
 ---
 
