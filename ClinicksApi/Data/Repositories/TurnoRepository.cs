@@ -94,6 +94,7 @@ namespace ClinicksApi.Data.Repositories
         public async Task ActualizarTurnoAsync(Turno turno)
         {
             // Procedimiento Almacenado
+#pragma warning disable CS8604
             await _context.Database.ExecuteSqlRawAsync(
                 "CALL ActualizarEstadoTurnoSP({0}, {1}, {2}, {3})", 
                 turno.IdTurno, 
@@ -101,6 +102,7 @@ namespace ClinicksApi.Data.Repositories
                 turno.IdConsulta,
                 turno.IdProcedimiento
             );
+#pragma warning restore CS8604
         }
 
         /// <inheritdoc/>

@@ -32,7 +32,7 @@ namespace ClinicksApi.Tests
         {
             // ARRANGE
             int idPrueba = 10;
-            var añoActual = DateTime.Now.Year;
+            var fechaNacimientoAyer = DateOnly.FromDateTime(DateTime.Today.AddDays(-1).AddYears(-30));
 
             var pacienteFake = new Paciente
             {
@@ -40,7 +40,7 @@ namespace ClinicksApi.Tests
                 Nombre = "Carlos",
                 Apellido = "Sánchez",
                 Dni = "30111222",
-                FechaNacimiento = new DateOnly(añoActual - 30, 1, 1) // Cumplió en enero
+                FechaNacimiento = fechaNacimientoAyer
             };
 
             // ACÁ USAMOS MOQ: Le ordenamos qué responder
@@ -60,7 +60,7 @@ namespace ClinicksApi.Tests
         {
             // ARRANGE
             int idPrueba = 20;
-            var añoActual = DateTime.Now.Year;
+            var fechaNacimientoManana = DateOnly.FromDateTime(DateTime.Today.AddDays(1).AddYears(-30));
 
             var pacienteFake = new Paciente
             {
@@ -68,7 +68,7 @@ namespace ClinicksApi.Tests
                 Nombre = "Ana",
                 Apellido = "Gómez",
                 Dni = "40333444",
-                FechaNacimiento = new DateOnly(añoActual - 30, 12, 31) // Cumple en diciembre
+                FechaNacimiento = fechaNacimientoManana
             };
 
             // ACÁ USAMOS MOQ OTRA VEZ
@@ -411,7 +411,7 @@ namespace ClinicksApi.Tests
             
             var consultasFake = new List<ConsultaMedica>
             {
-                new ConsultaMedica { IdConsulta = 1, Motivo = "Prueba", IdMedicoNavigation = null } // Sin médico
+                new ConsultaMedica { IdConsulta = 1, Motivo = "Prueba", IdMedicoNavigation = null! } // Sin médico
             };
 
             _pacienteRepoMock.Setup(repo => repo.ObtenerPorIdAsync(idPrueba)).ReturnsAsync(pacienteFake);

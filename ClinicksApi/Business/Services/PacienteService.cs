@@ -114,7 +114,7 @@ namespace ClinicksApi.Business.Services
 
             var procedimientos = procedimientosDB
                 .Select(p => {
-                    var turnoAsociado = p.Turnos.FirstOrDefault();
+                    var turnoAsociado = p.Turnos?.FirstOrDefault();
                     return new ProcesoHistorialDto
                     {
                         IdProcedimiento = p.IdProcedimiento,
