@@ -9,17 +9,17 @@ namespace ClinicksApi.Tests
     public class TurnoStateTests
     {
         [Fact]
-        public void TurnoStateFactory_DeberiaMapearCorrectamenteLosIdsAEstados()
+        public void Turno_DeberiaMapearCorrectamenteLosIdsAEstados()
         {
             // ACT & ASSERT
-            Assert.IsType<TurnoPendiente>(TurnoStateFactory.CrearEstado(ConstantesGenerales.EstadosTurno.PendienteId));
-            Assert.IsType<TurnoConfirmado>(TurnoStateFactory.CrearEstado(ConstantesGenerales.EstadosTurno.ConfirmadoId));
-            Assert.IsType<TurnoEnCurso>(TurnoStateFactory.CrearEstado(ConstantesGenerales.EstadosTurno.EnCursoId));
-            Assert.IsType<TurnoAtendido>(TurnoStateFactory.CrearEstado(ConstantesGenerales.EstadosTurno.AtendidoId));
-            Assert.IsType<TurnoCancelado>(TurnoStateFactory.CrearEstado(ConstantesGenerales.EstadosTurno.CanceladoId));
+            Assert.IsType<TurnoPendiente>(new Turno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.PendienteId }.EstadoActual);
+            Assert.IsType<TurnoConfirmado>(new Turno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.ConfirmadoId }.EstadoActual);
+            Assert.IsType<TurnoEnCurso>(new Turno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.EnCursoId }.EstadoActual);
+            Assert.IsType<TurnoAtendido>(new Turno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.AtendidoId }.EstadoActual);
+            Assert.IsType<TurnoCancelado>(new Turno { IdEstadoTurno = ConstantesGenerales.EstadosTurno.CanceladoId }.EstadoActual);
             
             // Fallback de seguridad
-            Assert.IsType<TurnoPendiente>(TurnoStateFactory.CrearEstado(999));
+            Assert.IsType<TurnoPendiente>(new Turno { IdEstadoTurno = 999 }.EstadoActual);
         }
 
         [Fact]
