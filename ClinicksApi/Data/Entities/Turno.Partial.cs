@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using ClinicksApi.Business.States;
+using ClinicksApi.Constants;
 
 namespace ClinicksApi.Data.Entities
 {
@@ -22,7 +23,15 @@ namespace ClinicksApi.Data.Entities
             {
                 if (_estadoActual == null)
                 {
-                    _estadoActual = TurnoStateFactory.CrearEstado(IdEstadoTurno);
+                    _estadoActual = IdEstadoTurno switch
+                    {
+                        ConstantesGenerales.EstadosTurno.PendienteId => new TurnoPendiente(),
+                        ConstantesGenerales.EstadosTurno.ConfirmadoId => new TurnoConfirmado(),
+                        ConstantesGenerales.EstadosTurno.EnCursoId => new TurnoEnCurso(),
+                        ConstantesGenerales.EstadosTurno.AtendidoId => new TurnoAtendido(),
+                        ConstantesGenerales.EstadosTurno.CanceladoId => new TurnoCancelado(),
+                        _ => new TurnoPendiente() // En caso de inconsistencias, inicia en Pendiente
+                    };
                 }
                 return _estadoActual;
             }
