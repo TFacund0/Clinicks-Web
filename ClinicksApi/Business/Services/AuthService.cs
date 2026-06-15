@@ -12,11 +12,13 @@ namespace ClinicksApi.Business.Services
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;
+        private readonly IMedicoRepository _medicoRepository;
         private readonly ITokenService _tokenService;
 
-        public AuthService(IAuthRepository authRepository, ITokenService tokenService)
+        public AuthService(IAuthRepository authRepository, IMedicoRepository medicoRepository, ITokenService tokenService)
         {
             _authRepository = authRepository;
+            _medicoRepository = medicoRepository;
             _tokenService = tokenService;
         }
 
@@ -57,7 +59,7 @@ namespace ClinicksApi.Business.Services
             }
 
             // Buscar al médico vinculado
-            var medico = await _authRepository.ObtenerMedicoPorUsuarioIdAsync(usuario.IdUsuario);
+            var medico = await _medicoRepository.ObtenerPorUsuarioIdAsync(usuario.IdUsuario);
 
             // Si el usuario no tiene médico vinculado, rechazamos el login de inmediato en lugar de usar un fallback
             // que suplantaría la identidad de otro médico.

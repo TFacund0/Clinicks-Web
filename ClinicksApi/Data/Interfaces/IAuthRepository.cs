@@ -22,13 +22,7 @@ namespace ClinicksApi.Data.Interfaces
         /// <returns>La entidad Usuario asociada al médico encontrado o null si no existe.</returns>
         Task<Usuario?> ObtenerUsuarioPorMatriculaAsync(string matricula);
 
-        /// <summary>
-        /// Busca el médico asociado a un usuario dado su ID de usuario (FK id_usuario).
-        /// Esta es la relación correcta entre las tablas 'usuario' y 'medico'.
-        /// </summary>
-        /// <param name="usuarioId">El ID del usuario para el cual se busca el médico asociado.</param>
-        /// <returns>La entidad Medico asociada al usuario o null si no existe.</returns>
-        Task<Medico?> ObtenerMedicoPorUsuarioIdAsync(int usuarioId);
+
 
         /// <summary>Obtiene todos los usuarios (para el proceso de migración de contraseñas).</summary>
         /// <returns>Una lista de entidades Usuario.</returns>

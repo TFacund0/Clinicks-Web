@@ -52,6 +52,7 @@ builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddScoped<IProcedimientoRepository, ProcedimientoRepository>();
+builder.Services.AddScoped<IMedicoRepository, MedicoRepository>();
 
 
 builder.Services.AddScoped<ITurnoService, TurnoService>();
@@ -60,6 +61,7 @@ builder.Services.AddScoped<IPacienteService, PacienteService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IConsultaService, ConsultaService>();
 builder.Services.AddScoped<IProcedimientoService, ProcedimientoService>();
+builder.Services.AddScoped<IMedicoService, MedicoService>();
 
 
 builder.Services.AddHostedService<ServicioLimpiezaTurnos>();

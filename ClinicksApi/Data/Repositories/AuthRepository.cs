@@ -44,13 +44,7 @@ namespace ClinicksApi.Data.Repositories
             return null;
         }
 
-        /// <inheritdoc/>
-        public async Task<Medico?> ObtenerMedicoPorUsuarioIdAsync(int usuarioId)
-        {
-            return await _context.Medicos
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.IdUsuario == usuarioId);
-        }
+
 
         /// <inheritdoc/>
         public async Task<IEnumerable<Usuario>> ObtenerTodosLosUsuariosAsync()
