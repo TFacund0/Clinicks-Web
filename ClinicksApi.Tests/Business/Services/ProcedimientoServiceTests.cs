@@ -14,23 +14,23 @@ using ClinicksApi.Constants;
 
 namespace ClinicksApi.Tests
 {
-    public class ProcesoServiceTests
+    public class ProcedimientoServiceTests
     {
-        private readonly Mock<IProcesoRepository> _procesoRepoMock;
+        private readonly Mock<IProcedimientoRepository> _procedimientoRepoMock;
         private readonly Mock<IPacienteService> _pacienteServiceMock;
         private readonly Mock<ITurnoRepository> _turnoRepoMock;
-        private readonly Mock<ILogger<ProcesoService>> _loggerMock;
-        private readonly ProcesoService _procesoService;
+        private readonly Mock<ILogger<ProcedimientoService>> _loggerMock;
+        private readonly ProcedimientoService _procedimientoService;
 
-        public ProcesoServiceTests()
+        public ProcedimientoServiceTests()
         {
-            _procesoRepoMock = new Mock<IProcesoRepository>();
+            _procedimientoRepoMock = new Mock<IProcedimientoRepository>();
             _pacienteServiceMock = new Mock<IPacienteService>();
             _turnoRepoMock = new Mock<ITurnoRepository>();
-            _loggerMock = new Mock<ILogger<ProcesoService>>();
+            _loggerMock = new Mock<ILogger<ProcedimientoService>>();
 
-            _procesoService = new ProcesoService(
-                _procesoRepoMock.Object,
+            _procedimientoService = new ProcedimientoService(
+                _procedimientoRepoMock.Object,
                 _pacienteServiceMock.Object,
                 _turnoRepoMock.Object,
                 _loggerMock.Object
@@ -38,10 +38,10 @@ namespace ClinicksApi.Tests
         }
 
         [Fact]
-        public void ObtenerTiposProceso_DeberiaDevolverListaConDatos()
+        public void ObtenerTiposProcedimiento_DeberiaDevolverListaConDatos()
         {
             // ACT
-            var resultado = _procesoService.ObtenerTiposProceso();
+            var resultado = _procedimientoService.ObtenerTiposProcedimiento();
 
             // ASSERT
             Assert.NotNull(resultado);
@@ -52,11 +52,11 @@ namespace ClinicksApi.Tests
         public async Task RegistrarProcedimiento_DeberiaDarError_CuandoMedicoEsInvalido()
         {
             // ARRANGE
-            var procDto = new ProcedimientoAltaDto { fechaproceso = DateTime.Now.AddDays(-1), dnipaciente = "111" };
+            var procDto = new ProcedimientoAltaDto { fechaprocedimiento = DateTime.Now.AddDays(-1), dnipaciente = "111" };
             int idMedico = 0; // Inválido
 
             // ACT
-            var resultado = await _procesoService.RegistrarProcedimiento(procDto, idMedico);
+            var resultado = await _procedimientoService.RegistrarProcedimiento(procDto, idMedico);
 
             // ASSERT
             Assert.False(resultado.Success);
@@ -68,13 +68,13 @@ namespace ClinicksApi.Tests
         public async Task RegistrarProcedimiento_DeberiaDarError_CuandoPacienteNoExiste()
         {
             // ARRANGE
-            var procDto = new ProcedimientoAltaDto { fechaproceso = DateTime.Now.AddDays(-1), dnipaciente = "111" };
+            var procDto = new ProcedimientoAltaDto { fechaprocedimiento = DateTime.Now.AddDays(-1), dnipaciente = "111" };
             int idMedico = 1;
 
             _pacienteServiceMock.Setup(service => service.ObtenerPorDni("111")).ReturnsAsync((PacienteDto?)null);
 
             // ACT
-            var resultado = await _procesoService.RegistrarProcedimiento(procDto, idMedico);
+            var resultado = await _procedimientoService.RegistrarProcedimiento(procDto, idMedico);
 
             // ASSERT
             Assert.False(resultado.Success);
@@ -87,7 +87,7 @@ namespace ClinicksApi.Tests
             // ARRANGE
             var procDto = new ProcedimientoAltaDto 
             { 
-                fechaproceso = DateTime.Now.AddDays(-1), 
+                fechaprocedimiento = DateTime.Now.AddDays(-1), 
                 dnipaciente = "111",
                 idTurno = 10
             };
@@ -99,12 +99,12 @@ namespace ClinicksApi.Tests
             var procGuardado = new Procedimiento { IdProcedimiento = 500 };
 
             _pacienteServiceMock.Setup(s => s.ObtenerPorDni("111")).ReturnsAsync(pacienteMock);
-            _procesoRepoMock.Setup(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>())).ReturnsAsync(procGuardado);
+            _procedimientoRepoMock.Setup(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>())).ReturnsAsync(procGuardado);
             _turnoRepoMock.Setup(repo => repo.ObtenerIdEstadoPorNombreAsync("Atendido")).ReturnsAsync(estadoAtendidoId);
             _turnoRepoMock.Setup(repo => repo.ObtenerParaActualizarAsync(10)).ReturnsAsync(turnoExistente);
 
             // ACT
-            var resultado = await _procesoService.RegistrarProcedimiento(procDto, idMedico);
+            var resultado = await _procedimientoService.RegistrarProcedimiento(procDto, idMedico);
 
             // ASSERT
             Assert.True(resultado.Success);
@@ -120,10 +120,10 @@ namespace ClinicksApi.Tests
             // ARRANGE
             var procDto = new ProcedimientoAltaDto 
             { 
-                fechaproceso = DateTime.Now.AddDays(-1), 
+                fechaprocedimiento = DateTime.Now.AddDays(-1), 
                 dnipaciente = "111",
                 idTurno = null, // Urgencia
-                tipoproceso = "Curación"
+                tipoprocedimiento = "Curación"
             };
             int idMedico = 1;
             int estadoAtendidoId = ConstantesGenerales.EstadosTurno.AtendidoId; // Fallback simulación
@@ -132,11 +132,11 @@ namespace ClinicksApi.Tests
             var procGuardado = new Procedimiento { IdProcedimiento = 500 };
 
             _pacienteServiceMock.Setup(s => s.ObtenerPorDni("111")).ReturnsAsync(pacienteMock);
-            _procesoRepoMock.Setup(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>())).ReturnsAsync(procGuardado);
+            _procedimientoRepoMock.Setup(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>())).ReturnsAsync(procGuardado);
             _turnoRepoMock.Setup(repo => repo.ObtenerIdEstadoPorNombreAsync("Atendido")).ReturnsAsync((int?)null);
 
             // ACT
-            var resultado = await _procesoService.RegistrarProcedimiento(procDto, idMedico);
+            var resultado = await _procedimientoService.RegistrarProcedimiento(procDto, idMedico);
 
             // ASSERT
             Assert.True(resultado.Success);
@@ -155,7 +155,7 @@ namespace ClinicksApi.Tests
             // ARRANGE
             var procDto = new ProcedimientoAltaDto 
             { 
-                fechaproceso = DateTime.Now.AddDays(-1), 
+                fechaprocedimiento = DateTime.Now.AddDays(-1), 
                 dnipaciente = "111",
                 idTurno = 9999
             };
@@ -165,11 +165,11 @@ namespace ClinicksApi.Tests
             var procGuardado = new Procedimiento { IdProcedimiento = 500 };
 
             _pacienteServiceMock.Setup(s => s.ObtenerPorDni("111")).ReturnsAsync(pacienteMock);
-            _procesoRepoMock.Setup(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>())).ReturnsAsync(procGuardado);
+            _procedimientoRepoMock.Setup(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>())).ReturnsAsync(procGuardado);
             _turnoRepoMock.Setup(repo => repo.ObtenerParaActualizarAsync(9999)).ReturnsAsync((Turno?)null);
 
             // ACT
-            var resultado = await _procesoService.RegistrarProcedimiento(procDto, idMedico);
+            var resultado = await _procedimientoService.RegistrarProcedimiento(procDto, idMedico);
 
             // ASSERT
             Assert.True(resultado.Success);
@@ -183,7 +183,7 @@ namespace ClinicksApi.Tests
             // ARRANGE
             var procDto = new ProcedimientoAltaDto 
             { 
-                fechaproceso = null, 
+                fechaprocedimiento = null, 
                 dnipaciente = "111",
                 resultado = null
             };
@@ -194,7 +194,7 @@ namespace ClinicksApi.Tests
 
             _pacienteServiceMock.Setup(s => s.ObtenerPorDni("111")).ReturnsAsync(pacienteMock);
             
-            _procesoRepoMock.Setup(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>()))
+            _procedimientoRepoMock.Setup(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>()))
                             .Callback<Procedimiento>(p => 
                             {
                                 Assert.Equal("Sin resultado ingresado", p.Resultado);
@@ -203,28 +203,28 @@ namespace ClinicksApi.Tests
                             .ReturnsAsync(procGuardado);
 
             // ACT
-            var resultado = await _procesoService.RegistrarProcedimiento(procDto, idMedico);
+            var resultado = await _procedimientoService.RegistrarProcedimiento(procDto, idMedico);
 
             // ASSERT
             Assert.True(resultado.Success);
-            _procesoRepoMock.Verify(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>()), Times.Once);
+            _procedimientoRepoMock.Verify(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>()), Times.Once);
         }
 
         [Fact]
         public async Task RegistrarProcedimiento_DeberiaCapturarExcepcionYDevolverErrorGenerico()
         {
             // ARRANGE
-            var procDto = new ProcedimientoAltaDto { fechaproceso = DateTime.Now.AddDays(-1), dnipaciente = "111" };
+            var procDto = new ProcedimientoAltaDto { fechaprocedimiento = DateTime.Now.AddDays(-1), dnipaciente = "111" };
             int idMedico = 1;
             var pacienteMock = new PacienteDto { Id = 100 };
 
             _pacienteServiceMock.Setup(s => s.ObtenerPorDni("111")).ReturnsAsync(pacienteMock);
             
-            _procesoRepoMock.Setup(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>()))
+            _procedimientoRepoMock.Setup(repo => repo.RegistrarProcedimiento(It.IsAny<Procedimiento>()))
                             .ThrowsAsync(new Exception("Error crítico BD"));
 
             // ACT
-            var resultado = await _procesoService.RegistrarProcedimiento(procDto, idMedico);
+            var resultado = await _procedimientoService.RegistrarProcedimiento(procDto, idMedico);
 
             // ASSERT
             Assert.False(resultado.Success);

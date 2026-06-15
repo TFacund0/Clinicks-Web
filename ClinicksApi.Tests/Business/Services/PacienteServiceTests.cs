@@ -13,7 +13,7 @@ namespace ClinicksApi.Tests
         // El Mock (Simulador) de la base de datos
         private readonly Mock<IPacienteRepository> _pacienteRepoMock;
         private readonly Mock<IConsultaRepository> _consultaRepoMock;
-        private readonly Mock<IProcesoRepository> _procesoRepoMock;
+        private readonly Mock<IProcedimientoRepository> _procedimientoRepoMock;
         // El servicio REAL que queremos probar
         private readonly PacienteService _pacienteService;
 
@@ -22,9 +22,9 @@ namespace ClinicksApi.Tests
             // 1. Inicializamos el simulador vacío
             _pacienteRepoMock = new Mock<IPacienteRepository>();
             _consultaRepoMock = new Mock<IConsultaRepository>();
-            _procesoRepoMock = new Mock<IProcesoRepository>();
+            _procedimientoRepoMock = new Mock<IProcedimientoRepository>();
             // 2. Le pasamos el objeto simulado (.Object) a nuestro servicio real
-            _pacienteService = new PacienteService(_pacienteRepoMock.Object, _consultaRepoMock.Object, _procesoRepoMock.Object);
+            _pacienteService = new PacienteService(_pacienteRepoMock.Object, _consultaRepoMock.Object, _procedimientoRepoMock.Object);
         }
 
         [Fact]
@@ -275,7 +275,7 @@ namespace ClinicksApi.Tests
             _consultaRepoMock.Setup(repo => repo.ObtenerHistorialConsultasAsync(idPrueba))
                              .ReturnsAsync(new List<ConsultaMedica>());
 
-            _procesoRepoMock.Setup(repo => repo.ObtenerHistorialProcedimientosAsync(idPrueba))
+            _procedimientoRepoMock.Setup(repo => repo.ObtenerHistorialProcedimientosAsync(idPrueba))
                              .ReturnsAsync(new List<Procedimiento>());
 
             // ACT
@@ -331,7 +331,7 @@ namespace ClinicksApi.Tests
             _consultaRepoMock.Setup(repo => repo.ObtenerHistorialConsultasAsync(idPrueba))
                              .ReturnsAsync(consultasFake);
 
-            _procesoRepoMock.Setup(repo => repo.ObtenerHistorialProcedimientosAsync(idPrueba))
+            _procedimientoRepoMock.Setup(repo => repo.ObtenerHistorialProcedimientosAsync(idPrueba))
                              .ReturnsAsync(procesosFake);
 
             // ACT
@@ -416,7 +416,7 @@ namespace ClinicksApi.Tests
 
             _pacienteRepoMock.Setup(repo => repo.ObtenerPorIdAsync(idPrueba)).ReturnsAsync(pacienteFake);
             _consultaRepoMock.Setup(repo => repo.ObtenerHistorialConsultasAsync(idPrueba)).ReturnsAsync(consultasFake);
-            _procesoRepoMock.Setup(repo => repo.ObtenerHistorialProcedimientosAsync(idPrueba)).ReturnsAsync(new List<Procedimiento>());
+            _procedimientoRepoMock.Setup(repo => repo.ObtenerHistorialProcedimientosAsync(idPrueba)).ReturnsAsync(new List<Procedimiento>());
 
             // ACT
             var resultado = await _pacienteService.ObtenerHistorialClinico(idPrueba);
@@ -441,7 +441,7 @@ namespace ClinicksApi.Tests
 
             _pacienteRepoMock.Setup(repo => repo.ObtenerPorIdAsync(idPrueba)).ReturnsAsync(pacienteFake);
             _consultaRepoMock.Setup(repo => repo.ObtenerHistorialConsultasAsync(idPrueba)).ReturnsAsync(new List<ConsultaMedica>());
-            _procesoRepoMock.Setup(repo => repo.ObtenerHistorialProcedimientosAsync(idPrueba)).ReturnsAsync(procesosFake);
+            _procedimientoRepoMock.Setup(repo => repo.ObtenerHistorialProcedimientosAsync(idPrueba)).ReturnsAsync(procesosFake);
 
             // ACT
             var resultado = await _pacienteService.ObtenerHistorialClinico(idPrueba);

@@ -14,6 +14,6 @@ namespace ClinicksApi.Business.DTOs
         public List<ConsultaHistorialDto> Consultas { get; set; } = new();
 
         /// <summary>Historial de procedimientos médicos del paciente.</summary>
-        public List<ProcesoHistorialDto> Procedimientos { get; set; } = new();
+        public List<ProcedimientoHistorialDto> Procedimientos { get; set; } = new();
     }
 }

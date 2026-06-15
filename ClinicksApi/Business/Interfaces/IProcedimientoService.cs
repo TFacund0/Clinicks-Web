@@ -5,15 +5,15 @@ namespace ClinicksApi.Business.Interfaces
 {
     /// <summary>
     /// Contrato (interfaz) que define las operaciones de negocio disponibles para los procedimientos médicos.
-    /// La implementación concreta es <see cref="ClinicksApi.Business.Services.ProcesoService"/>.
+    /// La implementación concreta es <see cref="ClinicksApi.Business.Services.ProcedimientoService"/>.
     /// </summary>
-    public interface IProcesoService
+    public interface IProcedimientoService
     {
         /// <summary>
         /// Aplica las reglas de negocio y persiste un nuevo procedimiento médico en la base de datos,
         /// creando además el Turno de vinculación entre el procedimiento, el paciente y el médico.
         /// </summary>
-        /// <param name="procedimiento">DTO con los datos del formulario (tipo de proceso, descripción, DNI del paciente, etc.).</param>
+        /// <param name="procedimiento">DTO con los datos del formulario (tipo de procedimiento, descripción, DNI del paciente, etc.).</param>
         /// <param name="idMedico">ID del médico autenticado, extraído del Token JWT en el Controlador.</param>
         /// <returns>
         /// Una tupla con tres valores:
@@ -28,6 +28,6 @@ namespace ClinicksApi.Business.Interfaces
         /// Este catálogo se almacena centralizadamente en la capa de negocio respetando SoC.
         /// </summary>
         /// <returns>Colección de tipos de procedimientos con su ID y Nombre descriptivo.</returns>
-        IEnumerable<object> ObtenerTiposProceso();
+        IEnumerable<object> ObtenerTiposProcedimiento();
     }
 }

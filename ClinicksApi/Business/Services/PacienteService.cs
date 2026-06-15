@@ -11,16 +11,16 @@ namespace ClinicksApi.Business.Services
     {
         private readonly IPacienteRepository _repository;
         private readonly IConsultaRepository _consultaRepository;
-        private readonly IProcesoRepository _procesoRepository;
+        private readonly IProcedimientoRepository _procedimientoRepository;
 
         /// <summary>
         /// Constructor de PacienteService.
         /// </summary>
-        public PacienteService(IPacienteRepository repository, IConsultaRepository consultaRepository, IProcesoRepository procesoRepository)
+        public PacienteService(IPacienteRepository repository, IConsultaRepository consultaRepository, IProcedimientoRepository procedimientoRepository)
         {
             _repository = repository;
             _consultaRepository = consultaRepository;
-            _procesoRepository = procesoRepository;
+            _procedimientoRepository = procedimientoRepository;
         }
 
         /// <inheritdoc/>
@@ -94,7 +94,7 @@ namespace ClinicksApi.Business.Services
             if (pacienteDto == null) return null;
 
             var consultasDirectas = await _consultaRepository.ObtenerHistorialConsultasAsync(pacienteId);
-            var procedimientosDB = await _procesoRepository.ObtenerHistorialProcedimientosAsync(pacienteId);
+            var procedimientosDB = await _procedimientoRepository.ObtenerHistorialProcedimientosAsync(pacienteId);
 
             var consultas = consultasDirectas
                 .Select(c => new ConsultaHistorialDto
@@ -115,7 +115,7 @@ namespace ClinicksApi.Business.Services
             var procedimientos = procedimientosDB
                 .Select(p => {
                     var turnoAsociado = p.Turnos?.FirstOrDefault();
-                    return new ProcesoHistorialDto
+                    return new ProcedimientoHistorialDto
                     {
                         IdProcedimiento = p.IdProcedimiento,
                         Tipo = p.Tipo,

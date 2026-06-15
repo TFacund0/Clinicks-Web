@@ -16,17 +16,17 @@ namespace ClinicksApi.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class ProcesosController : ControllerBase
+    public class ProcedimientosController : ControllerBase
     {
-        private readonly IProcesoService _procesoService;
+        private readonly IProcedimientoService _procedimientoService;
 
         /// <summary>
-        /// Constructor de ProcesosController.
+        /// Constructor de ProcedimientosController.
         /// </summary>
-        /// <param name="procesoService">Servicio con la lógica de negocio de procedimientos médicos.</param>
-        public ProcesosController(IProcesoService procesoService)
+        /// <param name="procedimientoService">Servicio con la lógica de negocio de procedimientos médicos.</param>
+        public ProcedimientosController(IProcedimientoService procedimientoService)
         {
-            _procesoService = procesoService;
+            _procedimientoService = procedimientoService;
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace ClinicksApi.Controllers
             if (idMedico == null)
                 return Unauthorized(new { message = "No se pudo identificar al médico autenticado." });
  
-            var resultado = await _procesoService.RegistrarProcedimiento(procedimiento, idMedico.Value);
+            var resultado = await _procedimientoService.RegistrarProcedimiento(procedimiento, idMedico.Value);
 
             if (resultado.Success)
             {
@@ -72,9 +72,9 @@ namespace ClinicksApi.Controllers
         /// </summary>
         /// <returns><see cref="OkResult"/> (200) con la lista de tipos de procedimiento disponibles.</returns>
         [HttpGet("tipos")]
-        public IActionResult ObtenerTiposProceso()
+        public IActionResult ObtenerTiposProcedimiento()
         {
-            var tipos = _procesoService.ObtenerTiposProceso();
+            var tipos = _procedimientoService.ObtenerTiposProcedimiento();
             return Ok(tipos);
         }
 

@@ -12,7 +12,7 @@ import Patients from '../pages/medico/Patients';
 import NewConsultation from '../pages/medico/NewConsultation';
 import PatientHistory from '../pages/medico/PatientHistory';
 import PatientVerification from '../pages/medico/PatientVerification';
-import NewProcess from '../pages/medico/NewProcess';
+import NewProcedure from '../pages/medico/NewProcedure';
 import Agenda from '../pages/medico/Agenda';
 import TurnAttentionDetail from '../pages/medico/TurnAttentionDetail';
 
@@ -30,9 +30,9 @@ const AppRoutes = () => {
         <Route path="/pacientes"              element={<Patients />} />
         <Route path="/pacientes/:id/historial" element={<PatientHistory />} />
         <Route path="/nueva-consulta"         element={<NewConsultation />} />
-        <Route path="/nuevo-procedimiento"    element={<NewProcess />} />
+        <Route path="/nuevo-procedimiento"    element={<NewProcedure />} />
         <Route path="/acceso-consulta"        element={<PatientVerification key="consulta"  destino="/nueva-consulta" />} />
-        <Route path="/acceso-procedimiento"   element={<PatientVerification key="proceso"   destino="/nuevo-procedimiento" />} />
+        <Route path="/acceso-procedimiento"   element={<PatientVerification key="procedimiento"   destino="/nuevo-procedimiento" />} />
         <Route path="/agenda"                 element={<Agenda />} />
         <Route path="/agenda/atencion/:idTurno" element={<TurnAttentionDetail />} />
       </Route>

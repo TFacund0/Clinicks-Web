@@ -3,7 +3,7 @@ namespace ClinicksApi.Business.DTOs
     /// <summary>
     /// DTO para el historial de procedimientos.
     /// </summary>
-    public class ProcesoHistorialDto
+    public class ProcedimientoHistorialDto
     {
         public int IdProcedimiento { get; set; }
         public string Tipo { get; set; } = string.Empty;

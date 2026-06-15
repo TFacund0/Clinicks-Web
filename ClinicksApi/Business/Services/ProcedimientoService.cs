@@ -8,15 +8,15 @@ using ClinicksApi.Constants;
 namespace ClinicksApi.Business.Services
 {
     /// <inheritdoc/>
-    public class ProcesoService : IProcesoService
+    public class ProcedimientoService : IProcedimientoService
     {
-        private readonly IProcesoRepository _procesoRepo;
+        private readonly IProcedimientoRepository _procedimientoRepo;
         private readonly IPacienteService _pacienteService;
         private readonly ITurnoRepository _turnoRepository;
-        private readonly ILogger<ProcesoService> _logger;
+        private readonly ILogger<ProcedimientoService> _logger;
         
 
-        private static readonly List<object> _tiposProceso = new List<object>
+        private static readonly List<object> _tiposProcedimiento = new List<object>
         {
             new { id = 1, nombre = "Cirugía Menor" },
             new { id = 2, nombre = "Estudio de Imagen (Rayos X, MRI)" },
@@ -29,14 +29,14 @@ namespace ClinicksApi.Business.Services
             new { id = 9, nombre = "Otro" }
         };
 
-        /// <summary>Constructor de ProcesoService</summary>
-        /// <param name="procesoRepo">Repositorio de procesos</param>
+        /// <summary>Constructor de ProcedimientoService</summary>
+        /// <param name="procedimientoRepo">Repositorio de procedimientos</param>
         /// <param name="pacienteService">Servicio para verificar la existencia del paciente por DNI antes de registrar.</param>
         /// <param name="turnoRepository">Repositorio de turnos</param>
         /// <param name="logger">Logger de diagnóstico del servicio.</param>
-        public ProcesoService(IProcesoRepository procesoRepo, IPacienteService pacienteService, ITurnoRepository turnoRepository, ILogger<ProcesoService> logger)
+        public ProcedimientoService(IProcedimientoRepository procedimientoRepo, IPacienteService pacienteService, ITurnoRepository turnoRepository, ILogger<ProcedimientoService> logger)
         {
-            _procesoRepo = procesoRepo;
+            _procedimientoRepo = procedimientoRepo;
             _pacienteService = pacienteService;
             _turnoRepository = turnoRepository;
             _logger = logger;
@@ -55,12 +55,12 @@ namespace ClinicksApi.Business.Services
                     return (false, "Paciente no encontrado en la base de datos o no apto para procedimientos.", null);
 
 
-                var fechaAUsar = procedimiento.fechaproceso ?? DateTime.Now;
+                var fechaAUsar = procedimiento.fechaprocedimiento ?? DateTime.Now;
 
 
                 var nuevoProcedimiento = new Procedimiento
                 {
-                    Tipo        = procedimiento.tipoproceso,
+                    Tipo        = procedimiento.tipoprocedimiento,
                     Descripcion = procedimiento.descripcion,
                     Resultado   = procedimiento.resultado ?? "Sin resultado ingresado",
                     Fecha       = fechaAUsar
@@ -71,7 +71,7 @@ namespace ClinicksApi.Business.Services
                                  ?? ConstantesGenerales.EstadosTurno.AtendidoId;
 
 
-                var procGuardado = await _procesoRepo.RegistrarProcedimiento(nuevoProcedimiento);
+                var procGuardado = await _procedimientoRepo.RegistrarProcedimiento(nuevoProcedimiento);
 
                 if (procedimiento.idTurno.HasValue && procedimiento.idTurno.Value > 0)
                 {
@@ -91,7 +91,7 @@ namespace ClinicksApi.Business.Services
                         IdMedico        = idMedico,
                         IdEstadoTurno   = idEstadoHecho,
                         FechaTurno      = fechaAUsar,
-                        Motivo          = $"Procedimiento: {procedimiento.tipoproceso}",
+                        Motivo          = $"Procedimiento: {procedimiento.tipoprocedimiento}",
                         IdProcedimiento = procGuardado.IdProcedimiento
                     };
 
@@ -109,9 +109,9 @@ namespace ClinicksApi.Business.Services
         }
 
         /// <inheritdoc/>
-        public IEnumerable<object> ObtenerTiposProceso()
+        public IEnumerable<object> ObtenerTiposProcedimiento()
         {
-            return _tiposProceso;
+            return _tiposProcedimiento;
         }
 
     }
