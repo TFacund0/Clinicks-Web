@@ -3,10 +3,9 @@ using ClinicksApi.Data.Entities;
 namespace ClinicksApi.Data.Interfaces
 {
     /// <summary>
-    /// Contrato para el acceso a datos relacionados con la autenticación y seguridad.
-    /// Define cómo el sistema debe interactuar con la base de datos para temas de login.
+    /// Contrato para el acceso a datos relacionados con los Usuarios.
     /// </summary>
-    public interface IAuthRepository
+    public interface IUsuarioRepository
     {
         /// <summary>
         /// Busca un usuario en la tabla Usuarios coincidiendo el nombre de usuario de forma exacta.
@@ -21,8 +20,6 @@ namespace ClinicksApi.Data.Interfaces
         /// <param name="matricula">La matrícula del médico a buscar.</param>
         /// <returns>La entidad Usuario asociada al médico encontrado o null si no existe.</returns>
         Task<Usuario?> ObtenerUsuarioPorMatriculaAsync(string matricula);
-
-
 
         /// <summary>Obtiene todos los usuarios (para el proceso de migración de contraseñas).</summary>
         /// <returns>Una lista de entidades Usuario.</returns>
