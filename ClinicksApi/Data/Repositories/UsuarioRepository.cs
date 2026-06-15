@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore;
 namespace ClinicksApi.Data.Repositories
 {
     /// <inheritdoc/>
-    public class AuthRepository : IAuthRepository
+    public class UsuarioRepository : IUsuarioRepository
     {
         private readonly ClinicksDbContext _context;
 
         /// <summary>
         /// Constructor del repositorio.
         /// </summary>
-        public AuthRepository(ClinicksDbContext context)
+        public UsuarioRepository(ClinicksDbContext context)
         {
             _context = context;
         }
@@ -45,14 +45,6 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<Medico?> ObtenerMedicoPorUsuarioIdAsync(int usuarioId)
-        {
-            return await _context.Medicos
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.IdUsuario == usuarioId);
-        }
-
-        /// <inheritdoc/>
         public async Task<IEnumerable<Usuario>> ObtenerTodosLosUsuariosAsync()
         {
             return await _context.Usuarios.ToListAsync();
@@ -64,7 +56,5 @@ namespace ClinicksApi.Data.Repositories
             _context.Usuarios.Update(usuario);
             await _context.SaveChangesAsync();
         }
-
-
     }
 }

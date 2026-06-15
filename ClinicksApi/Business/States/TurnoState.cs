@@ -24,7 +24,7 @@ namespace ClinicksApi.Business.States
             => throw new InvalidOperationException("No se puede iniciar la atención en el estado actual del turno.");
 
         /// <summary>
-        /// Intenta finalizar la atención médica (consulta o proceso) del turno.
+        /// Intenta finalizar la atención médica (consulta o procedimiento) del turno.
         /// Lanza una excepción por defecto si el estado actual no lo permite.
         /// </summary>
         public virtual void FinalizarAtencion(Turno turno)

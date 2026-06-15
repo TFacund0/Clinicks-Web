@@ -6,7 +6,7 @@
 // en true mientras la sesión ya está destruida.
 
 import axios from 'axios';
-import authService from '../services/authService';
+import usuarioService from '../services/usuarioService';
 
 export const AUTH_EXPIRED_EVENT = 'auth:session-expired';
 
@@ -21,7 +21,7 @@ const clinicksApi = axios.create({
 
 // Interceptor para agregar el token JWT a TODAS las peticiones
 clinicksApi.interceptors.request.use(config => {
-  const token = authService.getToken();
+  const token = usuarioService.getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

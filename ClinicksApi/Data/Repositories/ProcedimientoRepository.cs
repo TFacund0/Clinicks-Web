@@ -6,14 +6,14 @@ using ClinicksApi.Constants;
 namespace ClinicksApi.Data.Repositories
 {
     /// <inheritdoc/>
-    public class ProcesoRepository : IProcesoRepository
+    public class ProcedimientoRepository : IProcedimientoRepository
     {
         private readonly ClinicksDbContext _context;
 
         /// <summary>
         /// Constructor del repositorio.
         /// </summary>
-        public ProcesoRepository(ClinicksDbContext context)
+        public ProcedimientoRepository(ClinicksDbContext context)
         {
             _context = context;
         }

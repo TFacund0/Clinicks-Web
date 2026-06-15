@@ -6,21 +6,21 @@ using Microsoft.AspNetCore.Authorization;
 namespace ClinicksApi.Controllers
 {
     /// <summary>
-    /// Controlador responsable de gestionar la autenticación y seguridad de la API.
+    /// Controlador responsable de gestionar la autenticación y seguridad de los Usuarios de la API.
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class UsuariosController : ControllerBase
     {
-        private readonly IAuthService _authService;
+        private readonly IUsuarioService _usuarioService;
 
         /// <summary>
-        /// Constructor del controlador de autenticación.
+        /// Constructor del controlador de usuarios.
         /// </summary>
-        /// <param name="authService">El servicio de autenticación.</param>
-        public AuthController(IAuthService authService)
+        /// <param name="usuarioService">El servicio de usuarios/autenticación.</param>
+        public UsuariosController(IUsuarioService usuarioService)
         {
-            _authService = authService;
+            _usuarioService = usuarioService;
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace ClinicksApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> IniciarSesion([FromBody] LoginRequest request)
         {
-            var medico = await _authService.AutenticarAsync(request.Username, request.Password);
+            var medico = await _usuarioService.AutenticarAsync(request.Username, request.Password);
 
             if (medico == null)
                 return Unauthorized(new { message = "Usuario o contraseña incorrectos." });
@@ -56,7 +56,7 @@ namespace ClinicksApi.Controllers
             {
                 return Unauthorized(new { message = "Clave secreta incorrecta." });
             }
-            var cantidad = await _authService.EncriptarClavesExistentesAsync();
+            var cantidad = await _usuarioService.EncriptarClavesExistentesAsync();
             return Ok(new { message = $"Se han encriptado {cantidad} contraseñas exitosamente." });
         }
     }

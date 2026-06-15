@@ -1,12 +1,12 @@
 import React from 'react';
 import Sidebar from '../../components/Sidebar';
-import { useNewProcess } from '../../hooks/useNewProcess';
+import { useNewProcedure } from '../../hooks/useNewProcedure';
 import { Calendar, User, AlignLeft, AlertCircle, Save, X, Stethoscope, ClipboardList } from 'lucide-react';
 import PageLayout from '../../components/PageLayout';
 import Toast from '../../components/Toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const NewProcess = () => {
+const NewProcedure = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const dniEntrante = location.state?.dniIngresado || '';
@@ -22,7 +22,7 @@ const NewProcess = () => {
         handleSubmit,
         handleCancel,
         tiposDisponibles,
-    } = useNewProcess(dniEntrante, idTurnoEntrante);
+    } = useNewProcedure(dniEntrante, idTurnoEntrante);
 
 
     React.useEffect(() => {
@@ -46,7 +46,7 @@ const NewProcess = () => {
                             <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
                                 <h3 className="text-lg font-bold flex items-center gap-2 border-b border-slate-800 pb-3">
                                     <ClipboardList size={20} className="text-cyan-400" />
-                                    Contexto del Proceso
+                                    Contexto del Procedimiento
                                 </h3>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -55,14 +55,14 @@ const NewProcess = () => {
                                         <input type="text" name="dnipaciente" value={formData.dnipaciente} disabled className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed font-mono" />
                                     </div>
                                     <div>
-                                        <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Fecha del proceso</label>
-                                        <input type="datetime-local" name="fechaproceso" value={formData.fechaproceso} disabled className={`w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed`} />
-                                        {errors.fechaproceso && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.fechaproceso}</p>}
+                                        <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Fecha del procedimiento</label>
+                                        <input type="datetime-local" name="fechaprocedimiento" value={formData.fechaprocedimiento} disabled className={`w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed`} />
+                                        {errors.fechaprocedimiento && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.fechaprocedimiento}</p>}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Descripción del Proceso</label>
+                                    <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Descripción del Procedimiento</label>
                                     <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} rows="2" className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors resize-none" placeholder="Descripción breve..." />
                                     {errors.descripcion && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.descripcion}</p>}
                                 </div>
@@ -74,15 +74,15 @@ const NewProcess = () => {
                                     Detalle Clínico
                                 </h3>
                                 <div>
-                                    <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Tipo de Proceso</label>
-                                    <select name="tipoproceso" value={formData.tipoproceso} onChange={handleChange} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors scheme-dark">
+                                    <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Tipo de Procedimiento</label>
+                                    <select name="tipoprocedimiento" value={formData.tipoprocedimiento} onChange={handleChange} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 transition-colors scheme-dark">
                                         <option value="">Selecciona un tipo</option>
                                         {Array.isArray(tiposDisponibles) && tiposDisponibles.map((tipo) => (
                                             <option key={tipo.id} value={tipo.nombre}>
                                                 {tipo.nombre}
                                             </option>))}
                                     </select>
-                                    {errors.tipoproceso && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.tipoproceso}</p>}
+                                    {errors.tipoprocedimiento && <p className="text-red-500 text-[10px] mt-1 font-bold italic">{errors.tipoprocedimiento}</p>}
                                 </div>
                                 <div>
                                     <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">Resultado</label>
@@ -98,7 +98,7 @@ const NewProcess = () => {
                                 className={`px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors shadow-lg shadow-cyan-500/20 ${isSubmitting ? 'bg-cyan-700 text-slate-400 cursor-not-allowed' : 'bg-cyan-500 text-slate-950 hover:bg-cyan-400'}`}
                             >
                                 <Save size={20} />
-                                {isSubmitting ? 'Guardando...' : 'Guardar Proceso'}
+                                {isSubmitting ? 'Guardando...' : 'Guardar Procedimiento'}
                             </button>
                             <button
                                 type="button"
@@ -120,4 +120,4 @@ const NewProcess = () => {
     );
 };
 
-export default NewProcess;
+export default NewProcedure;

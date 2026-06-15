@@ -3,9 +3,9 @@ using ClinicksApi.Business.DTOs;
 namespace ClinicksApi.Business.Interfaces
 {
     /// <summary>
-    /// Contrato que define las operaciones de seguridad, autenticación y manejo de tokens.
+    /// Contrato que define las operaciones de seguridad, autenticación y manejo de tokens para los Usuarios.
     /// </summary>
-    public interface IAuthService
+    public interface IUsuarioService
     {
         /// <summary>
         /// Verifica las credenciales de un usuario y, si son válidas, emite un Token JWT.

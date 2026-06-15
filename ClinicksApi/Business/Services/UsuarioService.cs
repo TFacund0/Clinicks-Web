@@ -9,14 +9,16 @@ using System.Threading.Tasks;
 namespace ClinicksApi.Business.Services
 {
     /// <inheritdoc/>
-    public class AuthService : IAuthService
+    public class UsuarioService : IUsuarioService
     {
-        private readonly IAuthRepository _authRepository;
+        private readonly IUsuarioRepository _usuarioRepository;
+        private readonly IMedicoRepository _medicoRepository;
         private readonly ITokenService _tokenService;
 
-        public AuthService(IAuthRepository authRepository, ITokenService tokenService)
+        public UsuarioService(IUsuarioRepository usuarioRepository, IMedicoRepository medicoRepository, ITokenService tokenService)
         {
-            _authRepository = authRepository;
+            _usuarioRepository = usuarioRepository;
+            _medicoRepository = medicoRepository;
             _tokenService = tokenService;
         }
 
@@ -24,11 +26,11 @@ namespace ClinicksApi.Business.Services
         public async Task<LoginResponseDto?> AutenticarAsync(string username, string password)
         {
             // Buscar el usuario por username o matrícula (fallback coordinado en la capa de servicios)
-            var usuario = await _authRepository.ObtenerUsuarioPorUsernameAsync(username);
+            var usuario = await _usuarioRepository.ObtenerUsuarioPorUsernameAsync(username);
 
             if (usuario == null)
             {
-                usuario = await _authRepository.ObtenerUsuarioPorMatriculaAsync(username);
+                usuario = await _usuarioRepository.ObtenerUsuarioPorMatriculaAsync(username);
             }
 
             if (usuario == null)
@@ -57,7 +59,7 @@ namespace ClinicksApi.Business.Services
             }
 
             // Buscar al médico vinculado
-            var medico = await _authRepository.ObtenerMedicoPorUsuarioIdAsync(usuario.IdUsuario);
+            var medico = await _medicoRepository.ObtenerPorUsuarioIdAsync(usuario.IdUsuario);
 
             // Si el usuario no tiene médico vinculado, rechazamos el login de inmediato en lugar de usar un fallback
             // que suplantaría la identidad de otro médico.
@@ -82,7 +84,7 @@ namespace ClinicksApi.Business.Services
         /// <inheritdoc/>
         public async Task<int> EncriptarClavesExistentesAsync()
         {
-            var usuarios = await _authRepository.ObtenerTodosLosUsuariosAsync();
+            var usuarios = await _usuarioRepository.ObtenerTodosLosUsuariosAsync();
             int count = 0;
 
             foreach (var usuario in usuarios)
@@ -90,7 +92,7 @@ namespace ClinicksApi.Business.Services
                 if (!usuario.Password.StartsWith("$2"))
                 {
                     usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password.Trim());
-                    await _authRepository.ActualizarUsuarioAsync(usuario);
+                    await _usuarioRepository.ActualizarUsuarioAsync(usuario);
                     count++;
                 }
             }

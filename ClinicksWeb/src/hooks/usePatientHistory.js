@@ -45,14 +45,14 @@ export const usePatientHistory = (pacienteId) => {
                         fechaOrden: new Date(c.fechaConsulta).getTime()
                     }));
 
-                    const procesosMapeados = data.procedimientos.map(p => ({
+                    const procedimientosMapeados = data.procedimientos.map(p => ({
                         ...p,
                         tipoRegistro: 'procedimiento',
                         fechaOrden: new Date(p.fecha).getTime()
                     }));
 
                     // Unificar y ordenar cronológicamente (del más reciente al más antiguo)
-                    const historialUnificado = [...consultasMapeadas, ...procesosMapeados]
+                    const historialUnificado = [...consultasMapeadas, ...procedimientosMapeados]
                         .sort((a, b) => b.fechaOrden - a.fechaOrden);
 
                     setHistorial(historialUnificado);
@@ -86,7 +86,7 @@ export const usePatientHistory = (pacienteId) => {
 
         const busqueda = filtros.texto.toLowerCase();
 
-        // Unificar los textos donde el médico podría buscar, dependiendo de si es consulta o proceso
+        // Unificar los textos donde el médico podría buscar, dependiendo de si es consulta o procedimiento
         let textoBuscable = '';
         if (item.tipoRegistro === 'consulta') {
             textoBuscable = `${item.motivo} ${item.diagnostico} ${item.tratamiento} ${item.observacion || ''} ${item.recomendacion || ''} ${item.medicoAtencion}`;

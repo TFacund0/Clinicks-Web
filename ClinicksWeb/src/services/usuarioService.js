@@ -1,5 +1,5 @@
-// src/services/authService.js
-// Servicio centralizado de autenticación y gestión de sesión.
+// src/services/usuarioService.js
+// Servicio centralizado de sesión y autenticación de usuarios.
 // Es el ÚNICO lugar de la app autorizado a leer/escribir datos de sesión en localStorage
 // y a llamar al endpoint de login. Ninguna página ni componente debe tocar localStorage directamente.
 
@@ -14,16 +14,16 @@ const SESSION_KEYS = {
     MEDICO_MATRICULA: 'medicoMatricula',
 };
 
-const authService = {
+const usuarioService = {
 
     /**
-     * Autentica al médico contra el backend y persiste la sesión en localStorage.
+     * Autentica al médico/usuario contra el backend y persiste la sesión en localStorage.
      * @param {string} username - Nombre de usuario o matrícula.
      * @param {string} password - Contraseña en texto plano.
      * @returns {object} Datos del médico autenticado (token, nombre, etc.).
      */
     login: async (username, password) => {
-        const response = await clinicksApi.post('/Auth/login', {
+        const response = await clinicksApi.post('/Usuarios/login', {
             username: username.trim(),
             password,
         });
@@ -67,4 +67,4 @@ const authService = {
     getMedicoMatricula: () => localStorage.getItem(SESSION_KEYS.MEDICO_MATRICULA),
 };
 
-export default authService;
+export default usuarioService;

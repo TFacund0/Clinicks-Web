@@ -14,8 +14,8 @@ namespace ClinicksApi.Business.DTOs
         /// <summary>
         /// Categoría del procedimiento (ej: "Cirugía Menor", "Análisis de Laboratorio").
         /// </summary>
-        [Required(ErrorMessage = "El tipo de proceso es obligatorio")]
-        public string tipoproceso { get; set; } = null!;
+        [Required(ErrorMessage = "El tipo de procedimiento es obligatorio")]
+        public string tipoprocedimiento { get; set; } = null!;
 
         /// <summary>Descripción del procedimiento.</summary>
         [Required(ErrorMessage = "La descripción es obligatoria")]
@@ -24,7 +24,7 @@ namespace ClinicksApi.Business.DTOs
         /// <summary>
         /// Fecha del procedimiento.
         /// </summary>
-        public DateTime? fechaproceso { get; set; }
+        public DateTime? fechaprocedimiento { get; set; }
 
         /// <summary>Resultado del procedimiento.</summary>
         public string? resultado { get; set; }

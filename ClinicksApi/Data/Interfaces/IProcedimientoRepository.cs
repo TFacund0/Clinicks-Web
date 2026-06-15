@@ -4,9 +4,9 @@ namespace ClinicksApi.Data.Interfaces
 {
     /// <summary>
     /// Contrato (interfaz) que define las operaciones de acceso a datos para los procedimientos médicos.
-    /// La implementación concreta es <see cref="ClinicksApi.Data.Repositories.ProcesoRepository"/>.
+    /// La implementación concreta es <see cref="ClinicksApi.Data.Repositories.ProcedimientoRepository"/>.
     /// </summary>
-    public interface IProcesoRepository
+    public interface IProcedimientoRepository
     {
         /// <summary>
         /// Persiste un nuevo Procedimiento en la base de datos.

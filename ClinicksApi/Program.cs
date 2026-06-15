@@ -49,17 +49,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddScoped<ITurnoRepository, TurnoRepository>();
 builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
-builder.Services.AddScoped<IProcesoRepository, ProcesoRepository>();
+builder.Services.AddScoped<IProcedimientoRepository, ProcedimientoRepository>();
+builder.Services.AddScoped<IMedicoRepository, MedicoRepository>();
 
 
 builder.Services.AddScoped<ITurnoService, TurnoService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IPacienteService, PacienteService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IConsultaService, ConsultaService>();
-builder.Services.AddScoped<IProcesoService, ProcesoService>();
+builder.Services.AddScoped<IProcedimientoService, ProcedimientoService>();
+builder.Services.AddScoped<IMedicoService, MedicoService>();
 
 
 builder.Services.AddHostedService<ServicioLimpiezaTurnos>();

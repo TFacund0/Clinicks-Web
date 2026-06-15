@@ -6,7 +6,7 @@
 // sin necesidad de recargar la página ni depender de localStorage directamente.
 
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import authService from '../services/authService';
+import usuarioService from '../services/usuarioService';
 import { AUTH_EXPIRED_EVENT } from '../api/clinicksApi';
 
 const AuthContext = createContext(null);
@@ -17,15 +17,15 @@ const AuthContext = createContext(null);
  */
 export const AuthProvider = ({ children }) => {
     // Estado derivado de localStorage al arrancar: si ya había token, el usuario sigue logueado.
-    const [isAuthenticated, setIsAuthenticated] = useState(authService.isAuthenticated());
-    const [medicoNombre, setMedicoNombre] = useState(authService.getMedicoNombre());
+    const [isAuthenticated, setIsAuthenticated] = useState(usuarioService.isAuthenticated());
+    const [medicoNombre, setMedicoNombre] = useState(usuarioService.getMedicoNombre());
 
     /**
      * Inicia sesión: llama al servicio, persiste la sesión y actualiza el estado de React.
      * @returns {object} Datos del médico autenticado.
      */
     const login = useCallback(async (username, password) => {
-        const data = await authService.login(username, password);
+        const data = await usuarioService.login(username, password);
         setIsAuthenticated(true);
         setMedicoNombre(`${data.nombre} ${data.apellido}`);
         return data;
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
      * Cierra la sesión: limpia el storage y pone el estado en "no autenticado".
      */
     const logout = useCallback(() => {
-        authService.logout();
+        usuarioService.logout();
         setIsAuthenticated(false);
         setMedicoNombre('Médico');
     }, []);
