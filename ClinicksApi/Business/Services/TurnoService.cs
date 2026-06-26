@@ -14,14 +14,6 @@ namespace ClinicksApi.Business.Services
         {
             _turnoRepository = turnoRepository;
         }
-        
-        /// <inheritdoc/>
-        public async Task<IEnumerable<TurnoAgendaDto>> ObtenerTurnosAgendadosAsync()
-        {
-            var turnosDB = await _turnoRepository.ObtenerTodosAsync();
-
-            return turnosDB.Select(MapToDto);
-        }
 
         /// <inheritdoc/>
         public async Task<IEnumerable<TurnoAgendaDto>> ObtenerTurnosMedicoAsync(int idMedico, DateTime? fechaInicio, DateTime? fechaFin)

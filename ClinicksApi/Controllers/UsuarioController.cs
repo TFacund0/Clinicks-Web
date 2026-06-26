@@ -43,21 +43,5 @@ namespace ClinicksApi.Controllers
 
             return Ok(medico);
         }
-
-        /// <summary>
-        /// Endpoint temporal de mantenimiento para encriptar claves en texto plano.
-        /// Se agregó autorización para evitar ataques DoS públicos.
-        /// </summary>
-        [HttpPost("encriptar-claves")]
-        public async Task<IActionResult> EncriptarClaves([FromQuery] string secretKey)
-        {
-            // Protección manual básica temporal en lugar de JWT
-            if (secretKey != "ClinicksAdmin2026")
-            {
-                return Unauthorized(new { message = "Clave secreta incorrecta." });
-            }
-            var cantidad = await _usuarioService.EncriptarClavesExistentesAsync();
-            return Ok(new { message = $"Se han encriptado {cantidad} contraseñas exitosamente." });
-        }
     }
 }

@@ -140,7 +140,7 @@ namespace ClinicksApi.Tests
         }
 
         [Fact]
-        public async Task ObtenerListado_DeberiaDevolverTodosLosPacientes()
+        public async Task ObtenerTodos_DeberiaDevolverTodosLosPacientes()
         {
             // ARRANGE
             var pacientesFake = new List<Paciente>
@@ -152,7 +152,7 @@ namespace ClinicksApi.Tests
                              .ReturnsAsync(pacientesFake);
 
             // ACT
-            var resultado = await _pacienteService.ObtenerListado();
+            var resultado = await _pacienteService.ObtenerTodos();
 
             // ASSERT
             Assert.Single(resultado);
