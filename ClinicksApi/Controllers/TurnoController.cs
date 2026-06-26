@@ -28,20 +28,6 @@ namespace ClinicksApi.Controllers
             _turnoService = turnoService;
         }
 
-        /// <summary>
-        /// Endpoint para obtener la lista de turnos agendados. Devuelve información detallada de cada turno, incluyendo el nombre completo del paciente, su DNI, el motivo del turno y su estado actual.
-        /// </summary>
-        /// <returns>
-        /// <see cref="OkResult"/> (200) con una lista de objetos TurnoAgendaDto si la operación es exitosa.
-        /// <see cref="UnauthorizedResult"/> (401) si el usuario no está autenticado.
-        /// </returns>
-        [HttpGet("turnos-agendados")]
-        public async Task<IActionResult> ObtenerTurnosAgendadosAsync()
-        {
-            var miAgenda = await _turnoService.ObtenerTurnosAgendadosAsync();
-
-            return Ok(miAgenda);
-        }
 
         /// <summary>
         /// Endpoint para que un médico pueda obtener su propia agenda de turnos, opcionalmente filtrada por un rango de fechas.

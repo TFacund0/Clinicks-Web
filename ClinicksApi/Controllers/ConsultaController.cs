@@ -63,5 +63,15 @@ namespace ClinicksApi.Controllers
             });
         }
 
+        /// <summary>
+        /// Obtiene el listado completo de todas las consultas médicas registradas en el sistema.
+        /// </summary>
+        /// <returns>Una lista de DTOs <see cref="ConsultaHistorialDto"/>.</returns>
+        [HttpGet]
+        public async Task<IActionResult> ListaConsultas()
+        {
+            var consultas = await _consultaService.ListaConsultas();
+            return Ok(consultas);
+        }
     }
 }

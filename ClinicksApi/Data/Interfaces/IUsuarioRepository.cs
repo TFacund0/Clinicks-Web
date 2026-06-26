@@ -21,10 +21,6 @@ namespace ClinicksApi.Data.Interfaces
         /// <returns>La entidad Usuario asociada al médico encontrado o null si no existe.</returns>
         Task<Usuario?> ObtenerUsuarioPorMatriculaAsync(string matricula);
 
-        /// <summary>Obtiene todos los usuarios (para el proceso de migración de contraseñas).</summary>
-        /// <returns>Una lista de entidades Usuario.</returns>
-        Task<IEnumerable<Usuario>> ObtenerTodosLosUsuariosAsync();
-
         /// <summary>Actualiza los datos de un usuario (usada para guardar el hash de contraseña).</summary>
         /// <param name="usuario">La entidad Usuario con los datos actualizados que se desea guardar en la base de datos.</param>
         Task ActualizarUsuarioAsync(Usuario usuario);

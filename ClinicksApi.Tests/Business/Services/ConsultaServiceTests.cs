@@ -38,7 +38,7 @@ namespace ClinicksApi.Tests
         }
 
         [Fact]
-        public async Task ObtenerListaConsultas_DeberiaDevolverListaMapeada_CuandoHayConsultas()
+        public async Task ListaConsultas_DeberiaDevolverListaMapeada_CuandoHayConsultas()
         {
             // ARRANGE
             var consultasFake = new List<ConsultaMedica>
@@ -60,7 +60,7 @@ namespace ClinicksApi.Tests
             _consultaRepoMock.Setup(repo => repo.ListaConsultas()).ReturnsAsync(consultasFake);
 
             // ACT
-            var resultado = await _consultaService.ObtenerListaConsultas();
+            var resultado = await _consultaService.ListaConsultas();
 
             // ASSERT
             Assert.NotNull(resultado);
@@ -70,13 +70,13 @@ namespace ClinicksApi.Tests
         }
 
         [Fact]
-        public async Task ObtenerListaConsultas_DeberiaDevolverVacia_CuandoNoHayConsultas()
+        public async Task ListaConsultas_DeberiaDevolverVacia_CuandoNoHayConsultas()
         {
             // ARRANGE
             _consultaRepoMock.Setup(repo => repo.ListaConsultas()).ReturnsAsync(new List<ConsultaMedica>());
 
             // ACT
-            var resultado = await _consultaService.ObtenerListaConsultas();
+            var resultado = await _consultaService.ListaConsultas();
 
             // ASSERT
             Assert.Empty(resultado);

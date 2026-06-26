@@ -80,23 +80,5 @@ namespace ClinicksApi.Business.Services
                 Token = token
             };
         }
-
-        /// <inheritdoc/>
-        public async Task<int> EncriptarClavesExistentesAsync()
-        {
-            var usuarios = await _usuarioRepository.ObtenerTodosLosUsuariosAsync();
-            int count = 0;
-
-            foreach (var usuario in usuarios)
-            {
-                if (!usuario.Password.StartsWith("$2"))
-                {
-                    usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password.Trim());
-                    await _usuarioRepository.ActualizarUsuarioAsync(usuario);
-                    count++;
-                }
-            }
-            return count;
-        }
     }
 }

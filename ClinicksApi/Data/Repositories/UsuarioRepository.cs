@@ -45,12 +45,6 @@ namespace ClinicksApi.Data.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Usuario>> ObtenerTodosLosUsuariosAsync()
-        {
-            return await _context.Usuarios.ToListAsync();
-        }
-
-        /// <inheritdoc/>
         public async Task ActualizarUsuarioAsync(Usuario usuario)
         {
             _context.Usuarios.Update(usuario);

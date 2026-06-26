@@ -14,7 +14,7 @@ namespace ClinicksApi.Business.Interfaces
         /// Obtiene el listado completo de todas las consultas médicas registradas en el sistema.
         /// </summary>
         /// <returns>Una lista de DTOs <see cref="ConsultaHistorialDto"/>.</returns>
-        Task<List<ConsultaHistorialDto>> ObtenerListaConsultas();
+        Task<List<ConsultaHistorialDto>> ListaConsultas();
 
         /// <summary>
         /// Aplica las reglas de negocio, valida los datos y persiste una nueva consulta médica en la base de datos.

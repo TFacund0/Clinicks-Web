@@ -33,7 +33,7 @@ public class PacientesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> ObtenerTodos()
     {
-        var pacientes = await _pacienteService.ObtenerListado();
+        var pacientes = await _pacienteService.ObtenerTodos();
         return Ok(pacientes);
     }
 
