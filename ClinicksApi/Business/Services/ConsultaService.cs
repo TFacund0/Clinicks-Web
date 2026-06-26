@@ -29,7 +29,7 @@ namespace ClinicksApi.Business.Services
         }
 
         /// <inheritdoc/>
-        public async Task<List<ConsultaHistorialDto>> ObtenerListaConsultas()
+        public async Task<List<ConsultaHistorialDto>> ListaConsultas()
         {
             var consultas = await _consultaRepo.ListaConsultas();
             return consultas.Select(c => new ConsultaHistorialDto

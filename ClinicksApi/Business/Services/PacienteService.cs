@@ -31,7 +31,7 @@ namespace ClinicksApi.Business.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<PacienteDto>> ObtenerListado()
+        public async Task<IEnumerable<PacienteDto>> ObtenerTodos()
         {
             var datos = await _repository.ObtenerTodosAsync();
             return datos.Select(MapToDto);

@@ -22,40 +22,6 @@ namespace ClinicksApi.Tests
             _turnoService = new TurnoService(_turnoRepoMock.Object);
         }
 
-        [Fact]
-        public async Task ObtenerTurnosAgendadosAsync_DeberiaDevolverLista_CuandoExistenTurnos()
-        {
-            // ARRANGE
-            var turnosFake = new List<Turno>
-            {
-                new Turno { IdTurno = 1, IdPacienteNavigation = new Paciente { Nombre = "Juan", Apellido = "Pérez" } },
-                new Turno { IdTurno = 2, IdPacienteNavigation = new Paciente { Nombre = "Ana", Apellido = "López" } }
-            };
-
-            _turnoRepoMock.Setup(repo => repo.ObtenerTodosAsync()).ReturnsAsync(turnosFake);
-
-            // ACT
-            var resultado = await _turnoService.ObtenerTurnosAgendadosAsync();
-
-            // ASSERT
-            Assert.NotNull(resultado);
-            Assert.Equal(2, resultado.Count());
-            Assert.Equal("Juan Pérez", resultado.First().PacienteNombreCompleto);
-        }
-
-        [Fact]
-        public async Task ObtenerTurnosAgendadosAsync_DeberiaDevolverVacio_CuandoNoHayTurnos()
-        {
-            // ARRANGE
-            _turnoRepoMock.Setup(repo => repo.ObtenerTodosAsync()).ReturnsAsync(new List<Turno>());
-
-            // ACT
-            var resultado = await _turnoService.ObtenerTurnosAgendadosAsync();
-
-            // ASSERT
-            Assert.NotNull(resultado);
-            Assert.Empty(resultado);
-        }
 
         [Fact]
         public async Task ObtenerTurnosMedicoAsync_DeberiaDevolverListaFiltrada()

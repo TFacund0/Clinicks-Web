@@ -12,7 +12,7 @@ public interface IPacienteService
     /// <summary>
     /// Obtiene el listado completo de pacientes registrados.
     /// </summary>
-    Task<IEnumerable<PacienteDto>> ObtenerListado();
+    Task<IEnumerable<PacienteDto>> ObtenerTodos();
 
     /// <summary>
     /// Busca y obtiene un paciente específico por su ID.
