@@ -166,22 +166,6 @@ const Agenda = () => {
     navigate(`/pacientes/${turno.pacienteId}/historial`);
   };
 
-  // Cambiar el estado del turno directamente desde la agenda (por ejemplo, check-in manual)
-  const cambiarEstadoTurno = (turnoId, nuevoEstado) => {
-    const actualizados = turnos.map(t => {
-      if (t.id === turnoId) {
-        return { ...t, estado: nuevoEstado };
-      }
-      return t;
-    });
-    guardarTurnos(actualizados);
-    
-    // Actualizamos el detalle seleccionado si es el mismo
-    if (turnoSeleccionado && turnoSeleccionado.id === turnoId) {
-      setTurnoSeleccionado(prev => ({ ...prev, estado: nuevoEstado }));
-    }
-  };
-
   // ==========================================
   // ESTILOS DE ESTADOS
   // ==========================================

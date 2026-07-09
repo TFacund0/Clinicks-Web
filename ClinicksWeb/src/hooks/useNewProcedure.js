@@ -15,14 +15,14 @@ export const useNewProcedure = (dniInicial = '', idTurnoInicial = null) => {
         return new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
     };
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState(() => ({
         dnipaciente: dniInicial,
         tipoprocedimiento: '',
         descripcion: '',
         fechaprocedimiento: obtenerFechaHoraLocal(),
         resultado: '',
         idTurno: idTurnoInicial,
-    });
+    }));
     const [errors, setErrors] = useState({});
     const [showSuccess, setShowSuccess] = useState(false);
     const [errorMsg, setErrorMsg] = useState(null);
