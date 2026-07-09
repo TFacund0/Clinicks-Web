@@ -29,6 +29,8 @@
 
 El proyecto ha sido desarrollado bajo un fuerte compromiso con las mejores prácticas de la Ingeniería de Software (Arquitectura N-Tier, Patrones de Diseño, Principios SOLID, SoC y DRY), garantizando así un sistema resiliente, mantenible y preparado para alta escalabilidad.
 
+> **Alcance actual**: la versión actual implementa el flujo completo del rol **Médico** (agenda, atenciones, procedimientos e historial clínico). Los roles administrativos están planificados en el roadmap.
+
 ---
 
 ## Capturas de Pantalla
