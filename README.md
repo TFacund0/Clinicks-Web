@@ -59,28 +59,30 @@ El sistema adopta una **Arquitectura Cliente-Servidor Desacoplada**, separando c
 
 ```mermaid
 flowchart LR
-    subgraph Cliente["🖥️ Frontend — React SPA (Vite)"]
+    subgraph Cliente["Frontend - React SPA (Vite)"]
         direction TB
-        UI["Pages y Components<br/>(Tailwind CSS)"]
-        HOOKS["Custom Hooks<br/>(lógica de UI)"]
-        SVC["Services<br/>(Axios + interceptor JWT)"]
-        UI --> HOOKS --> SVC
+        UI["Pages y Components<br/>Tailwind CSS"]
+        HOOKS["Custom Hooks<br/>lógica de UI"]
+        SVC["Services<br/>Axios + interceptor JWT"]
+        UI --> HOOKS
+        HOOKS --> SVC
     end
 
-    subgraph Servidor["⚙️ Backend — ASP.NET Core Web API (.NET 8)"]
+    subgraph Servidor["Backend - ASP.NET Core Web API (.NET 8)"]
         direction TB
-        CTRL["Controllers<br/>(Endpoints REST + Auth JWT)"]
-        BIZ["Business<br/>(Services, DTOs, State Pattern)"]
-        DATA["Data<br/>(Repositories + EF Core)"]
-        WORK["Workers<br/>(tareas en segundo plano)"]
-        CTRL --> BIZ --> DATA
+        CTRL["Controllers<br/>Endpoints REST + Auth JWT"]
+        BIZ["Business<br/>Services, DTOs, State Pattern"]
+        DATA["Data<br/>Repositories + EF Core"]
+        WORK["Workers<br/>tareas en segundo plano"]
+        CTRL --> BIZ
+        BIZ --> DATA
         WORK --> BIZ
     end
 
-    DB[("🗄️ PostgreSQL")]
+    DB[("PostgreSQL")]
 
-    SVC -- "HTTP / JSON<br/>Bearer Token" --> CTRL
-    DATA -- "SQL" --> DB
+    SVC -->|"HTTP / JSON + Bearer Token"| CTRL
+    DATA -->|"SQL"| DB
 ```
 
 ### Backend (API RESTful)
