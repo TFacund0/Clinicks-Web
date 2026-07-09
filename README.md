@@ -11,6 +11,8 @@
 
 <div align="center">
   
+  [![CI](https://github.com/TFacund0/Clinicks-Web/actions/workflows/ci.yml/badge.svg)](https://github.com/TFacund0/Clinicks-Web/actions/workflows/ci.yml)
+
   [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
   [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
   [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
@@ -29,9 +31,18 @@ El proyecto ha sido desarrollado bajo un fuerte compromiso con las mejores prác
 
 ---
 
+## Capturas de Pantalla
+
+<!-- TODO: agregar capturas reales en docs/img/ y referenciarlas acá. Sugeridas: dashboard, agenda, historial clínico. -->
+<!-- Ejemplo: ![Dashboard](docs/img/dashboard.png) -->
+
+*Próximamente: capturas del dashboard, la agenda médica y el historial clínico.*
+
+---
+
 ## Características Principales
 
-* **Agenda Médica Inteligente**: Calendario interactivo con vistas diarias, semanales y mensuales. Flujo optimizado para reducir la sobrecarga de red con consultas filtradas temporalmente O(1).
+* **Agenda Médica Inteligente**: Calendario interactivo con vistas diarias, semanales y mensuales. Las consultas se filtran por rango de fechas en el servidor para minimizar la transferencia de datos.
 * **Expediente Clínico Electrónico (EHR)**: Línea de tiempo unificada con el historial completo de consultas y procedimientos del paciente.
 * **Búsqueda Dinámica**: Búsqueda delegada al servidor (`.Contains()` en PostgreSQL) con implementación de algoritmo *Debounce* en el frontend para evitar cuellos de botella en la API.
 * **Dashboard Analítico**: Panel principal con métricas reactivas, próximos turnos y atajos para agilizar el flujo de trabajo médico.
@@ -50,7 +61,7 @@ Desarrollado bajo el marco **ASP.NET Core Web API (C#)** utilizando Arquitectura
 - **ORM:** Entity Framework Core (Code-First)
 - **Base de Datos:** PostgreSQL
 - **Patrones:** Repository Pattern, Dependency Injection (DI), State Pattern.
-- **Testing:** xUnit + Moq (Cobertura exhaustiva en la Capa de Negocio).
+- **Testing:** xUnit + Moq (49 pruebas unitarias sobre la Capa de Negocio).
 
 ### Frontend (SPA)
 Interfaz fluida (Single Page Application) enfocada en la experiencia del usuario (UX) médico:
@@ -155,7 +166,7 @@ Asegúrate de contar con el siguiente software instalado:
 
 ## Testing
 
-El proyecto cuenta con una robusta suite de **Pruebas Unitarias** enfocadas en la Capa de Negocio (`Services`) utilizando `xUnit`. 
+El proyecto cuenta con una suite de **49 pruebas unitarias** enfocadas en la Capa de Negocio (`Services`) utilizando `xUnit` y `Moq`, ejecutadas automáticamente en cada push y pull request mediante **GitHub Actions**. 
 
 Para ejecutar los tests, sitúate en el directorio raíz o en `ClinicksApi.Tests` y ejecuta:
 
@@ -171,6 +182,7 @@ dotnet test
 
 ```text
 Clinicks/
+├── .github/workflows/           # CI (GitHub Actions: build, test y lint)
 ├── Clinicks.sln                 # Solución Global de .NET
 ├── ClinicksApi/                 # Proyecto Backend (ASP.NET Core)
 │   ├── Business/                # Capa de Negocio (Interfaces, DTOs, Services, States)
@@ -184,6 +196,8 @@ Clinicks/
 │   │   ├── components/          # Componentes reutilizables
 │   │   ├── pages/               # Vistas principales (Dashboard, Agenda, etc.)
 │   │   └── hooks/               # Custom Hooks de React
+├── docs/                        # Documentación (Manual de Usuario)
+├── LICENSE                      # Licencia MIT
 └── README.md                    # Documentación
 ```
 

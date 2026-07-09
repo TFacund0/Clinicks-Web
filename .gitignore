@@ -19,3 +19,7 @@ ClinicksWeb/node_modules/
 *.suo
 
 **/.env.local
+# Logs de build
+*.log
+build_logs.txt
+warnings*.txt

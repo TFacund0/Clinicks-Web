@@ -13,7 +13,7 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
         return new Date(Date.now() - tzoffset).toISOString().slice(0, 16);
     };
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState(() => ({
         dnipaciente: dniInicial,
         motivo: '',
         fechaconsulta: obtenerFechaHoraLocal(),
@@ -22,7 +22,7 @@ export const useNewConsultation = (dniInicial = '', idTurnoInicial = null) => {
         observaciones: '',
         recomendacion: '',
         idTurno: idTurnoInicial,
-    });
+    }));
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
     const [showSuccess, setShowSuccess] = useState(false);
