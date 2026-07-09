@@ -57,6 +57,32 @@ El proyecto ha sido desarrollado bajo un fuerte compromiso con las mejores prác
 
 El sistema adopta una **Arquitectura Cliente-Servidor Desacoplada**, separando completamente la interfaz de usuario de la capa de acceso a datos y reglas de negocio.
 
+```mermaid
+flowchart LR
+    subgraph Cliente["🖥️ Frontend — React SPA (Vite)"]
+        direction TB
+        UI["Pages y Components<br/>(Tailwind CSS)"]
+        HOOKS["Custom Hooks<br/>(lógica de UI)"]
+        SVC["Services<br/>(Axios + interceptor JWT)"]
+        UI --> HOOKS --> SVC
+    end
+
+    subgraph Servidor["⚙️ Backend — ASP.NET Core Web API (.NET 8)"]
+        direction TB
+        CTRL["Controllers<br/>(Endpoints REST + Auth JWT)"]
+        BIZ["Business<br/>(Services, DTOs, State Pattern)"]
+        DATA["Data<br/>(Repositories + EF Core)"]
+        WORK["Workers<br/>(tareas en segundo plano)"]
+        CTRL --> BIZ --> DATA
+        WORK --> BIZ
+    end
+
+    DB[("🗄️ PostgreSQL")]
+
+    SVC -- "HTTP / JSON<br/>Bearer Token" --> CTRL
+    DATA -- "SQL" --> DB
+```
+
 ### Backend (API RESTful)
 Desarrollado bajo el marco **ASP.NET Core Web API (C#)** utilizando Arquitectura por Capas:
 - **Framework:** .NET 8
