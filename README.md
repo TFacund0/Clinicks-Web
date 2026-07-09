@@ -29,6 +29,8 @@
 
 El proyecto ha sido desarrollado bajo un fuerte compromiso con las mejores prácticas de la Ingeniería de Software (Arquitectura N-Tier, Patrones de Diseño, Principios SOLID, SoC y DRY), garantizando así un sistema resiliente, mantenible y preparado para alta escalabilidad.
 
+> **Alcance actual**: la versión actual implementa el flujo completo del rol **Médico** (agenda, atenciones, procedimientos e historial clínico). Los roles administrativos están planificados en el roadmap.
+
 ---
 
 ## Capturas de Pantalla
@@ -54,6 +56,34 @@ El proyecto ha sido desarrollado bajo un fuerte compromiso con las mejores prác
 ## Arquitectura y Tecnologías
 
 El sistema adopta una **Arquitectura Cliente-Servidor Desacoplada**, separando completamente la interfaz de usuario de la capa de acceso a datos y reglas de negocio.
+
+```mermaid
+flowchart LR
+    subgraph Cliente["Frontend - React SPA (Vite)"]
+        direction TB
+        UI["Pages y Components<br/>Tailwind CSS"]
+        HOOKS["Custom Hooks<br/>lógica de UI"]
+        SVC["Services<br/>Axios + interceptor JWT"]
+        UI --> HOOKS
+        HOOKS --> SVC
+    end
+
+    subgraph Servidor["Backend - ASP.NET Core Web API (.NET 8)"]
+        direction TB
+        CTRL["Controllers<br/>Endpoints REST + Auth JWT"]
+        BIZ["Business<br/>Services, DTOs, State Pattern"]
+        DATA["Data<br/>Repositories + EF Core"]
+        WORK["Workers<br/>tareas en segundo plano"]
+        CTRL --> BIZ
+        BIZ --> DATA
+        WORK --> BIZ
+    end
+
+    DB[("PostgreSQL")]
+
+    SVC -->|"HTTP / JSON + Bearer Token"| CTRL
+    DATA -->|"SQL"| DB
+```
 
 ### Backend (API RESTful)
 Desarrollado bajo el marco **ASP.NET Core Web API (C#)** utilizando Arquitectura por Capas:
