@@ -35,10 +35,31 @@ El proyecto ha sido desarrollado bajo un fuerte compromiso con las mejores prác
 
 ## Capturas de Pantalla
 
-<!-- TODO: agregar capturas reales en docs/img/ y referenciarlas acá. Sugeridas: dashboard, agenda, historial clínico. -->
-<!-- Ejemplo: ![Dashboard](docs/img/dashboard.png) -->
-
-*Próximamente: capturas del dashboard, la agenda médica y el historial clínico.*
+<div align="center">
+  <img src="docs/img/login.png" alt="Inicio de Sesión" width="80%" />
+  <p><em>Inicio de Sesión</em></p>
+  <br />
+  <img src="docs/img/dashboard.png" alt="Dashboard" width="80%" />
+  <p><em>Panel de Control (Dashboard)</em></p>
+  <br />
+  <img src="docs/img/agenda.png" alt="Agenda Médica" width="80%" />
+  <p><em>Agenda Médica</em></p>
+  <br />
+  <img src="docs/img/detalle-turno.png" alt="Detalle de Turno" width="80%" />
+  <p><em>Detalle de Turno</em></p>
+  <br />
+  <img src="docs/img/pacientes.png" alt="Pacientes" width="80%" />
+  <p><em>Búsqueda de Pacientes</em></p>
+  <br />
+  <img src="docs/img/historia-clinica.png" alt="Historia Clínica" width="80%" />
+  <p><em>Historia Clínica Electrónica</em></p>
+  <br />
+  <img src="docs/img/nueva_consulta.png" alt="Nueva Consulta" width="80%" />
+  <p><em>Registro de Nueva Consulta Médica</em></p>
+  <br />
+  <img src="docs/img/nuevo_procedimiento.png" alt="Nuevo Procedimiento" width="80%" />
+  <p><em>Registro de Nuevo Procedimiento</em></p>
+</div>
 
 ---
 
