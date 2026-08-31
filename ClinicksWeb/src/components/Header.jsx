@@ -3,12 +3,13 @@
 // Ahora lo obtiene del AuthContext, que es la única fuente de verdad de la sesión.
 
 import { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronRight, Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 // Se define el componente Header. Recibe una "prop" llamada 'paginaActual'.
 // Si el componente padre (como Dashboard o Patients) no le pasa nada, por defecto dirá "Panel de Control".
-const Header = ({ paginaActual = "Panel de Control" }) => {
+// isDrawerOpen/onToggleDrawer/triggerRef llegan desde PageLayout, que es dueño del estado del drawer móvil.
+const Header = ({ paginaActual = "Panel de Control", isDrawerOpen = false, onToggleDrawer, triggerRef }) => {
   // Aquí guardamos el estado de la hora actual. Lo inicializamos con el momento exacto en que carga el componente.
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -45,19 +46,32 @@ const Header = ({ paginaActual = "Panel de Control" }) => {
 
   // Todo esto es la parte visual (HTML/Tailwind) del Header.
   return (
-    <header className="h-20 border-b border-slate-800 flex items-center justify-between px-8 bg-slate-950">
-      
+    <header className="h-20 border-b border-slate-800 flex items-center justify-between px-4 md:px-6 lg:px-8 bg-slate-950">
+
+      {/* Botón hamburguesa: solo visible debajo de lg, controla el drawer de navegación. */}
+      <button
+        type="button"
+        ref={triggerRef}
+        onClick={onToggleDrawer}
+        aria-label="Abrir menú de navegación"
+        aria-expanded={isDrawerOpen}
+        aria-controls="app-sidebar"
+        className="lg:hidden mr-4 p-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-slate-100 transition-colors"
+      >
+        <Menu size={22} />
+      </button>
+
       {/* Las "Migas de pan" (Breadcrumbs) muestran dónde está el usuario. Aquí uso la prop 'paginaActual' para que el texto cambie dinámicamente. */}
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <span className="text-slate-500">Módulo Médico</span>
-        <ChevronRight size={14} className="text-slate-600" />
-        <span className="text-cyan-500 bg-cyan-500/10 px-3 py-1 rounded-full">
+      <div className="flex items-center gap-2 min-w-0 text-sm font-medium">
+        <span className="text-slate-500 hidden sm:inline">Módulo Médico</span>
+        <ChevronRight size={14} className="text-slate-600 hidden sm:inline shrink-0" />
+        <span className="text-cyan-500 bg-cyan-500/10 px-3 py-1 rounded-full truncate">
           {paginaActual}
         </span>
       </div>
 
-      <div className="flex items-center gap-6">
-        
+      <div className="flex items-center gap-3 sm:gap-6">
+
         {/* Aquí muestro el reloj en tiempo real y la fecha que formateamos arriba. */}
         <div className="text-right hidden md:block text-slate-400 text-sm">
           <div className="flex items-center gap-2 justify-end font-bold text-slate-200">
@@ -67,14 +81,14 @@ const Header = ({ paginaActual = "Panel de Control" }) => {
         </div>
 
         {/* Esta sección muestra el perfil del médico. */}
-        <div className="flex items-center gap-3 border-l border-slate-800 pl-6">
-          
+        <div className="flex items-center gap-3 border-l border-slate-800 pl-3 sm:pl-6">
+
           {/* Un truquito visual: Tomo el nombre del médico (ej. "Alex Carter"), lo separo por espacios y extraigo la primera letra de cada parte para formar un "Avatar" de iniciales (ej. "AC"). */}
-          <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-cyan-500 text-xs font-bold shadow-inner">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-cyan-500 text-xs font-bold shadow-inner shrink-0">
             {iniciales}
           </div>
 
-          <div className="text-sm">
+          <div className="text-sm hidden sm:block">
             <p className="text-slate-200 font-bold">{medicoNombre}</p>
             <p className="text-slate-500 text-[10px] uppercase tracking-wider font-semibold">
               En línea
