@@ -28,6 +28,12 @@ const Patients = () => {
   return (
     <PageLayout title="Pacientes">
 
+            {/* TÍTULO DE SECCIÓN */}
+            <div className="mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">Pacientes</h1>
+              <p className="text-slate-500 mt-1 text-sm sm:text-base">Consulte y busque entre los pacientes atendidos.</p>
+            </div>
+
             {/* BARRA DE BÚSQUEDA */}
             <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 mb-6 flex flex-wrap gap-4 items-center justify-between">
               <div className="flex items-center gap-3 bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 w-full md:w-96">

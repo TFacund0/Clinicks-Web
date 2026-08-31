@@ -35,9 +35,9 @@ const NewProcedure = () => {
         <PageLayout title="Nuevo Procedimiento">
             <div className="max-w-4xl mx-auto">
 
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-white tracking-tight">Nuevo Procedimiento</h1>
-                    <p className="text-slate-500 mt-1">Complete el formulario para registrar el procedimiento médico.</p>
+                <div className="mb-6 sm:mb-8">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">Nuevo Procedimiento</h1>
+                    <p className="text-slate-500 mt-1 text-sm sm:text-base">Complete el formulario para registrar el procedimiento médico.</p>
                 </div>
 
                     <form onSubmit={handleSubmit} className="w-full">
