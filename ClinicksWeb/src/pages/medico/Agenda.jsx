@@ -175,6 +175,7 @@ const Agenda = () => {
           badge: 'bg-slate-800 text-slate-400 border-slate-700/50',
           card: 'border-slate-800 opacity-60 hover:opacity-100 bg-slate-900/30',
           dot: 'bg-slate-600',
+          puntoMes: 'bg-slate-600',
           texto: 'text-slate-500 line-through'
         };
       case ESTADOS_TURNO.CONFIRMADO:
@@ -182,6 +183,7 @@ const Agenda = () => {
           badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
           card: 'border-slate-800 hover:border-emerald-500/40 bg-slate-900/80 shadow-md shadow-emerald-950/5',
           dot: 'bg-emerald-400 animate-pulse',
+          puntoMes: 'bg-emerald-400',
           texto: 'text-slate-200 font-semibold'
         };
       case ESTADOS_TURNO.EN_CURSO:
@@ -189,6 +191,7 @@ const Agenda = () => {
           badge: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30 animate-pulse',
           card: 'border-cyan-500 bg-slate-900 shadow-lg shadow-cyan-950/20 border-l-4 ring-1 ring-cyan-500/20',
           dot: 'bg-cyan-400 ring-4 ring-cyan-500/25 animate-ping',
+          puntoMes: 'bg-cyan-400',
           texto: 'text-white font-bold'
         };
       case ESTADOS_TURNO.CANCELADO:
@@ -196,6 +199,7 @@ const Agenda = () => {
           badge: 'bg-red-500/10 text-red-400 border-red-500/20',
           card: 'border-slate-800 opacity-40 bg-slate-950',
           dot: 'bg-red-500',
+          puntoMes: 'bg-red-500',
           texto: 'text-slate-600 line-through'
         };
       case ESTADOS_TURNO.PENDIENTE:
@@ -204,6 +208,7 @@ const Agenda = () => {
           badge: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
           card: 'border-slate-800 hover:border-amber-500/30 bg-slate-900/50',
           dot: 'bg-amber-400',
+          puntoMes: 'bg-amber-400',
           texto: 'text-slate-300'
         };
     }
@@ -468,14 +473,14 @@ const Agenda = () => {
         {/* Cabecera de días de la semana */}
         <div className="grid grid-cols-7 gap-2 text-center mb-4">
           {nombresDiasSemana.map((d, idx) => (
-            <span key={idx} className="text-[10px] uppercase tracking-widest font-black text-slate-500">
+            <span key={idx} className="text-[10px] uppercase tracking-normal sm:tracking-widest font-black text-slate-500">
               {d.slice(0, 3)}
             </span>
           ))}
         </div>
 
         {/* Cuadrícula de celdas */}
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {celdas.map((celda, idx) => {
             const esHoy = new Date().toDateString() === celda.fecha.toDateString();
             const esSeleccionado = fechaSeleccionada.toDateString() === celda.fecha.toDateString();
@@ -494,7 +499,7 @@ const Agenda = () => {
                   setFechaSeleccionada(celda.fecha);
                   setVistaActual('dia'); // Al hacer clic en un día del mes, bajamos al detalle de ese Día
                 }}
-                className={`min-h-[85px] p-2 rounded-xl border cursor-pointer flex flex-col justify-between transition-all hover:bg-slate-800/30 ${
+                className={`min-h-[60px] sm:min-h-[85px] p-1 sm:p-2 rounded-xl border cursor-pointer flex flex-col justify-between transition-all hover:bg-slate-800/30 ${
                   celda.esMesActual ? 'text-slate-200' : 'text-slate-600 bg-slate-950/20 border-transparent'
                 } ${
                   esHoy 
@@ -514,12 +519,12 @@ const Agenda = () => {
                 {/* Indicadores de turnos en mini burbujas */}
                 <div className="space-y-1">
                   {turnosDelDia.length > 0 && (
-                    <div className="flex flex-col gap-1">
+                    <div className="hidden sm:flex flex-col gap-1">
                       {turnosDelDia.slice(0, 2).map((t, tIdx) => {
                         const estilo = obtenerEstiloEstado(t.estado);
                         return (
-                          <div 
-                            key={tIdx} 
+                          <div
+                            key={tIdx}
                             className={`px-1.5 py-0.2 rounded text-[7px] truncate font-bold border ${estilo.badge}`}
                           >
                             {t.hora} {t.pacienteNombre.split(' ')[0]}
@@ -531,6 +536,22 @@ const Agenda = () => {
                           +{turnosDelDia.length - 2} más
                         </div>
                       )}
+                    </div>
+                  )}
+                  {turnosDelDia.length > 0 && (
+                    <div className="flex sm:hidden flex-wrap justify-center items-center gap-1">
+                      {turnosDelDia.slice(0, 4).map((t, tIdx) => (
+                        <span
+                          key={tIdx}
+                          className={`h-1.5 w-1.5 rounded-full ${obtenerEstiloEstado(t.estado).puntoMes}`}
+                        />
+                      ))}
+                      {turnosDelDia.length > 4 && (
+                        <span className="text-[7px] font-bold text-slate-500 leading-none">
+                          +{turnosDelDia.length - 4}
+                        </span>
+                      )}
+                      <span className="sr-only">{turnosDelDia.length} turnos</span>
                     </div>
                   )}
                 </div>
@@ -749,7 +770,7 @@ const Agenda = () => {
                     <CalendarIcon size={12} className="text-cyan-500" /> Información de la Cita
                   </h4>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="bg-slate-900 border border-slate-850 p-4 rounded-xl">
                       <p className="text-[9px] text-slate-500 uppercase font-black">Fecha</p>
                       <p className="text-sm font-bold text-slate-300 mt-1">

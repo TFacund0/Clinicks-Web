@@ -44,7 +44,8 @@ const Patients = () => {
 
             {/* TABLA DE PACIENTES */}
             <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
-              <table className="w-full text-left">
+              <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] text-left">
                 <thead className="bg-slate-950 text-slate-500 text-xs uppercase tracking-widest font-bold">
                   <tr>
                     <th className="p-5">ID</th>
@@ -118,6 +119,7 @@ const Patients = () => {
                 </tbody>
 
               </table>
+              </div>
             </div>
     </PageLayout>
   );
