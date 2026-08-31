@@ -1,5 +1,4 @@
 import React from 'react';
-import Sidebar from '../../components/Sidebar';
 import { useNewProcedure } from '../../hooks/useNewProcedure';
 import { Calendar, User, AlignLeft, AlertCircle, Save, X, Stethoscope, ClipboardList } from 'lucide-react';
 import PageLayout from '../../components/PageLayout';

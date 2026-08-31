@@ -1,8 +1,7 @@
 // src/pages/medico/Agenda.jsx
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
+import PageLayout from '../../components/PageLayout';
 import { useAgenda } from '../../hooks/useAgenda';
 import { useAuth } from '../../context/AuthContext';
 import { ESTADOS_TURNO } from '../../utils/constants';
@@ -547,21 +546,8 @@ const Agenda = () => {
   // VISTA FINAL DEL COMPONENTE
   // ==========================================
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-200 overflow-hidden font-sans">
-      
-      {/* 1. MENÚ LATERAL */}
-      <Sidebar />
-
-      {/* 2. AREA DE CONTENIDO */}
-      <div className="flex-1 flex flex-col min-w-0">
-        
-        {/* Cabecera Superior */}
-        <Header paginaActual='Agenda Médica'/>
-
-        {/* Zona Scrollable Principal */}
-        <main className="p-8 overflow-y-auto flex-1">
-          
-          <div className="max-w-7xl mx-auto space-y-8">
+    <PageLayout title="Agenda Médica">
+      <div className="max-w-7xl mx-auto space-y-8">
             
             {/* ENCABEZADO DE SECCIÓN CON SALUDO */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-900 pb-6">
@@ -709,8 +695,6 @@ const Agenda = () => {
               )}
             </div>
 
-          </div>
-        </main>
       </div>
 
       {/* ==========================================
@@ -922,7 +906,7 @@ const Agenda = () => {
         </div>
       )}
 
-    </div>
+    </PageLayout>
   );
 };
 
