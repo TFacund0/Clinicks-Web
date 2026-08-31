@@ -50,7 +50,7 @@ const NewConsultation = () => {
                                 Contexto de la Consulta
                             </h3>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs text-slate-500 uppercase mb-2 font-bold">DNI Paciente</label>
                                     <input type="text" name="dnipaciente" value={formData.dnipaciente} disabled className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-400 cursor-not-allowed font-mono" />

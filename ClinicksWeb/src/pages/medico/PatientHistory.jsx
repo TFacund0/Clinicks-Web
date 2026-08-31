@@ -62,7 +62,7 @@ const PatientHistory = () => {
             </div>
         </div>
         
-        <div className="flex gap-12 z-10">
+        <div className="flex flex-wrap gap-6 sm:gap-12 z-10">
             <div>
             <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest mb-1">DNI</p>
             <p className="font-mono text-slate-300 text-lg">{paciente.dni}</p>
@@ -198,7 +198,7 @@ const PatientHistory = () => {
                     </h4>
                   </div>
 
-                  <div className={`grid ${isConsulta ? 'grid-cols-2' : 'grid-cols-1'} gap-4 text-sm bg-slate-950/60 p-5 rounded-2xl border ${isConsulta ? 'border-cyan-500/10' : 'border-purple-500/10'}`}>
+                  <div className={`grid ${isConsulta ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'} gap-4 text-sm bg-slate-950/60 p-5 rounded-2xl border ${isConsulta ? 'border-cyan-500/10' : 'border-purple-500/10'}`}>
                     {isConsulta ? (
                         <>
                             <div>

@@ -51,7 +51,7 @@ const Dashboard = () => {
             
             {/* Botones de acceso rápido para crear consultas o procedimientos */}
             <div className="space-y-8">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <button 
                   onClick={() => navigate('/acceso-consulta')} 
                   className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col items-center gap-4 hover:border-cyan-500/50 transition-all group shadow-sm">
@@ -120,7 +120,8 @@ const Dashboard = () => {
                 </button>
               </div>
               
-              <table className="w-full text-left">
+              <div className="overflow-x-auto">
+              <table className="w-full min-w-[640px] text-left">
                 <thead className="bg-slate-950/50 text-slate-500 text-[10px] uppercase tracking-widest font-black">
                   <tr>
                     <th className="p-4">Paciente</th>
@@ -168,6 +169,7 @@ const Dashboard = () => {
                   )}
                 </tbody>
               </table>
+              </div>
             </div>
 
           </div>
