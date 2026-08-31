@@ -48,20 +48,20 @@ const PatientHistory = () => {
       </button>
 
       {/* CABECERA DEL PACIENTE (Premium Card) */}
-      <div className="bg-linear-to-r from-slate-900 to-slate-950 border border-slate-800/50 rounded-3xl p-8 mb-10 flex flex-wrap gap-8 justify-between items-center shadow-2xl relative overflow-hidden">
+      <div className="bg-linear-to-r from-slate-900 to-slate-950 border border-slate-800/50 rounded-3xl p-5 sm:p-8 mb-6 sm:mb-10 flex flex-wrap gap-6 sm:gap-8 justify-between items-center shadow-2xl relative overflow-hidden">
         {/* Glow de fondo para darle un toque premium */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-        
-        <div className="flex items-center gap-4 z-10">
-            <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-cyan-500 border border-slate-700 shadow-inner">
+
+        <div className="flex items-center gap-4 z-10 min-w-0">
+            <div className="w-16 h-16 shrink-0 bg-slate-800 rounded-2xl flex items-center justify-center text-cyan-500 border border-slate-700 shadow-inner">
                 <User size={32} />
             </div>
-            <div>
+            <div className="min-w-0">
                 <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest mb-1">Paciente</p>
-                <p className="font-bold text-2xl text-white">{paciente.nombreCompleto}</p>
+                <p className="font-bold text-2xl text-white truncate">{paciente.nombreCompleto}</p>
             </div>
         </div>
-        
+
         <div className="flex flex-wrap gap-6 sm:gap-12 z-10">
             <div>
             <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest mb-1">DNI</p>
@@ -87,7 +87,7 @@ const PatientHistory = () => {
       </div>
 
       {/* BARRA DE FILTROS INTELIGENTES */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-8 flex flex-col md:flex-row gap-6 items-center shadow-lg">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 mb-6 sm:mb-8 flex flex-col md:flex-row gap-4 sm:gap-6 items-stretch md:items-center shadow-lg">
         <div className="relative flex-1 w-full group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-500 transition-colors" size={20} />
           <input
@@ -98,12 +98,12 @@ const PatientHistory = () => {
             className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-12 pr-4 text-slate-200 focus:border-cyan-500 outline-none transition-all placeholder:text-slate-600"
           />
         </div>
-        
-        <div className="flex items-center gap-4 border-l border-slate-800 pl-6">
+
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 border-t border-slate-800 pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-6">
           <Filter size={20} className="text-slate-500 hidden md:block" />
           <label className="flex items-center gap-2 cursor-pointer group">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               checked={filtros.mostrarConsultas}
               onChange={(e) => setFiltros({ ...filtros, mostrarConsultas: e.target.checked })}
               className="w-5 h-5 accent-cyan-500 cursor-pointer"
@@ -111,8 +111,8 @@ const PatientHistory = () => {
             <span className="text-slate-300 font-medium group-hover:text-cyan-400 transition-colors">Consultas</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer group">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               checked={filtros.mostrarProcedimientos}
               onChange={(e) => setFiltros({ ...filtros, mostrarProcedimientos: e.target.checked })}
               className="w-5 h-5 accent-purple-500 cursor-pointer"
@@ -160,28 +160,28 @@ const PatientHistory = () => {
                 }`}></div>
                 
                 {/* Timeline Card */}
-                <div className={`bg-slate-900 border rounded-3xl p-6 shadow-xl transition-all duration-300 hover:-translate-y-1 ${
-                    isConsulta 
-                        ? 'border-cyan-500/20 hover:border-cyan-500/50 hover:shadow-cyan-900/20' 
+                <div className={`bg-slate-900 border rounded-3xl p-4 sm:p-6 shadow-xl transition-all duration-300 hover:-translate-y-1 ${
+                    isConsulta
+                        ? 'border-cyan-500/20 hover:border-cyan-500/50 hover:shadow-cyan-900/20'
                         : 'border-purple-500/20 hover:border-purple-500/50 hover:shadow-purple-900/20'
                 }`}>
-                  
+
                   {/* Card Header */}
-                  <div className="flex justify-between items-start mb-6 pb-6 border-b border-slate-800/50">
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-2xl ${isConsulta ? 'bg-cyan-500/10 text-cyan-500' : 'bg-purple-500/10 text-purple-500'}`}>
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4 pb-4 sm:mb-6 sm:pb-6 border-b border-slate-800/50">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className={`shrink-0 p-3 rounded-2xl ${isConsulta ? 'bg-cyan-500/10 text-cyan-500' : 'bg-purple-500/10 text-purple-500'}`}>
                         {isConsulta ? <Stethoscope size={24} /> : <FileText size={24} />}
                       </div>
-                      <div>
-                        <h3 className={`font-black text-xl tracking-tight ${isConsulta ? 'text-cyan-400' : 'text-purple-400'}`}>
+                      <div className="min-w-0">
+                        <h3 className={`font-black text-lg sm:text-xl tracking-tight ${isConsulta ? 'text-cyan-400' : 'text-purple-400'}`}>
                           {isConsulta ? 'Consulta Médica' : 'Procedimiento Médico'}
                         </h3>
-                        <span className="text-slate-500 text-sm font-mono mt-1 block">
+                        <span className="text-slate-500 text-xs sm:text-sm font-mono mt-1 block">
                           {new Date(item.fechaOrden).toLocaleString('es-ES', { dateStyle: 'long', timeStyle: 'short' })}
                         </span>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left sm:text-right">
                       <p className="text-[10px] uppercase font-black tracking-widest text-slate-500 mb-1">
                         {isConsulta ? 'Atendido por' : 'Realizado por'}
                       </p>

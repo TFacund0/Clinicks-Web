@@ -18,20 +18,20 @@ const PatientVerification = ({ destino }) => {
         <PageLayout title="Acceso">
             <div className="max-w-2xl mx-auto">
                 {/* TÍTULO DE SECCIÓN */}
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-white tracking-tight">Gestión de Acceso</h1>
-                    <p className="text-slate-500 mt-1">Valide la identidad del paciente para iniciar la atención médica.</p>
+                <div className="mb-6 sm:mb-8">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">Gestión de Acceso</h1>
+                    <p className="text-slate-500 mt-1 text-sm sm:text-base">Valide la identidad del paciente para iniciar la atención médica.</p>
                 </div>
 
                 {/* CONTENEDOR DE CENTRADO */}
                 <div className="w-full flex justify-center pt-5">
-                    
-                    <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-                        
+
+                    <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+
                         {/* Icono Centralizado */}
                         <div className="flex flex-col items-center mb-2 text-center">
-                            <div className="w-24 h-24 bg-cyan-500/10 rounded-full flex items-center justify-center mb-4 border border-cyan-500/20">
-                                <ClipboardPlus className="text-cyan-500" size={48} />
+                            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-cyan-500/10 rounded-full flex items-center justify-center mb-4 border border-cyan-500/20">
+                                <ClipboardPlus className="text-cyan-500 w-10 h-10 sm:w-12 sm:h-12" />
                             </div>
                         </div>
 

@@ -573,8 +573,8 @@ const Agenda = () => {
             {/* ENCABEZADO DE SECCIÓN CON SALUDO */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-900 pb-6">
               <div>
-                <h1 className="text-4xl font-bold text-white tracking-tight">Mi Agenda</h1>
-                <p className="text-slate-500 mt-1">Organice y gestione sus consultas del día, {medicoNombre}.</p>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">Mi Agenda</h1>
+                <p className="text-slate-500 mt-1 text-sm sm:text-base">Organice y gestione sus consultas del día, {medicoNombre}.</p>
               </div>
               
               {/* Barra de Búsqueda rápida de turnos */}
@@ -647,31 +647,31 @@ const Agenda = () => {
             </div>
 
             {/* TABLERO DE CONTROLES DE LA AGENDA */}
-            <div className="bg-slate-900 p-4 md:p-6 rounded-3xl border border-slate-800 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
-              
+            <div className="bg-slate-900 p-3 sm:p-4 md:p-6 rounded-3xl border border-slate-800 shadow-sm flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 md:gap-4">
+
               {/* Controles de Navegación del Calendario */}
-              <div className="flex items-center gap-3">
-                <button 
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                <button
                   onClick={() => navegarTemporal(-1)}
-                  className="p-3 bg-slate-950 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-slate-200 rounded-xl transition-all shadow-sm active:scale-95"
+                  className="shrink-0 p-2.5 sm:p-3 bg-slate-950 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-slate-200 rounded-xl transition-all shadow-sm active:scale-95"
                 >
                   <ChevronLeft size={16} />
                 </button>
-                
-                <h3 className="text-base md:text-lg font-bold text-white capitalize min-w-[200px] text-center">
+
+                <h3 className="flex-1 min-w-0 sm:min-w-[200px] truncate text-sm sm:text-base md:text-lg font-bold text-white capitalize text-center">
                   {tituloFecha}
                 </h3>
 
-                <button 
+                <button
                   onClick={() => navegarTemporal(1)}
-                  className="p-3 bg-slate-950 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-slate-200 rounded-xl transition-all shadow-sm active:scale-95"
+                  className="shrink-0 p-2.5 sm:p-3 bg-slate-950 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-slate-200 rounded-xl transition-all shadow-sm active:scale-95"
                 >
                   <ChevronRight size={16} />
                 </button>
 
-                <button 
+                <button
                   onClick={irAHoy}
-                  className="px-4 py-3 bg-slate-950 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-slate-200 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95"
+                  className="shrink-0 px-3 py-2.5 sm:px-4 sm:py-3 bg-slate-950 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-slate-200 rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95"
                 >
                   Hoy
                 </button>
@@ -686,7 +686,7 @@ const Agenda = () => {
                       setVistaActual(vista);
                       setTurnoSeleccionado(null);
                     }}
-                    className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
+                    className={`flex-1 md:flex-none px-3 sm:px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all ${
                       vistaActual === vista
                       ? 'bg-cyan-500 text-slate-950 font-black shadow-lg shadow-cyan-500/10'
                       : 'text-slate-500 hover:text-slate-300'
